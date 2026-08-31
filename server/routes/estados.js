@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
+const verificarToken = require("../middlewares/verificarToken");
 
 // GET /api/estados -> Lista todos los estados activos
 router.get("/", async (req, res) => {

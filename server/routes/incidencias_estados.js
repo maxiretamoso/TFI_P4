@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
+const verificarToken = require("../middlewares/verificarToken");
 
 // GET /api/incidencias_estados -> Historial de cambios de estado de las incidencias
 router.get("/", async (req, res) => {
