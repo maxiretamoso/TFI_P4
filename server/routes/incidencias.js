@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const pool = require("../db");
+const verificarToken = require("../middlewares/verificarToken");
 
-// GET /api/incidencias -> Lista todas las incidencias con sus datos relacionados
-router.get("/", async (req, res) => {
+// GET /api/incidencias -> Lista todas las incidencias (requiere estar logueado)
+router.get("/", verificarToken, async (req, res) => {
   try {
     const resultado = await pool.query(`
       SELECT
