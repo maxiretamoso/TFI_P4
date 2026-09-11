@@ -34,6 +34,12 @@ app.get("/", (req, res) => {
 const authRouter = require("./routes/auth");
 app.use("/api", authRouter);
 
+const healthRouter = require("./routes/health");
+app.use("/api/health", healthRouter);
+
+const meRouter = require("./routes/me");
+app.use("/api/me", meRouter);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
