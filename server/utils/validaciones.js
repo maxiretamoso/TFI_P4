@@ -36,7 +36,7 @@ function validarEstado(datos) {
 function validarArticulo(datos) {
   const errores = [];
   if (!Number.isInteger(datos.id_area)) errores.push("id_area debe ser entero");
-  if (!Number.isInteger(datos.categoria)) errores.push("categoria debe ser entero");
+  if (!Number.isInteger(datos.id_categoria)) errores.push("id_categoria debe ser entero");
   if (!esTextoNoVacio(datos.descripcion, 150)) {
     errores.push("descripcion requerida (1-150 caracteres)");
   }
@@ -57,7 +57,7 @@ function validarUsuario(datos) {
 function validarIncidencia(datos) {
   const errores = [];
   if (!Number.isInteger(datos.id_estado)) errores.push("id_estado debe ser entero");
-  if (!Number.isInteger(datos.articulo)) errores.push("articulo debe ser entero");
+  if (!Number.isInteger(datos.id_articulo)) errores.push("id_articulo debe ser entero");
   if (!Number.isInteger(datos.prioridad) || ![1, 2, 3].includes(datos.prioridad)) {
     errores.push("prioridad debe ser 1, 2 o 3");
   }

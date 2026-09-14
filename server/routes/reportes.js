@@ -22,7 +22,7 @@ router.get("/incidencias", verificarToken, verificarRol(3), async (req, res, nex
     const porPrioridad = await pool.query(`SELECT prioridad, COUNT(*)::int AS total FROM incidencias GROUP BY prioridad ORDER BY prioridad`);
     const porArea = await pool.query(`
       SELECT areas.descripcion AS area, COUNT(*)::int AS total
-      FROM incidencias JOIN articulos ON incidencias.articulo=articulos.id_articulo JOIN areas ON articulos.id_area=areas.id_area
+      FROM incidencias JOIN articulos ON incidencias.id_articulo=articulos.id_articulo JOIN areas ON articulos.id_area=areas.id_area
       GROUP BY areas.descripcion`);
 
     res.setHeader("Content-Type", "application/pdf");

@@ -18,10 +18,10 @@ router.get("/", async (req, res, next) => {
     const r = await pool.query(`
       SELECT articulos.id_articulo, articulos.descripcion, articulos.activo,
              areas.descripcion AS area, categorias.descripcion AS categoria,
-             articulos.id_area, articulos.categoria AS id_categoria
+             articulos.id_area, articulos.id_categoria
       FROM articulos
       JOIN areas ON articulos.id_area = areas.id_area
-      JOIN categorias ON articulos.categoria = categorias.id_categoria
+      JOIN categorias ON articulos.id_categoria = categorias.id_categoria
       WHERE articulos.activo=1 ORDER BY articulos.descripcion`);
     res.json(r.rows);
   } catch (e) { next(e); }
@@ -38,13 +38,13 @@ router.get("/:id", async (req, res, next) => {
 
 // Add
 router.post("/", verificarToken, verificarRol(2, 3),
-  [body("id_area").isInt(), body("categoria").isInt(), body("descripcion").isString().trim().isLength({ min: 1, max: 150 })],
+  [body("id_area").isInt(), body("id_categoria").isInt(), body("descripcion").isString().trim().isLength({ min: 1, max: 150 })],
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
-    const { id_area, categoria, descripcion } = req.body;
+    const { id_area, id_categoria, descripcion } = req.body;
     try {
-      const r = await pool.query(`INSERT INTO articulos (id_area, descripcion, categoria, activo) VALUES ($1,$2,$3,1) RETURNING *`, [id_area, descripcion, categoria]);
+      const r = await pool.query(`INSERT INTO articulos (id_area, descripcion, id_categoria, activo) VALUES ($1,$2,$3,1) RETURNING *`, [id_area, descripcion, id_categoria]);
       res.status(201).json(r.rows[0]);
     } catch (e) { next(e); }
   }
@@ -52,7 +52,7 @@ router.post("/", verificarToken, verificarRol(2, 3),
 
 // Edit
 router.put("/:id", verificarToken, verificarRol(2, 3),
-  [body("id_area").optional().isInt(), body("categoria").optional().isInt(), body("descripcion").optional().isString().trim().isLength({ min: 1, max: 150 })],
+  [body("id_area").optional().isInt(), body("id_categoria").optional().isInt(), body("descripcion").optional().isString().trim().isLength({ min: 1, max: 150 })],
   async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
@@ -61,9 +61,9 @@ router.put("/:id", verificarToken, verificarRol(2, 3),
       if (actual.rows.length === 0) return res.status(404).json({ error: "Artículo no encontrado" });
       const a = actual.rows[0];
       const id_area = req.body.id_area ?? a.id_area;
-      const categoria = req.body.categoria ?? a.categoria;
+      const id_categoria = req.body.id_categoria ?? a.id_categoria;
       const descripcion = req.body.descripcion ?? a.descripcion;
-      const r = await pool.query(`UPDATE articulos SET id_area=$1, categoria=$2, descripcion=$3 WHERE id_articulo=$4 RETURNING *`, [id_area, categoria, descripcion, req.params.id]);
+      const r = await pool.query(`UPDATE articulos SET id_area=$1, id_categoria=$2, descripcion=$3 WHERE id_articulo=$4 RETURNING *`, [id_area, id_categoria, descripcion, req.params.id]);
       res.json(r.rows[0]);
     } catch (e) { next(e); }
   }

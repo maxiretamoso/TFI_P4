@@ -23,7 +23,7 @@ const SELECT_BASE = `
     incidencias.creado,
     incidencias.creado_por,
     incidencias.asignado_a,
-    incidencias.articulo,
+    incidencias.id_articulo,
     incidencias.id_estado,
     estados.descripcion AS estado,
     articulos.descripcion AS articulo_descripcion,
@@ -33,7 +33,7 @@ const SELECT_BASE = `
     asignado.apellidos AS asignado_a_apellido
   FROM incidencias
   JOIN estados ON incidencias.id_estado = estados.id_estado
-  JOIN articulos ON incidencias.articulo = articulos.id_articulo
+  JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
   JOIN usuarios AS creador ON incidencias.creado_por = creador.id_usuario
   LEFT JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
 `;
@@ -132,7 +132,7 @@ router.post(
   "/",
   verificarToken,
   [
-    body("articulo").isInt(),
+    body("id_articulo").isInt(),
     body("prioridad").isInt({ min: 1, max: 3 }),
     body("descripcion_pedido").isString().trim().isLength({ min: 1, max: 255 }),
     body("id_estado").optional().isInt(),
@@ -141,16 +141,16 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    const { articulo, prioridad, descripcion_pedido, descripcion_resolucion } = req.body;
+    const { id_articulo, prioridad, descripcion_pedido, descripcion_resolucion } = req.body;
     // id_estado por defecto PENDIENTE = 1
     const id_estado = req.body.id_estado || 1;
     const creado_por = req.usuario.id_usuario;
 
     try {
       const r = await pool.query(
-        `INSERT INTO incidencias (id_estado, creado_por, asignado_a, creado, prioridad, articulo, descripcion_pedido, descripcion_resolucion)
+        `INSERT INTO incidencias (id_estado, creado_por, asignado_a, creado, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion)
          VALUES ($1,$2,NULL, now(), $3,$4,$5,$6) RETURNING *`,
-        [id_estado, creado_por, prioridad, articulo, descripcion_pedido, descripcion_resolucion || null]
+        [id_estado, creado_por, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion || null]
       );
       const inc = r.rows[0];
       // historial
