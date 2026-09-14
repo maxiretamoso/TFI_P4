@@ -31,7 +31,7 @@ router.get("/", verificarToken, verificarRol(3), async (req, res, next) => {
     const prioritarias = await pool.query(`
       SELECT incidencias.*, estados.descripcion AS estado, articulos.descripcion AS articulo_desc
       FROM incidencias JOIN estados ON incidencias.id_estado=estados.id_estado
-      JOIN articulos ON incidencias.articulo=articulos.id_articulo
+      JOIN articulos ON incidencias.id_articulo=articulos.id_articulo
       WHERE prioridad=3 ORDER BY creado DESC LIMIT 20`);
     const total = await pool.query(`SELECT COUNT(*)::int AS total FROM incidencias`);
     res.json({ total: total.rows[0].total, porEstado: porEstado.rows, porFecha: porFecha.rows, prioritarias: prioritarias.rows });

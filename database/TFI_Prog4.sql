@@ -27,7 +27,7 @@ CREATE TABLE articulos (
     id_articulo integer NOT NULL,
     id_area integer NOT NULL,
     descripcion varchar(150) NOT NULL,
-    categoria integer NOT NULL,
+    id_categoria integer NOT NULL,
     activo smallint NOT NULL DEFAULT 1
 );
 
@@ -39,7 +39,7 @@ ALTER TABLE articulos
 
 ALTER TABLE articulos
     ADD CONSTRAINT fk_articulos_categorias
-    FOREIGN KEY (categoria) REFERENCES categorias(id_categoria);
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria);
 -----
 CREATE TABLE usuarios (
     id_usuario integer NOT NULL,
@@ -66,7 +66,7 @@ CREATE TABLE incidencias (
 	asignado_a integer,
 	creado timestamp with time zone NOT NULL,
 	prioridad integer NOT NULL,
-	articulo integer NOT NULL,
+	id_articulo integer NOT NULL,
 	descripcion_pedido varchar(255) NOT NULL,
 	descripcion_resolucion varchar(255)
 );
@@ -83,7 +83,7 @@ ALTER TABLE incidencias
 
 ALTER TABLE incidencias
     ADD CONSTRAINT fk_incidencias_articulos
-    FOREIGN KEY (articulo) REFERENCES articulos(id_articulo);
+    FOREIGN KEY (id_articulo) REFERENCES articulos(id_articulo);
 
 ALTER TABLE incidencias
     ADD CONSTRAINT fk_incidencias_estados
@@ -147,7 +147,7 @@ INSERT INTO estados (descripcion, activo) VALUES
 -----
 SELECT * FROM areas;
 SELECT * FROM categorias;
-INSERT INTO articulos (id_area, descripcion, categoria, activo) VALUES
+INSERT INTO articulos (id_area, descripcion, id_categoria, activo) VALUES
 (2, 'PC Escritorio - Obras Públicas 01', 1, 1),
 (3, 'Notebook - RRHH 03', 1, 1),
 (4, 'Impresora Multifunción - Hacienda', 1, 1),
@@ -160,7 +160,7 @@ INSERT INTO usuarios (id_area, nombres, apellidos, usuario, contrasenia, avatar,
 (1, 'Marina', 'López', 'mlopez', encode(digest('Usuario.2', 'sha256'), 'hex'), NULL, 2, 1),
 (1, 'Romina', 'Aguirre', 'raguirre', encode(digest('Usuario.3', 'sha256'), 'hex'), NULL, 3, 1);
 -----
-INSERT INTO incidencias (id_estado, creado_por, asignado_a, creado, prioridad, articulo, descripcion_pedido, descripcion_resolucion) VALUES
+INSERT INTO incidencias (id_estado, creado_por, asignado_a, creado, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion) VALUES
 (1, 1, NULL, now(), 2, 1, 'La PC no enciende, se cortó la luz mientras estaba prendida.', NULL),
 (2, 1, 2, now(), 3, 3, 'La impresora no responde y tira error de papel atascado.', NULL),
 (3, 1, 2, now(), 1, 2, 'La notebook no conecta al WiFi de la oficina.', 'Se reinstaló el driver de red y se probó la conexión.');
