@@ -12,6 +12,17 @@ const { body, validationResult } = require("express-validator");
  *   description: BREAD de categorías
  */
 
+/**
+ * @swagger
+ * /api/v1/categorias:
+ *   get:
+ *     summary: Listar categorías activas
+ *     tags: [Categorias]
+ *   post:
+ *     summary: Crear categoría (rol 2/3)
+ *     tags: [Categorias]
+ *     security: [{ bearerAuth: [] }]
+ */
 // GET /api/v1/categorias -> lista activas (Browse)
 router.get("/", async (req, res, next) => {
   try {
@@ -20,6 +31,21 @@ router.get("/", async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+/**
+ * @swagger
+ * /api/v1/categorias/{id}:
+ *   get:
+ *     summary: Obtener categoría
+ *     tags: [Categorias]
+ *   put:
+ *     summary: Editar categoría (rol 2/3)
+ *     tags: [Categorias]
+ *     security: [{ bearerAuth: [] }]
+ *   delete:
+ *     summary: Soft delete categoría
+ *     tags: [Categorias]
+ *     security: [{ bearerAuth: [] }]
+ */
 // GET /:id -> Read
 router.get("/:id", async (req, res, next) => {
   try {

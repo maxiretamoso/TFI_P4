@@ -12,6 +12,18 @@ const { body, validationResult } = require("express-validator");
  *   description: BREAD de artículos
  */
 
+/**
+ * @swagger
+ * /api/v1/articulos:
+ *   get:
+ *     summary: Listar artículos activos
+ *     tags: [Articulos]
+ *     responses: { 200: { description: Lista } }
+ *   post:
+ *     summary: Crear artículo (rol 2/3)
+ *     tags: [Articulos]
+ *     security: [{ bearerAuth: [] }]
+ */
 // Browse
 router.get("/", async (req, res, next) => {
   try {
@@ -27,6 +39,21 @@ router.get("/", async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
+/**
+ * @swagger
+ * /api/v1/articulos/{id}:
+ *   get:
+ *     summary: Obtener artículo por id
+ *     tags: [Articulos]
+ *   put:
+ *     summary: Editar artículo (rol 2/3)
+ *     tags: [Articulos]
+ *     security: [{ bearerAuth: [] }]
+ *   delete:
+ *     summary: Soft delete artículo (activo=0)
+ *     tags: [Articulos]
+ *     security: [{ bearerAuth: [] }]
+ */
 // Read
 router.get("/:id", async (req, res, next) => {
   try {

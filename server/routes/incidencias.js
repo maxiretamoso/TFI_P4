@@ -160,6 +160,24 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/v1/incidencias/{id}/cancelar:
+ *   patch:
+ *     summary: Cancelar incidencia pendiente (municipal propia o director cualquiera)
+ *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ * /api/v1/incidencias/{id}/finalizar:
+ *   patch:
+ *     summary: Finalizar incidencia (rol 2/3, requiere descripcion_resolucion, envía email)
+ *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ * /api/v1/incidencias/{id}/asignar:
+ *   patch:
+ *     summary: Asignar incidencia a empleado sistemas (solo director)
+ *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ */
 // PATCH /:id/cancelar
 router.patch("/:id/cancelar", verificarToken, async (req, res, next) => {
   try {
