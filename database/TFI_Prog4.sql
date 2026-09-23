@@ -253,3 +253,6 @@ ALTER TABLE ONLY public.usuarios ADD CONSTRAINT usuarios_pkey PRIMARY KEY (id_us
 -- Constraint adicional: nombre de usuario único
 --
 ALTER TABLE ONLY public.usuarios ADD CONSTRAINT usuarios_usuario_key UNIQUE (usuario);
+
+-- Activar extensión para encriptación de contraseñas (pgcrypto) para el login en supabase
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
