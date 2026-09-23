@@ -80,22 +80,44 @@ router.get("/", verificarToken, async (req, res, next) => {
 // Sub-rutas explícitas (opcional, más prolijo para frontend, pero no reemplaza el filtrado automático)
 router.get("/mias", verificarToken, async (req, res, next) => {
   try {
-    const r = await pool.query(`${SELECT_BASE} WHERE incidencias.creado_por=$1 ORDER BY creado DESC`, [req.usuario.id_usuario]);
+    const r = await pool.query(
+      `${SELECT_BASE} WHERE incidencias.creado_por=$1 ORDER BY creado DESC`,
+      [req.usuario.id_usuario],
+    );
     res.json(r.rows);
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 });
-router.get("/asignadas", verificarToken, verificarRol(2, 3), async (req, res, next) => {
-  try {
-    const r = await pool.query(`${SELECT_BASE} WHERE incidencias.asignado_a=$1 ORDER BY creado DESC`, [req.usuario.id_usuario]);
-    res.json(r.rows);
-  } catch (e) { next(e); }
-});
-router.get("/todas", verificarToken, verificarRol(3), async (req, res, next) => {
-  try {
-    const r = await pool.query(`${SELECT_BASE} ORDER BY creado DESC`);
-    res.json(r.rows);
-  } catch (e) { next(e); }
-});
+router.get(
+  "/asignadas",
+  verificarToken,
+  verificarRol(2, 3),
+  async (req, res, next) => {
+    try {
+      const r = await pool.query(
+        `${SELECT_BASE} WHERE incidencias.asignado_a=$1 ORDER BY creado DESC`,
+        [req.usuario.id_usuario],
+      );
+      res.json(r.rows);
+    } catch (e) {
+      next(e);
+    }
+  },
+);
+router.get(
+  "/todas",
+  verificarToken,
+  verificarRol(3),
+  async (req, res, next) => {
+    try {
+      const r = await pool.query(`${SELECT_BASE} ORDER BY creado DESC`);
+      res.json(r.rows);
+    } catch (e) {
+      next(e);
+    }
+  },
+);
 
 /**
  * @swagger
@@ -106,19 +128,28 @@ router.get("/todas", verificarToken, verificarRol(3), async (req, res, next) => 
  */
 router.get("/:id", verificarToken, async (req, res, next) => {
   try {
-    const r = await pool.query(`${SELECT_BASE} WHERE incidencias.id_incidencia=$1`, [req.params.id]);
-    if (r.rows.length === 0) return res.status(404).json({ error: "Incidencia no encontrada" });
+    const r = await pool.query(
+      `${SELECT_BASE} WHERE incidencias.id_incidencia=$1`,
+      [req.params.id],
+    );
+    if (r.rows.length === 0)
+      return res.status(404).json({ error: "Incidencia no encontrada" });
     // Control de acceso: municipal solo ve las suyas, sistemas solo asignadas, director ve todo
     const inc = r.rows[0];
     const { rol, id_usuario } = req.usuario;
-    if (rol === 1 && inc.creado_por !== id_usuario) return res.status(403).json({ error: "No autorizado" });
+    if (rol === 1 && inc.creado_por !== id_usuario)
+      return res.status(403).json({ error: "No autorizado" });
     if (rol === 2 && inc.asignado_a !== id_usuario && rol !== 3) {
       // empleado sistemas que no es el asignado no puede ver (director sí)
       // permitir si aún no asignada y es sistemas? decidimos denegar si no es suya
-      return res.status(403).json({ error: "No autorizado: no está asignada a vos" });
+      return res
+        .status(403)
+        .json({ error: "No autorizado: no está asignada a vos" });
     }
     res.json(inc);
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 });
 
 /**
@@ -139,25 +170,47 @@ router.post(
   ],
   async (req, res, next) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
-    const { id_articulo, prioridad, descripcion_pedido, descripcion_resolucion } = req.body;
+    const {
+      id_articulo,
+      prioridad,
+      descripcion_pedido,
+      descripcion_resolucion,
+    } = req.body;
     // id_estado por defecto PENDIENTE = 1
     const id_estado = req.body.id_estado || 1;
     const creado_por = req.usuario.id_usuario;
+    // La tabla exige asignado_a NOT NULL: se autoasigna temporalmente al creador
+    // hasta que el Director la reasigne a un empleado de Sistemas real.
+    const asignado_a = creado_por;
 
     try {
       const r = await pool.query(
         `INSERT INTO incidencias (id_estado, creado_por, asignado_a, creado, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion)
-         VALUES ($1,$2,NULL, now(), $3,$4,$5,$6) RETURNING *`,
-        [id_estado, creado_por, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion || null]
+         VALUES ($1,$2,$3, now(), $4,$5,$6,$7) RETURNING *`,
+        [
+          id_estado,
+          creado_por,
+          asignado_a,
+          prioridad,
+          id_articulo,
+          descripcion_pedido,
+          descripcion_resolucion || null,
+        ],
       );
       const inc = r.rows[0];
       // historial
-      await pool.query(`INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,$2, now())`, [inc.id_incidencia, id_estado]);
+      await pool.query(
+        `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,$2, now())`,
+        [inc.id_incidencia, id_estado],
+      );
       res.status(201).json(inc);
-    } catch (e) { next(e); }
-  }
+    } catch (e) {
+      next(e);
+    }
+  },
 );
 
 /**
@@ -182,26 +235,51 @@ router.post(
 router.patch("/:id/cancelar", verificarToken, async (req, res, next) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const q = await pool.query(`SELECT * FROM incidencias WHERE id_incidencia=$1`, [id]);
-    if (q.rows.length === 0) return res.status(404).json({ error: "Incidencia no encontrada" });
+    const q = await pool.query(
+      `SELECT * FROM incidencias WHERE id_incidencia=$1`,
+      [id],
+    );
+    if (q.rows.length === 0)
+      return res.status(404).json({ error: "Incidencia no encontrada" });
     const inc = q.rows[0];
     const { rol, id_usuario } = req.usuario;
 
     // Solo si está pendiente (1)
-    if (inc.id_estado !== 1) return res.status(400).json({ error: "Solo se pueden cancelar incidencias PENDIENTES" });
+    if (inc.id_estado !== 1)
+      return res
+        .status(400)
+        .json({ error: "Solo se pueden cancelar incidencias PENDIENTES" });
 
     // Permisos: municipal solo propias, director cualquiera pendiente, sistemas NO puede cancelar
-    if (rol === 1 && inc.creado_por !== id_usuario) return res.status(403).json({ error: "Solo podés cancelar tus propias incidencias" });
-    if (rol === 2) return res.status(403).json({ error: "Empleado de sistemas no puede cancelar incidencias" });
-    if (rol !== 1 && rol !== 3) return res.status(403).json({ error: "Rol no autorizado para cancelar" });
+    if (rol === 1 && inc.creado_por !== id_usuario)
+      return res
+        .status(403)
+        .json({ error: "Solo podés cancelar tus propias incidencias" });
+    if (rol === 2)
+      return res
+        .status(403)
+        .json({ error: "Empleado de sistemas no puede cancelar incidencias" });
+    if (rol !== 1 && rol !== 3)
+      return res.status(403).json({ error: "Rol no autorizado para cancelar" });
 
-    const upd = await pool.query(`UPDATE incidencias SET id_estado=4 WHERE id_incidencia=$1 RETURNING *`, [id]);
-    await pool.query(`INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,4, now())`, [id]);
+    const upd = await pool.query(
+      `UPDATE incidencias SET id_estado=4 WHERE id_incidencia=$1 RETURNING *`,
+      [id],
+    );
+    await pool.query(
+      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,4, now())`,
+      [id],
+    );
 
     // email al creador
     try {
-      const creador = await pool.query(`SELECT usuario, nombres, apellidos FROM usuarios WHERE id_usuario=$1`, [inc.creado_por]);
-      const to = creador.rows[0] ? `${creador.rows[0].usuario}@example.com` : null;
+      const creador = await pool.query(
+        `SELECT usuario, nombres, apellidos FROM usuarios WHERE id_usuario=$1`,
+        [inc.creado_por],
+      );
+      const to = creador.rows[0]
+        ? `${creador.rows[0].usuario}@example.com`
+        : null;
       // Si existe columna email real, usarla; por ahora usuario como placeholder o env var
       const dest = process.env.MAIL_TO_TEST || to;
       if (dest) {
@@ -209,7 +287,7 @@ router.patch("/:id/cancelar", verificarToken, async (req, res, next) => {
           to: dest,
           subject: `Incidencia #${id} cancelada`,
           text: `Tu incidencia #${id} fue cancelada.`,
-          html: `<p>Tu incidencia <b>#${id}</b> fue cancelada por ${rol === 3 ? 'el Director' : 'vos'}.</p><p>${inc.descripcion_pedido}</p>`,
+          html: `<p>Tu incidencia <b>#${id}</b> fue cancelada por ${rol === 3 ? "el Director" : "vos"}.</p><p>${inc.descripcion_pedido}</p>`,
         });
       }
     } catch (mailErr) {
@@ -217,7 +295,9 @@ router.patch("/:id/cancelar", verificarToken, async (req, res, next) => {
     }
 
     res.json(upd.rows[0]);
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 });
 
 // PATCH /:id/finalizar - solo empleado sistemas (2) o director (3) si quiere finalizar? enunciado dice empleado sistemas finaliza
@@ -225,35 +305,63 @@ router.patch(
   "/:id/finalizar",
   verificarToken,
   verificarRol(2, 3),
-  [body("descripcion_resolucion").isString().trim().isLength({ min: 1, max: 255 })],
+  [
+    body("descripcion_resolucion")
+      .isString()
+      .trim()
+      .isLength({ min: 1, max: 255 }),
+  ],
   async (req, res, next) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
     try {
       const id = parseInt(req.params.id, 10);
-      const q = await pool.query(`SELECT * FROM incidencias WHERE id_incidencia=$1`, [id]);
-      if (q.rows.length === 0) return res.status(404).json({ error: "Incidencia no encontrada" });
+      const q = await pool.query(
+        `SELECT * FROM incidencias WHERE id_incidencia=$1`,
+        [id],
+      );
+      if (q.rows.length === 0)
+        return res.status(404).json({ error: "Incidencia no encontrada" });
       const inc = q.rows[0];
 
       // Solo puede finalizar si está ASIGNADA (2) o PENDIENTE? Según flujo debería ser ASIGNADA, pero permitimos PENDIENTE asignada previamente
-      if (inc.id_estado === 3) return res.status(400).json({ error: "La incidencia ya está FINALIZADA" });
-      if (inc.id_estado === 4) return res.status(400).json({ error: "La incidencia está CANCELADA, no se puede finalizar" });
+      if (inc.id_estado === 3)
+        return res
+          .status(400)
+          .json({ error: "La incidencia ya está FINALIZADA" });
+      if (inc.id_estado === 4)
+        return res
+          .status(400)
+          .json({
+            error: "La incidencia está CANCELADA, no se puede finalizar",
+          });
 
       // Si es empleado sistemas, debe estar asignada a él
       if (req.usuario.rol === 2 && inc.asignado_a !== req.usuario.id_usuario) {
-        return res.status(403).json({ error: "Solo podés finalizar incidencias asignadas a vos" });
+        return res
+          .status(403)
+          .json({ error: "Solo podés finalizar incidencias asignadas a vos" });
       }
 
       const upd = await pool.query(
         `UPDATE incidencias SET id_estado=3, descripcion_resolucion=$1 WHERE id_incidencia=$2 RETURNING *`,
-        [req.body.descripcion_resolucion, id]
+        [req.body.descripcion_resolucion, id],
       );
-      await pool.query(`INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,3, now())`, [id]);
+      await pool.query(
+        `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,3, now())`,
+        [id],
+      );
 
       try {
-        const creador = await pool.query(`SELECT usuario FROM usuarios WHERE id_usuario=$1`, [inc.creado_por]);
-        const dest = process.env.MAIL_TO_TEST || (creador.rows[0] ? `${creador.rows[0].usuario}@example.com` : null);
+        const creador = await pool.query(
+          `SELECT usuario FROM usuarios WHERE id_usuario=$1`,
+          [inc.creado_por],
+        );
+        const dest =
+          process.env.MAIL_TO_TEST ||
+          (creador.rows[0] ? `${creador.rows[0].usuario}@example.com` : null);
         if (dest) {
           await enviarMail({
             to: dest,
@@ -267,8 +375,10 @@ router.patch(
       }
 
       res.json(upd.rows[0]);
-    } catch (e) { next(e); }
-  }
+    } catch (e) {
+      next(e);
+    }
+  },
 );
 
 // PATCH /:id/asignar - solo director
@@ -279,29 +389,58 @@ router.patch(
   [body("asignado_a").isInt()],
   async (req, res, next) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
     try {
       const id = parseInt(req.params.id, 10);
       const { asignado_a } = req.body;
 
       // Validar que asignado_a sea empleado sistemas (rol 2) activo
-      const u = await pool.query(`SELECT id_usuario, rol, activo FROM usuarios WHERE id_usuario=$1`, [asignado_a]);
-      if (u.rows.length === 0) return res.status(404).json({ error: "Usuario a asignar no encontrado" });
-      if (u.rows[0].rol !== 2) return res.status(400).json({ error: "Solo se puede asignar a un empleado de sistemas (rol 2)" });
-      if (u.rows[0].activo !== 1) return res.status(400).json({ error: "Usuario inactivo" });
+      const u = await pool.query(
+        `SELECT id_usuario, rol, activo FROM usuarios WHERE id_usuario=$1`,
+        [asignado_a],
+      );
+      if (u.rows.length === 0)
+        return res
+          .status(404)
+          .json({ error: "Usuario a asignar no encontrado" });
+      if (u.rows[0].rol !== 2)
+        return res
+          .status(400)
+          .json({
+            error: "Solo se puede asignar a un empleado de sistemas (rol 2)",
+          });
+      if (u.rows[0].activo !== 1)
+        return res.status(400).json({ error: "Usuario inactivo" });
 
-      const q = await pool.query(`SELECT * FROM incidencias WHERE id_incidencia=$1`, [id]);
-      if (q.rows.length === 0) return res.status(404).json({ error: "Incidencia no encontrada" });
+      const q = await pool.query(
+        `SELECT * FROM incidencias WHERE id_incidencia=$1`,
+        [id],
+      );
+      if (q.rows.length === 0)
+        return res.status(404).json({ error: "Incidencia no encontrada" });
       if (q.rows[0].id_estado === 3 || q.rows[0].id_estado === 4) {
-        return res.status(400).json({ error: "No se puede asignar una incidencia finalizada o cancelada" });
+        return res
+          .status(400)
+          .json({
+            error: "No se puede asignar una incidencia finalizada o cancelada",
+          });
       }
 
-      const upd = await pool.query(`UPDATE incidencias SET asignado_a=$1, id_estado=2 WHERE id_incidencia=$2 RETURNING *`, [asignado_a, id]);
-      await pool.query(`INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,2, now())`, [id]);
+      const upd = await pool.query(
+        `UPDATE incidencias SET asignado_a=$1, id_estado=2 WHERE id_incidencia=$2 RETURNING *`,
+        [asignado_a, id],
+      );
+      await pool.query(
+        `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,2, now())`,
+        [id],
+      );
       res.json(upd.rows[0]);
-    } catch (e) { next(e); }
-  }
+    } catch (e) {
+      next(e);
+    }
+  },
 );
 
 module.exports = router;
