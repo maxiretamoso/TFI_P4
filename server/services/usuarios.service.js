@@ -36,6 +36,16 @@ async function actualizarUsuario(id, datos, solicitante) {
   const cur = await pool.query(`SELECT * FROM usuarios WHERE id_usuario=$1`, [id]);
   if (cur.rows.length === 0) return null;
   const u = cur.rows[0];
+
+  if (solicitante.rol !== 3) {                      
+    const cambiaRol = datos.rol !== undefined && datos.rol !== u.rol;   
+    const cambiaArea = datos.id_area !== undefined && datos.id_area !== u.id_area; 
+
+    if (cambiaRol || cambiaArea) {
+      throw crearError(403, "Solo el Director puede cambiar el rol o el área");
+    }
+  }
+
   let hash = u.contrasenia;
   if (datos.contrasenia) hash = await bcrypt.hash(datos.contrasenia, 10);
   const r = await pool.query(
