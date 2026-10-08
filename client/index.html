@@ -8,10 +8,48 @@
 
 <body>
 
-    <h1>Sistema de Incidencias</h1>
-    <p>Municipalidad de Concordia</p>
+    <div class="container-princ">
 
-    <script type="module" src="/src/main.js"></script>
+        <div class="titulo-container">
+            <h1>Sistema de Incidencias</h1>
+            <p>Municipalidad de Concordia</p>
+        </div>
+
+        <div class="categorias-container">
+                        <h2>Categorías</h2>
+
+            <form id="form-categoria">
+                <label for="nombre-categoria">Nombre:</label>
+
+                <input
+                    type="text"
+                    id="nombre-categoria"
+                    placeholder="Ingrese una categoría"
+                >
+
+                <button type="submit">Agregar</button>
+            </form>
+
+            <h2>Listado de categorías</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabla-categorias">
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+    
+        <script type="module" src="/src/main.js"></script>
     
 </body>
 
