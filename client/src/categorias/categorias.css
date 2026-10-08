@@ -1,5 +1,7 @@
 .categorias-container {
-    width: 70%;
+    width: fit-content;
+    min-width: 500px;
+    max-width: 90%;
     margin: 20px auto 0 auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -8,4 +10,52 @@
 
 .categorias-container h2 {
     margin-top: 0;
+}
+
+.categorias-container thead {
+    background-color: #8BC756;
+    color: white;
+}
+
+.categorias-container th {
+    padding: 14px;
+    text-align: left;
+    border: none;
+}
+
+.categorias-container td {
+    border: none;
+    border-bottom: 1px solid #ddd;
+    padding: 14px;
+}
+
+.categorias-container td button {
+    margin-right: 10px;
+}
+
+.boton-editar {
+    background-color: #e8f3dc;
+    color: #3d7025;
+    border: none;
+    border-radius: 5px;
+}
+
+.boton-eliminar {
+    background-color: #fce8e8;
+    color: #b42323;
+    border: none;
+    border-radius: 5px;
+}
+
+.boton-agregar {
+    background-color: #8BC756;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.categorias-container input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
