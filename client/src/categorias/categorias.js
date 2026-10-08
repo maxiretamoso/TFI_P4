@@ -1,5 +1,4 @@
 const formularioCategoria = document.getElementById('form-categoria');
-console.log(formularioCategoria);
 const nombreCategoria = document.getElementById('nombre-categoria');
 const tablaCategorias = document.getElementById('tabla-categorias');
 
@@ -44,5 +43,4 @@ formularioCategoria.addEventListener('submit', (evento) => {
     evento.preventDefault();
 
     const descripcion = nombreCategoria.value;
-    console.log(descripcion);
 });
