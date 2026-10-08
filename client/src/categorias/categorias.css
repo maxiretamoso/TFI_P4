@@ -1,0 +1,11 @@
+.categorias-container {
+    width: 70%;
+    margin: 20px auto 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.categorias-container h2 {
+    margin-top: 0;
+}
