@@ -49,10 +49,7 @@ formularioCategoria.addEventListener('submit', (evento) => {
 });
 
 const respuestaCategoria = await fetch('http://localhost:3000/api/v1/categorias/1');
-
 const categoria = await respuestaCategoria.json();
-
-console.log(categoria);
 
 botonBuscarCategoria.addEventListener('click', async () => {
     const id = idBuscarCategoria.value;
