@@ -1,0 +1,25 @@
+/* Lo específico de Artículos: los selects y el formulario con varios campos.
+   El resto (tarjeta, tabla, botones, inputs) viene del CSS original de Paz. */
+
+.form-articulo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-articulo label {
+    font-weight: bold;
+}
+
+.form-articulo select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.mensaje-error {
+    color: #b00020;
+    margin: 8px 0;
+}

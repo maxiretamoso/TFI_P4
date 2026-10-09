@@ -1,51 +1,88 @@
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  Outlet,
+  NavLink,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext.jsx";
 import Login from "./pantallas/Login.jsx";
-import Categorias from "./pantallas/Categorias.jsx";
+import MisIncidencias from "./pantallas/MisIncidencias.jsx";
+import MisAsignadas from "./pantallas/MisAsignadas.jsx";
+import Catalogos from "./pantallas/Catalogos.jsx";
+import Dashboard from "./pantallas/Dashboard.jsx";
+import Usuarios from "./pantallas/Usuarios.jsx";
+import Reportes from "./pantallas/Reportes.jsx";
 import logo from "./img/logo-muni.png";
+import "./App.css";
 
-// Pantalla principal cuando hay sesión (B04 agrega acá las categorías)
-function Principal() {
+// Sin sesión no entra ninguna ruta protegida: redirige al login
+function Protegida() {
+  const { usuario } = useAuth();
+  if (!usuario) return <Navigate to="/login" replace />;
+  return <Outlet />;
+}
+
+// Barra de menú + saludo + salir. El contenido va en el Outlet
+function ConMenu() {
   const { usuario, cerrarSesion } = useAuth();
 
   return (
-    <section className="principal-container">
-      <p>
-        Hola, {usuario.nombres} {usuario.apellidos} (rol {usuario.rol})
-      </p>
-      <button type="button" onClick={cerrarSesion}>
-        Salir
-      </button>
+    <>
+      <nav className="menu-principal">
+        <NavLink to="/">Mis incidencias</NavLink>
+        {usuario.rol >= 2 && <NavLink to="/asignadas">Mis asignadas</NavLink>}
+        <NavLink to="/catalogos">Catálogos</NavLink>
+        <NavLink to="/usuarios">Usuarios</NavLink>
+        {usuario.rol >= 3 && <NavLink to="/dashboard">Dashboard</NavLink>}
+        {usuario.rol >= 3 && <NavLink to="/reportes">Reportes</NavLink>}
 
-      <Categorias />
-    </section>
-  );
-}
+        <span className="menu-saludo">
+          Hola, {usuario.nombres} {usuario.apellidos} (rol {usuario.rol})
+        </span>
+        <button type="button" onClick={cerrarSesion}>
+          Salir
+        </button>
+      </nav>
 
-// Decide qué se ve: sin sesión -> Login, con sesión -> Principal
-function Pantallas() {
-  const { usuario } = useAuth();
-
-  return (
-    <div className="container-princ">
-      <div className="titulo-container">
-        <img
-          className="logo-municipalidad"
-          src={logo}
-          alt="Logo Municipalidad de Concordia"
-        />
-        <h1>Sistema de Incidencias</h1>
-      </div>
-
-      {!usuario && <Login />}
-      {usuario && <Principal />}
-    </div>
+      <Outlet />
+    </>
   );
 }
 
 export default function App() {
   return (
     <AuthProvider>
-      <Pantallas />
+      <BrowserRouter>
+        <div className="container-princ">
+          <div className="titulo-container">
+            <img
+              className="logo-municipalidad"
+              src={logo}
+              alt="Logo Municipalidad de Concordia"
+            />
+            <h1>Sistema de Incidencias</h1>
+          </div>
+
+          <Routes>
+            <Route path="/login" element={<Login />} />
+
+            <Route element={<Protegida />}>
+              <Route element={<ConMenu />}>
+                <Route path="/" element={<MisIncidencias />} />
+                <Route path="/asignadas" element={<MisAsignadas />} />
+                <Route path="/catalogos" element={<Catalogos />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/usuarios" element={<Usuarios />} />
+                <Route path="/reportes" element={<Reportes />} />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
     </AuthProvider>
   );
 }

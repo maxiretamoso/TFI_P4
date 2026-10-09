@@ -1,0 +1,144 @@
+.dashboard {
+    max-width: 1100px;
+    margin: 20px auto 0 auto;
+}
+
+.dashboard h2 {
+    margin-top: 0;
+}
+
+.dashboard-cargando,
+.dashboard-vacio {
+    color: #777;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* Fila de tarjetas KPI: número grande + etiqueta debajo */
+.kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.kpi {
+    flex: 1;
+    min-width: 140px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+
+.kpi-numero {
+    display: block;
+    font-size: 32px;
+    font-weight: bold;
+    color: #3d7025;
+}
+
+.kpi-etiqueta {
+    color: #555;
+}
+
+.tarjeta-dashboard {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Barras horizontales: el color de siempre, ancho calculado en el JSX */
+.barra-fila {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.barra-etiqueta {
+    min-width: 90px;
+    color: #333;
+}
+
+.barra-contenedor {
+    flex: 1;
+}
+
+.barra {
+    height: 18px;
+    background-color: #8BC756;
+    border-radius: 4px;
+}
+
+.barra-valor {
+    font-weight: bold;
+    min-width: 20px;
+    text-align: right;
+}
+
+/* Tabla de prioritarias: mismo lenguaje visual que el resto del sistema */
+.tarjeta-dashboard table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tarjeta-dashboard thead {
+    background-color: #8BC756;
+    color: white;
+}
+
+.tarjeta-dashboard th {
+    padding: 12px;
+    text-align: left;
+}
+
+.tarjeta-dashboard td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.celda-pedido-larga {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Badges de estado (mismos colores que en las tablas de incidencias) */
+.estado {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.estado-1 {
+    background-color: #fff1e0;
+    color: #b45309;
+}
+
+.estado-2 {
+    background-color: #e0edff;
+    color: #1d4ed8;
+}
+
+.estado-3 {
+    background-color: #e8f3dc;
+    color: #3d7025;
+}
+
+.estado-4 {
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+.mensaje-error {
+    color: #b00020;
+}

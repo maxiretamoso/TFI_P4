@@ -1,0 +1,7 @@
+/* Lo mínimo: el mensaje de error compartido por los catálogos.
+   El resto (tarjeta, tabla, botones, inputs) viene del CSS original de Paz. */
+
+.mensaje-error {
+    color: #b00020;
+    margin: 8px 0;
+}

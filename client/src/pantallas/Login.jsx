@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../api/cliente.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import "./Login.css";
 
 function Login() {
   const { iniciarSesion } = useAuth();
+  const navegar = useNavigate();
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [error, setError] = useState("");
@@ -23,6 +25,8 @@ function Login() {
     try {
       const datos = await api.post("/auth/login", { usuario, contrasenia });
       iniciarSesion(datos);
+      // replace: que el login no quede en el historial (atrás no vuelve al form)
+      navegar("/", { replace: true });
     } catch (e) {
       setError(e.message);
     }

@@ -1,0 +1,34 @@
+.tarjeta-reporte {
+    max-width: 700px;
+    margin: 20px auto 0 auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.tarjeta-reporte h2 {
+    margin-top: 0;
+}
+
+.tarjeta-reporte p {
+    color: #555;
+}
+
+.boton-descargar {
+    background-color: #8BC756;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 16px;
+    font-size: 15px;
+}
+
+.boton-descargar:disabled {
+    background-color: #b5d995;
+    cursor: wait;
+}
+
+.mensaje-error {
+    color: #b00020;
+}

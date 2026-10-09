@@ -1,0 +1,21 @@
+/* Lo específico de esta pantalla: el formulario de alta.
+   El resto (tabla, badges, acciones inline) vive en incidencias.css compartido. */
+
+.form-alta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-alta label {
+    font-weight: bold;
+}
+
+.form-alta input,
+.form-alta select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}

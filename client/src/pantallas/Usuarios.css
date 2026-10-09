@@ -1,0 +1,26 @@
+/* Lo específico de Usuarios: el formulario con varios campos.
+   La tarjeta, la tabla y los botones vienen del CSS original de Paz. */
+
+.form-usuario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.form-usuario label {
+    font-weight: bold;
+}
+
+.form-usuario input,
+.form-usuario select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.mensaje-error {
+    color: #b00020;
+    margin: 8px 0;
+}

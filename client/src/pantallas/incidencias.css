@@ -1,0 +1,108 @@
+/* Estilos compartidos por las pantallas de incidencias (Mis incidencias y Mis asignadas) */
+
+.tarjeta-lista {
+    max-width: 1100px;
+    margin: 20px auto 0 auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+}
+
+.tarjeta-lista table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tarjeta-lista thead {
+    background-color: #8BC756;
+    color: white;
+}
+
+.tarjeta-lista th {
+    padding: 12px;
+    text-align: left;
+}
+
+.tarjeta-lista td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.celda-pedido {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.celda-acciones button {
+    margin-right: 6px;
+    margin-bottom: 4px;
+}
+
+.boton-asignar {
+    background-color: #e0edff;
+    color: #1d4ed8;
+    border: none;
+    border-radius: 5px;
+}
+
+.estado {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.estado-1 {
+    background-color: #fff1e0;
+    color: #b45309;
+}
+
+.estado-2 {
+    background-color: #e0edff;
+    color: #1d4ed8;
+}
+
+.estado-3 {
+    background-color: #e8f3dc;
+    color: #3d7025;
+}
+
+.estado-4 {
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+.fila-accion {
+    background-color: #fafafa;
+}
+
+.accion-inline {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.accion-inline label {
+    font-weight: bold;
+}
+
+.accion-inline input,
+.accion-inline select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.mensaje-error {
+    color: #b00020;
+    margin: 8px 0;
+}
