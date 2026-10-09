@@ -1,6 +1,9 @@
 const formularioCategoria = document.getElementById('form-categoria');
 const nombreCategoria = document.getElementById('nombre-categoria');
 const tablaCategorias = document.getElementById('tabla-categorias');
+const idBuscarCategoria = document.getElementById('id-buscar-categoria');
+const botonBuscarCategoria = document.getElementById('boton-buscar-categoria');
+const resultadoBusqueda = document.getElementById('resultado-busqueda');
 
 const respuesta = await fetch('http://localhost:3000/api/v1/categorias');
 
@@ -43,4 +46,30 @@ formularioCategoria.addEventListener('submit', (evento) => {
     evento.preventDefault();
 
     const descripcion = nombreCategoria.value;
+});
+
+const respuestaCategoria = await fetch('http://localhost:3000/api/v1/categorias/1');
+
+const categoria = await respuestaCategoria.json();
+
+console.log(categoria);
+
+botonBuscarCategoria.addEventListener('click', async () => {
+    const id = idBuscarCategoria.value;
+
+    if (id === '') {
+    resultadoBusqueda.textContent = 'Ingresá un ID para buscar.';
+    return;
+    }
+
+    const respuesta = await fetch(`http://localhost:3000/api/v1/categorias/${id}`);
+
+    if (!respuesta.ok) {
+    resultadoBusqueda.textContent = 'No se encontró la categoría.';
+    return;
+    }
+
+    const categoria = await respuesta.json();
+
+    resultadoBusqueda.textContent = `Categoría encontrada: ${categoria.descripcion}`;
 });
