@@ -58,7 +58,7 @@ async function register(datos, solicitante) {
     const r = await pool.query(
       `INSERT INTO usuarios (id_area, nombres, apellidos, usuario, contrasenia, avatar, rol, activo)
        VALUES ($1,$2,$3,$4,$5,$6,$7,1) RETURNING id_usuario, usuario, rol`,
-      [id_area, nombres, apellidos, usuario, hash, avatar || null, rol]
+      [id_area, nombres, apellidos, usuario, hash, avatar || '', rol]
     );
     return r.rows[0];
   } catch (e) {
