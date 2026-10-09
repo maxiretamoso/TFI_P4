@@ -6,7 +6,7 @@ const { body } = require("express-validator");
 const usuariosController = require("../controllers/usuarios.controller");
 const { uploadAvatar } = require("../utils/avatarUpload");
 
-// Browse (requiere auth: expone nómina de usuarios, ver NOTAS_CORRECCION.md punto 2)
+// Browse (requiere auth: expone nómina de usuarios)
 router.get("/", verificarToken, usuariosController.listar);
 
 router.get("/:id", verificarToken, usuariosController.obtenerPorId);
