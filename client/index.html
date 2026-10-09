@@ -8,59 +8,9 @@
 
 <body>
 
-    <div class="container-princ">
+    <div id="root"></div>
 
-        <div class="titulo-container">
-            
-            <img class="logo-municipalidad" src="./src/img/logo-muni.png" alt="Logo Municipalidad de Concordia">
-            <h1>Sistema de Incidencias</h1>
+    <script type="module" src="/src/main.jsx"></script>
 
-        </div>
-
-        <div class="categorias-container">
-            
-            <h2>Categorías</h2>
-
-            <form id="form-categoria">
-                <label for="nombre-categoria">Nombre:</label>
-
-                <input
-                    type="text"
-                    id="nombre-categoria"
-                    placeholder="Ingrese una categoría"
-                >
-
-                <button type="submit" class="boton-agregar">Agregar</button>
-            </form>
-
-            <div class="buscador-categoria">
-                <label for="id-buscar-categoria">ID de categoría:</label>
-                <p id="resultado-busqueda"></p>
-                <input type="number" id="id-buscar-categoria" min="1">
-                <button type="button" id="boton-buscar-categoria">Buscar</button>
-            </div>
-
-            <h2>Listado de categorías</h2>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Categoría</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody id="tabla-categorias">
-                </tbody>
-            </table>
-
-        </div>
-
-    </div>
-    
-        <script type="module" src="/src/main.js"></script>
-    
 </body>
-
 </html>
