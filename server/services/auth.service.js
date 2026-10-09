@@ -30,8 +30,14 @@ async function login(usuario, contrasenia) {
     const legacy = await pool.query(`SELECT encode(digest($1,'sha256'),'hex') AS h`, [contrasenia]);
     if (legacy.rows[0].h === hash) {
       ok = true;
-      const nuevoHash = await bcrypt.hash(contrasenia, 10);
-      await pool.query(`UPDATE usuarios SET contrasenia=$1 WHERE id_usuario=$2`, [nuevoHash, u.id_usuario]);
+      // Migración best-effort: la contraseña YA es correcta, si el UPDATE
+      // falla el login no debe fallar (se reintentará en el próximo login)
+      try {
+        const nuevoHash = await bcrypt.hash(contrasenia, 10);
+        await pool.query(`UPDATE usuarios SET contrasenia=$1 WHERE id_usuario=$2`, [nuevoHash, u.id_usuario]);
+      } catch (migErr) {
+        console.error("No se pudo migrar el hash a bcrypt:", migErr.message);
+      }
     }
   }
 

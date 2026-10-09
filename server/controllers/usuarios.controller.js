@@ -12,9 +12,18 @@ function borrarArchivoSeguro(filePath) {
   }
 }
 
-// Solo borra avatares dentro de uploads/avatars (evita path traversal).
-function esAvatarGestionado(relPath) {
-  return typeof relPath === "string" && relPath.startsWith("uploads/avatars/");
+// Carpeta física de avatares: el único lugar permitido para borrar.
+const AVATAR_DIR = path.resolve(__dirname, "..", "uploads", "avatars");
+
+// Borra el avatar anterior solo si, tras resolver la ruta, queda DENTRO de
+// uploads/avatars. basename() descarta cualquier "../" del nombre guardado,
+// así un valor malicioso no puede escaparse de la carpeta (path traversal).
+function borrarAvatarSeguro(relPath) {
+  if (!relPath || typeof relPath !== "string") return;
+  const destino = path.resolve(AVATAR_DIR, path.basename(relPath));
+  if (destino.startsWith(AVATAR_DIR + path.sep) && fs.existsSync(destino)) {
+    borrarArchivoSeguro(destino);
+  }
 }
 
 async function listar(req, res, next) {
@@ -73,9 +82,7 @@ async function subirAvatar(req, res, next) {
       borrarArchivoSeguro(req.file.path);
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
-    if (previo.avatar && previo.avatar !== relPath && esAvatarGestionado(previo.avatar)) {
-      borrarArchivoSeguro(path.join(__dirname, "..", previo.avatar));
-    }
+    if (previo.avatar && previo.avatar !== relPath) borrarAvatarSeguro(previo.avatar);
     res.json(usuario);
   } catch (e) {
     if (req.file) borrarArchivoSeguro(req.file.path);

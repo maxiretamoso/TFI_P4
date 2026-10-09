@@ -10,11 +10,13 @@ async function verificarSalud(req, res) {
       database: "conectada",
     });
   } catch (error) {
+    // El detalle se queda solo en el servidor: error.message de Postgres
+    // puede filtrar datos sensibles y /health no tiene autenticación.
+    // 503 (Service Unavailable) además es el código correcto, no 500.
     console.error(error);
-    res.status(500).json({
+    res.status(503).json({
       status: "error",
       database: "desconectada",
-      error: error.message,
     });
   }
 }

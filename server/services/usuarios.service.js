@@ -22,11 +22,17 @@ async function obtenerUsuarioPorId(id) {
 async function crearUsuario(datos) {
   const { id_area, nombres, apellidos, usuario, contrasenia, rol, avatar } = datos;
   const hash = await bcrypt.hash(contrasenia, 10);
-  const r = await pool.query(
-    `INSERT INTO usuarios (id_area, nombres, apellidos, usuario, contrasenia, avatar, rol, activo) VALUES ($1,$2,$3,$4,$5,$6,$7,1) RETURNING id_usuario, usuario, rol`,
-    [id_area, nombres, apellidos, usuario, hash, avatar || '', rol]
-  );
-  return r.rows[0];
+  try {
+    const r = await pool.query(
+      `INSERT INTO usuarios (id_area, nombres, apellidos, usuario, contrasenia, avatar, rol, activo) VALUES ($1,$2,$3,$4,$5,$6,$7,1) RETURNING id_usuario, usuario, rol`,
+      [id_area, nombres, apellidos, usuario, hash, avatar || '', rol]
+    );
+    return r.rows[0];
+  } catch (e) {
+    // 23505 = clave duplicada (UNIQUE de usuario): conflicto, no error de servidor
+    if (e.code === "23505") throw crearError(409, "Usuario ya existe");
+    throw e;
+  }
 }
 
 async function actualizarUsuario(id, datos, solicitante) {
