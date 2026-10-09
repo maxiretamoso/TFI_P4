@@ -1,90 +1,173 @@
-TFI Programación IV – Sistema de Registro de Incidencias (UNER)
+# Sistema de Registro de Incidencias
 
-Backend REST en Node.js + Express + PostgreSQL (Supabase), con autenticación JWT, roles de usuario, generación de reportes en PDF, envío de email y documentación Swagger.
+Trabajo Práctico Integrador — Programación IV · UNER · Facultad de Ciencias de la Administración · Licenciatura en Sistemas · 2026
 
-Facultad de Ciencias de la Administración – UNER Programación IV – 2do Cuatrimestre 2026 – Licenciatura en Sistemas
+## Sobre el proyecto
 
-Instalación desde cero
-bash
+Sistema para que un municipio registre, asigne, resuelva y reporte incidencias: un empleado municipal informa un problema, el Director lo asigna a un responsable de Sistemas, quien lo finaliza con una descripción de la solución — y cada paso queda guardado en un historial. Expone una API REST documentada con Swagger, genera reportes en PDF, envía notificaciones por email y controla el acceso con tres roles de usuario sobre tokens JWT.
+
+## Características
+
+- Tres roles con permisos distintos (Municipal, Empleado de Sistemas y Director); el filtrado de incidencias ocurre en el servidor, no en la interfaz.
+- Flujo completo de incidencias: Pendiente → En proceso → Resuelta / Cancelada, con historial de cada cambio.
+- Autenticación JWT con tokens de 8 horas y contraseñas con bcrypt.
+- Reportes en PDF con totales por estado, fecha e incidencias prioritarias.
+- Notificación por email al finalizar o cancelar (si no hay correo configurado, se simula en consola sin romper nada).
+- Documentación Swagger interactiva de todos los endpoints.
+- Soft delete en todas las tablas (columna `activo`): nunca se borran datos físicamente.
+- API versionada bajo `/api/v1/...`, con compatibilidad para `/api/...`.
+
+## Stack
+
+| Área | Tecnología |
+|---|---|
+| Runtime | Node.js |
+| Framework | Express 5 |
+| Base de datos | PostgreSQL en Supabase (Pool con SSL) |
+| Autenticación | JSON Web Token + bcrypt |
+| Reportes | pdfkit |
+| Email | nodemailer (con fallback a consola) |
+| Documentación | Swagger (swagger-jsdoc + swagger-ui-express) |
+| Frontend | Vite (React en construcción) |
+
+## Puesta en marcha
+
+### Requisitos
+
+- Node.js 20 o superior
+- Una base PostgreSQL (el equipo usa Supabase)
+
+### 1) Instalación
+
+```bash
 git clone https://github.com/maxiretamoso/TFI_P4.git
 cd TFI_P4/server
 npm install
-Variables de entorno
+```
 
-El archivo real server/.env no se sube al repo (está en .gitignore). Usá server/.env.example como plantilla:
+### 2) Variables de entorno
 
-bash
-cp server/.env.example server/.env
+```bash
+cp .env.example .env
+# completar server/.env con tus datos
+```
 
-# editar server/.env
+El archivo real `.env` nunca se sube al repo (lo bloquea `.gitignore`). La plantilla [`server/.env.example`](server/.env.example) explica variable por variable. Las credenciales de Supabase y el `JWT_SECRET` se comparten por privado dentro del equipo, nunca por GitHub.
 
-Variables necesarias:
+### 3) Base de datos
 
-DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME → conexión a Supabase
-PORT → puerto local del servidor (por defecto 3000)
-JWT_SECRET → clave propia para firmar los tokens (no es de Supabase, la define cada uno igual para todo el equipo)
-MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASS, MAIL_FROM, MAIL_TO_TEST → si quedan vacías, el email se simula en consola y no rompe nada
-Base de datos
+El script completo de la cátedra (estructura y datos de prueba) está en [`database/TFI_Prog4.sql`](database/TFI_Prog4.sql). En el proyecto de Supabase compartido ya está cargado: si usás esa base, solo necesitás completar tu `.env`.
 
-La base está alojada en Supabase (PostgreSQL en la nube, compartida por todo el equipo) — no hace falta instalar PostgreSQL local ni correr ningún script a mano.
+Para cargarlo en una base nueva:
 
-El script real, provisto por la cátedra, está guardado en database/TFI_Prog4.sql como referencia (ya fue cargado una sola vez en el proyecto de Supabase compartido).
+1. Supabase → SQL Editor
+2. Ejecutar primero: `CREATE EXTENSION IF NOT EXISTS pgcrypto;` (necesaria para las contraseñas)
+3. Correr el script `TFI_Prog4.sql` completo
 
-Para conectarte:
+### 4) Usuarios de prueba
 
-Pedile a Máximo el host, usuario y contraseña de Supabase (por privado, nunca por GitHub)
-Completá tu server/.env con esos datos
-Listo — ya estás conectado a la misma base que el resto del equipo
-Usuarios de prueba (seed del profesor)
+La contraseña de cada usuario son las 3 primeras letras del nombre más las 3 del apellido, en minúscula:
 
-La contraseña de cada usuario son las 3 primeras letras del nombre + las 3 primeras del apellido, en minúscula:
+| Usuario (login) | Contraseña | Rol |
+|---|---|---|
+| `pamalm@correo.com` | `pamalm` | Empleado Municipal (1) |
+| `carper@correo.com` | `carper` | Empleado de Sistemas (2) |
+| `cargom@correo.com` | `cargom` | Empleado de Sistemas (2) |
+| `estren@correo.com` | `estren` | Director (3) |
 
-Usuario Contraseña Rol
-carper@correo.com carper Empleado de Sistemas (2)
-cargom@correo.com cargom Empleado de Sistemas (2)
-pamalm@correo.com pamalm Empleado Municipal (1)
-estren@correo.com estren Director (3)
+Las contraseñas del seed vienen en SHA-256 (formato original de la cátedra): en el primer login se migran solas a bcrypt, no hay que hacer nada.
 
-Las contraseñas se migran automáticamente de SHA-256 (formato original del profesor) a bcrypt en el primer login de cada usuario — no requiere ninguna acción manual.
+### 5) Levantar el servidor
 
-Levantar el proyecto
-bash
-cd server
-npm start # producción: node index.js
-npm run dev # desarrollo con --watch (reinicia solo al guardar)
+```bash
+npm run dev    # desarrollo: reinicia solo al guardar
+npm start      # producción
 
-# Servidor en http://localhost:3000 (o el PORT que pusiste en .env)
+# Servidor: http://localhost:3000
+# Swagger:  http://localhost:3000/api-docs
+```
 
-# Docs Swagger en http://localhost:3000/api-docs
+## Roles y permisos
 
-Documentación de la API
-Swagger UI: http://localhost:3000/api-docs
-Swagger JSON: http://localhost:3000/api-docs.json
-Versionado: todas las rutas viven bajo /api/v1/... (se mantiene compatibilidad con /api/... sin versión)
-Roles y permisos
-Empleado Municipal (rol 1): listar artículos; POST /incidencias (crear); GET /incidencias (solo las propias, por creado_por); PATCH /incidencias/:id/cancelar (solo si está PENDIENTE y es propia).
-Empleado de Sistemas (rol 2): GET /incidencias (solo las que tiene asignado_a); PATCH /incidencias/:id/finalizar (requiere descripcion_resolucion); BREAD de categorías/artículos (con soft delete vía activo).
-Director (rol 3): ve todas las incidencias; PATCH /incidencias/:id/asignar; PATCH .../cancelar de cualquier incidencia PENDIENTE; GET /dashboard y GET /reportes/incidencias (PDF); BREAD completo y gestión de usuarios.
-Endpoints principales
-POST /api/v1/auth/login — devuelve JWT con id_usuario y rol
-GET /api/v1/incidencias — filtrado automático según el rol logueado
-PATCH /api/v1/incidencias/:id/cancelar · /finalizar · /asignar
-GET /api/v1/dashboard — totales por estado, por fecha, incidencias prioritarias
-GET /api/v1/reportes/incidencias — reporte en PDF
-BREAD de categorias, articulos, areas, estados, usuarios (soft delete con activo = 0)
-POST /api/v1/usuarios/:id/avatar — carga de imagen (máx. 2MB) vía Multer
-Flujo end-to-end verificado
+| Rol | Qué puede hacer |
+|---|---|
+| Empleado Municipal (1) | Crear incidencias; ver solo las suyas; cancelarlas mientras estén pendientes |
+| Empleado de Sistemas (2) | Ver las incidencias asignadas; finalizarlas con descripción de la solución; gestionar categorías y artículos |
+| Director (3) | Ver todas las incidencias; asignarlas; dashboard y reportes en PDF; gestionar usuarios |
 
-Login → crear incidencia → asignar (Director) → finalizar (Sistemas) → cancelar (Municipal o Director) → ver dashboard / generar PDF → todo documentado en Swagger. El email se envía automáticamente al creador de la incidencia al finalizarla o cancelarla (si MAIL\_\* no está configurado, se simula en consola sin romper nada).
+## API
 
-Arquitectura del backend
-server/
-├── db/ → conexión a PostgreSQL (Supabase), con SSL habilitado
-├── routes/ → un archivo por entidad, define los endpoints REST
-├── middlewares/ → verificarToken (JWT) y verificarRol (permisos por rol)
-├── utils/ → envío de email y validaciones reutilizables
-└── index.js → arma el servidor y conecta todas las rutas
-Notas técnicas importantes
-La tabla incidencias.asignado_a es NOT NULL en el script del profesor. Al crear una incidencia nueva, se autoasigna temporalmente al mismo usuario que la creó, hasta que el Director la reasigne a un empleado de Sistemas real mediante PATCH /incidencias/:id/asignar.
-La conexión a Supabase requiere SSL (ssl: { rejectUnauthorized: false } en db/index.js) — sin eso, la conexión falla aunque las credenciales sean correctas.
-La extensión pgcrypto debe estar activa en la base (Supabase → SQL Editor → CREATE EXTENSION IF NOT EXISTS pgcrypto;), necesaria para la migración de contraseñas legacy.
+Documentación interactiva: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+Todas las rutas viven bajo `/api/v1/...` (versión pedida por la consigna) y responden también bajo `/api/...` sin versión, por compatibilidad.
+
+### Endpoints principales
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/v1/auth/login` | Devuelve un JWT |
+| POST | `/api/v1/auth/register` | Alta de usuario (solo Director) |
+| GET | `/api/v1/me` | Datos del usuario logueado |
+| GET | `/api/v1/incidencias` | Lista filtrada automáticamente por rol |
+| POST | `/api/v1/incidencias` | Crear una incidencia |
+| PATCH | `/api/v1/incidencias/:id/asignar` | Asignar a un empleado (Director) |
+| PATCH | `/api/v1/incidencias/:id/finalizar` | Marcar como resuelta (Sistemas) |
+| PATCH | `/api/v1/incidencias/:id/cancelar` | Cancelar (Municipal o Director) |
+| GET | `/api/v1/dashboard` | Totales por estado, fecha y prioridades |
+| GET | `/api/v1/reportes/incidencias` | Reporte general en PDF |
+| GET | `/api/v1/health` | Estado del servidor y de la base |
+| POST | `/api/v1/usuarios/:id/avatar` | Subir avatar (máx. 2 MB, Multer) |
+
+Además hay BREAD completo de áreas, artículos, categorías, estados y usuarios.
+
+### Ejemplo rápido
+
+```bash
+# 1) Loguearse (como Director)
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"usuario":"estren@correo.com","password":"estren"}'
+
+# 2) Usar el token devuelto en el resto de las requests
+curl http://localhost:3000/api/v1/incidencias \
+  -H "Authorization: Bearer PEGAR_TOKEN_ACA"
+```
+
+## Estructura del proyecto
+
+```
+TFI_P4/
+├── client/                # frontend (Vite) en construcción
+├── database/
+│   └── TFI_Prog4.sql      # script de la base: estructura, datos y claves foráneas
+├── server/
+│   ├── controllers/       # reciben req/res y delegan en los services
+│   ├── services/          # lógica de negocio y acceso a la base
+│   ├── routes/            # un archivo por entidad: los endpoints REST
+│   ├── middlewares/       # verificarToken (JWT) y verificarRol
+│   ├── db/                # conexión a PostgreSQL (Pool con SSL)
+│   ├── dtos/              # forma de los datos que viajan
+│   ├── utils/             # email, validaciones, transacciones y errores HTTP
+│   ├── uploads/           # avatares subidos
+│   ├── index.js           # arma el servidor y monta todas las rutas
+│   ├── .env.example       # plantilla de variables de entorno
+│   └── package.json
+├── README.md
+└── .gitignore
+```
+
+## Notas técnicas
+
+- `incidencias.asignado_a` es NOT NULL en el script de la cátedra: al crear una incidencia se autoasigna a quien la creó, hasta que el Director la reasigna a un empleado de Sistemas.
+- La conexión a Supabase requiere SSL (`ssl: { rejectUnauthorized: false }` en `db/index.js`): sin eso falla aunque las credenciales sean correctas.
+- La extensión `pgcrypto` es la que verifica las contraseñas viejas (SHA-256) y las migra a bcrypt en el primer login.
+- El estado 3 figura como "Resuela" en la base de la cátedra: se mantiene tal cual el original.
+- El email sin configurar no rompe nada: se simula en consola con todos los datos del mensaje.
+
+## Integrantes del proyecto
+
+- Retamoso Máximo
+- Francia Maira
+- Gonzalez Paz
+
+Programación IV — UNER, 2026.
