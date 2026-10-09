@@ -1,8 +1,8 @@
 const pool = require("../db");
 const { crearError } = require("../utils/httpError");
 const { enviarMail } = require("../utils/email");
+const { conTransaccion } = require("../utils/transaccion");
 
-// Base select with joins (movido desde routes/incidencias.js sin cambios)
 const SELECT_BASE = `
   SELECT
     incidencias.id_incidencia,
@@ -71,46 +71,66 @@ async function listarTodas() {
 }
 
 async function obtenerPorId(id, { rol, id_usuario }) {
-  const r = await pool.query(`${SELECT_BASE} WHERE incidencias.id_incidencia=$1`, [id]);
+  const r = await pool.query(
+    `${SELECT_BASE} WHERE incidencias.id_incidencia=$1`,
+    [id],
+  );
   if (r.rows.length === 0) throw crearError(404, "Incidencia no encontrada");
-  // Control de acceso: municipal solo ve las suyas, sistemas solo asignadas, director ve todo
   const inc = r.rows[0];
   if (rol === 1 && inc.creado_por !== id_usuario)
     throw crearError(403, "No autorizado");
   if (rol === 2 && inc.asignado_a !== id_usuario && rol !== 3) {
-    // empleado sistemas que no es el asignado no puede ver (director sí)
-    // permitir si aún no asignada y es sistemas? decidimos denegar si no es suya
     throw crearError(403, "No autorizado: no está asignada a vos");
   }
   return inc;
 }
 
-async function crear({ id_articulo, prioridad, descripcion_pedido, descripcion_resolucion, id_estado, creado_por }) {
+async function crear({
+  id_articulo,
+  prioridad,
+  descripcion_pedido,
+  descripcion_resolucion,
+  id_estado,
+  creado_por,
+}) {
   // id_estado por defecto PENDIENTE = 1
   const estadoFinal = id_estado || 1;
   // La tabla exige asignado_a NOT NULL: se autoasigna temporalmente al creador
   // hasta que el Director la reasigne a un empleado de Sistemas real.
   const asignado_a = creado_por;
-  const r = await pool.query(
-    `INSERT INTO incidencias (id_estado, creado_por, asignado_a, creado, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion)
-     VALUES ($1,$2,$3, now(), $4,$5,$6,$7) RETURNING *`,
-    [estadoFinal, creado_por, asignado_a, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion || null],
-  );
-  const inc = r.rows[0];
-  // historial
-  await pool.query(
-    `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,$2, now())`,
-    [inc.id_incidencia, estadoFinal],
-  );
-  return inc;
+  // Las dos escrituras van en UNA transacción: o se crea la incidencia junto con su
+  // primer registro de historial, o no se crea nada (todo o nada).
+  return conTransaccion(async (client) => {
+    const r = await client.query(
+      `INSERT INTO incidencias (id_estado, creado_por, asignado_a, creado, prioridad, id_articulo, descripcion_pedido, descripcion_resolucion)
+       VALUES ($1,$2,$3, now(), $4,$5,$6,$7) RETURNING *`,
+      [
+        estadoFinal,
+        creado_por,
+        asignado_a,
+        prioridad,
+        id_articulo,
+        descripcion_pedido,
+        descripcion_resolucion || null,
+      ],
+    );
+    const inc = r.rows[0];
+    await client.query(
+      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,$2, now())`,
+      [inc.id_incidencia, estadoFinal],
+    );
+    return inc;
+  });
 }
 
 async function cancelar(id, { rol, id_usuario }) {
-  const q = await pool.query(`SELECT * FROM incidencias WHERE id_incidencia=$1`, [id]);
+  const q = await pool.query(
+    `SELECT * FROM incidencias WHERE id_incidencia=$1`,
+    [id],
+  );
   if (q.rows.length === 0) throw crearError(404, "Incidencia no encontrada");
   const inc = q.rows[0];
 
-  // Solo si está pendiente (1)
   if (inc.id_estado !== 1)
     throw crearError(400, "Solo se pueden cancelar incidencias PENDIENTES");
 
@@ -122,14 +142,19 @@ async function cancelar(id, { rol, id_usuario }) {
   if (rol !== 1 && rol !== 3)
     throw crearError(403, "Rol no autorizado para cancelar");
 
-  const upd = await pool.query(
-    `UPDATE incidencias SET id_estado=4 WHERE id_incidencia=$1 RETURNING *`,
-    [id],
-  );
-  await pool.query(
-    `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,4, now())`,
-    [id],
-  );
+  // Las dos escrituras van en UNA transacción: o pasa a CANCELADA con su registro de
+  // historial, o no cambia nada (todo o nada). El email queda FUERA (es secundario).
+  const upd = await conTransaccion(async (client) => {
+    const r = await client.query(
+      `UPDATE incidencias SET id_estado=4 WHERE id_incidencia=$1 RETURNING *`,
+      [id],
+    );
+    await client.query(
+      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,4, now())`,
+      [id],
+    );
+    return r;
+  });
 
   // email al creador (no bloquea la respuesta si falla)
   try {
@@ -137,8 +162,9 @@ async function cancelar(id, { rol, id_usuario }) {
       `SELECT usuario, nombres, apellidos FROM usuarios WHERE id_usuario=$1`,
       [inc.creado_por],
     );
-    const to = creador.rows[0] ? `${creador.rows[0].usuario}@example.com` : null;
-    // Si existe columna email real, usarla; por ahora usuario como placeholder o env var
+    const to = creador.rows[0] ? creador.rows[0].usuario : null;
+    // El destinatario es el `usuario` del creador, que YA ES un email (ej: carper@correo.com).
+    // Si MAIL_TO_TEST está seteado, todos los mails van a esa casilla (para pruebas).
     const dest = process.env.MAIL_TO_TEST || to;
     if (dest) {
       await enviarMail({
@@ -156,33 +182,48 @@ async function cancelar(id, { rol, id_usuario }) {
 }
 
 async function finalizar(id, { descripcion_resolucion, rol, id_usuario }) {
-  const q = await pool.query(`SELECT * FROM incidencias WHERE id_incidencia=$1`, [id]);
+  const q = await pool.query(
+    `SELECT * FROM incidencias WHERE id_incidencia=$1`,
+    [id],
+  );
   if (q.rows.length === 0) throw crearError(404, "Incidencia no encontrada");
   const inc = q.rows[0];
 
-  // Solo puede finalizar si está ASIGNADA (2) o PENDIENTE? Según flujo debería ser ASIGNADA, pero permitimos PENDIENTE asignada previamente
-  if (inc.id_estado === 3) throw crearError(400, "La incidencia ya está FINALIZADA");
+  if (inc.id_estado === 3)
+    throw crearError(400, "La incidencia ya está FINALIZADA");
   if (inc.id_estado === 4)
-    throw crearError(400, "La incidencia está CANCELADA, no se puede finalizar");
+    throw crearError(
+      400,
+      "La incidencia está CANCELADA, no se puede finalizar",
+    );
 
   // Si es empleado sistemas, debe estar asignada a él
   if (rol === 2 && inc.asignado_a !== id_usuario) {
     throw crearError(403, "Solo podés finalizar incidencias asignadas a vos");
   }
 
-  const upd = await pool.query(
-    `UPDATE incidencias SET id_estado=3, descripcion_resolucion=$1 WHERE id_incidencia=$2 RETURNING *`,
-    [descripcion_resolucion, id],
-  );
-  await pool.query(
-    `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,3, now())`,
-    [id],
-  );
+  // Las dos escrituras van en UNA transacción: o pasa a RESUELTA con su registro de
+  // historial, o no cambia nada (todo o nada). El email queda FUERA (es secundario).
+  const upd = await conTransaccion(async (client) => {
+    const r = await client.query(
+      `UPDATE incidencias SET id_estado=3, descripcion_resolucion=$1 WHERE id_incidencia=$2 RETURNING *`,
+      [descripcion_resolucion, id],
+    );
+    await client.query(
+      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,3, now())`,
+      [id],
+    );
+    return r;
+  });
 
   try {
-    const creador = await pool.query(`SELECT usuario FROM usuarios WHERE id_usuario=$1`, [inc.creado_por]);
+    const creador = await pool.query(
+      `SELECT usuario FROM usuarios WHERE id_usuario=$1`,
+      [inc.creado_por],
+    );
     const dest =
-      process.env.MAIL_TO_TEST || (creador.rows[0] ? `${creador.rows[0].usuario}@example.com` : null);
+      process.env.MAIL_TO_TEST ||
+      (creador.rows[0] ? creador.rows[0].usuario : null);
     if (dest) {
       await enviarMail({
         to: dest,
@@ -200,26 +241,44 @@ async function finalizar(id, { descripcion_resolucion, rol, id_usuario }) {
 
 async function asignar(id, { asignado_a }) {
   // Validar que asignado_a sea empleado sistemas (rol 2) activo
-  const u = await pool.query(`SELECT id_usuario, rol, activo FROM usuarios WHERE id_usuario=$1`, [asignado_a]);
-  if (u.rows.length === 0) throw crearError(404, "Usuario a asignar no encontrado");
+  const u = await pool.query(
+    `SELECT id_usuario, rol, activo FROM usuarios WHERE id_usuario=$1`,
+    [asignado_a],
+  );
+  if (u.rows.length === 0)
+    throw crearError(404, "Usuario a asignar no encontrado");
   if (u.rows[0].rol !== 2)
-    throw crearError(400, "Solo se puede asignar a un empleado de sistemas (rol 2)");
+    throw crearError(
+      400,
+      "Solo se puede asignar a un empleado de sistemas (rol 2)",
+    );
   if (u.rows[0].activo !== 1) throw crearError(400, "Usuario inactivo");
 
-  const q = await pool.query(`SELECT * FROM incidencias WHERE id_incidencia=$1`, [id]);
-  if (q.rows.length === 0) throw crearError(404, "Incidencia no encontrada");
-  if (q.rows[0].id_estado === 3 || q.rows[0].id_estado === 4) {
-    throw crearError(400, "No se puede asignar una incidencia finalizada o cancelada");
-  }
-
-  const upd = await pool.query(
-    `UPDATE incidencias SET asignado_a=$1, id_estado=2 WHERE id_incidencia=$2 RETURNING *`,
-    [asignado_a, id],
-  );
-  await pool.query(
-    `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,2, now())`,
+  const q = await pool.query(
+    `SELECT * FROM incidencias WHERE id_incidencia=$1`,
     [id],
   );
+  if (q.rows.length === 0) throw crearError(404, "Incidencia no encontrada");
+  if (q.rows[0].id_estado === 3 || q.rows[0].id_estado === 4) {
+    throw crearError(
+      400,
+      "No se puede asignar una incidencia finalizada o cancelada",
+    );
+  }
+
+  // Las dos escrituras van en UNA transacción: o se reasigna con su registro de
+  // historial, o no cambia nada (todo o nada).
+  const upd = await conTransaccion(async (client) => {
+    const r = await client.query(
+      `UPDATE incidencias SET asignado_a=$1, id_estado=2 WHERE id_incidencia=$2 RETURNING *`,
+      [asignado_a, id],
+    );
+    await client.query(
+      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado) VALUES ($1,2, now())`,
+      [id],
+    );
+    return r;
+  });
   return upd.rows[0];
 }
 
