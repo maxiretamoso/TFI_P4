@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { api } from "../api/cliente.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import { PRIORIDADES } from "./prioridades.js";
-import "../categorias/categorias.css";
+import "../styles/categorias.css";
 import "./incidencias.css";
 
 function MisAsignadas() {

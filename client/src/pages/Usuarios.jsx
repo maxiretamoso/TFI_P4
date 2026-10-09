@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/cliente.js";
 import { useAuth } from "../auth/AuthContext.jsx";
-import "../categorias/categorias.css";
+import "../styles/categorias.css";
 import "./Usuarios.css";
 
 // Etiquetas de los roles según el enunciado (la API guarda números)

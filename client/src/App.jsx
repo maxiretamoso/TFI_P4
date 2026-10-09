@@ -7,13 +7,13 @@ import {
   NavLink,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./auth/AuthContext.jsx";
-import Login from "./pantallas/Login.jsx";
-import MisIncidencias from "./pantallas/MisIncidencias.jsx";
-import MisAsignadas from "./pantallas/MisAsignadas.jsx";
-import Catalogos from "./pantallas/Catalogos.jsx";
-import Dashboard from "./pantallas/Dashboard.jsx";
-import Usuarios from "./pantallas/Usuarios.jsx";
-import Reportes from "./pantallas/Reportes.jsx";
+import Login from "./pages/Login.jsx";
+import MisIncidencias from "./pages/MisIncidencias.jsx";
+import MisAsignadas from "./pages/MisAsignadas.jsx";
+import Catalogos from "./pages/Catalogos.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import Usuarios from "./pages/Usuarios.jsx";
+import Reportes from "./pages/Reportes.jsx";
 import logo from "./img/logo-muni.png";
 import "./App.css";
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/cliente.js";
 import { useAuth } from "../auth/AuthContext.jsx";
-import "../categorias/categorias.css";
+import "../styles/categorias.css";
 import "./Catalogo.css";
 
 // BREAD genérico para catálogos de texto simple (áreas, categorías, estados).
