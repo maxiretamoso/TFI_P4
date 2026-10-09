@@ -13,21 +13,25 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Swagger
 const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: "3.0.0",
-    info: { title: "API Incidencias TFI P4", version: "1.0.0", description: "API REST - Trabajo Final Integrador Programación IV" },
+    info: {
+      title: "API Incidencias TFI P4",
+      version: "1.0.0",
+      description: "API REST - Trabajo Final Integrador Programación IV",
+    },
     components: {
-      securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } }
-    }
+      securitySchemes: {
+        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
+      },
+    },
   },
   apis: ["./routes/*.js"],
 });
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get("/api-docs.json", (req, res) => res.json(swaggerSpec));
 
-// Routers
 const areasRouter = require("./routes/areas");
 const categoriasRouter = require("./routes/categorias");
 const estadosRouter = require("./routes/estados");
@@ -41,10 +45,9 @@ const meRouter = require("./routes/me");
 const dashboardRouter = require("./routes/dashboard");
 const reportesRouter = require("./routes/reportes");
 
-// Versionado /api/v1 + compatibilidad /api
 function mountVersioned(prefix, router) {
   app.use(`/api/v1${prefix}`, router);
-  app.use(`/api${prefix}`, router); // compat legacy
+  app.use(`/api${prefix}`, router);
 }
 mountVersioned("/areas", areasRouter);
 mountVersioned("/categorias", categoriasRouter);
@@ -56,7 +59,6 @@ mountVersioned("/incidencias_estados", incidenciasEstadosRouter);
 mountVersioned("/dashboard", dashboardRouter);
 mountVersioned("/reportes", reportesRouter);
 
-// auth tiene rutas /login y /register -> montado como /api/v1/auth y /api/auth
 app.use("/api/v1/auth", authRouter);
 app.use("/api", authRouter);
 
@@ -66,26 +68,43 @@ app.use("/api/v1/me", meRouter);
 app.use("/api/me", meRouter);
 
 app.get("/", (req, res) => {
-  res.json({ mensaje: "¡La API de Incidencias está funcionando!", version: "v1", docs: "/api-docs" });
+  res.json({
+    mensaje: "¡La API de Incidencias está funcionando!",
+    version: "v1",
+    docs: "/api-docs",
+  });
 });
 
-// 404 genérico
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada", path: req.originalUrl });
 });
 
-// Manejo centralizado de errores
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, _next) => {
   console.error("Error no manejado:", err);
+  // Violación de foreign key en Postgres (código 23503): el pedido traía un id que
+  // no existe en la tabla referenciada. Se traduce a 400 con mensaje claro,
+  // en vez de un 500 genérico que parecería un crash del servidor.
+  if (err.code === "23503") {
+    return res
+      .status(400)
+      .json({
+        error:
+          "Referencia inexistente: uno de los ids enviados no existe en la base",
+      });
+  }
   const status = err.status || 500;
-  res.status(status).json({ error: err.message || "Error interno del servidor" });
+  res
+    .status(status)
+    .json({ error: err.message || "Error interno del servidor" });
 });
 
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT} - docs en /api-docs`);
+    console.log(
+      `Servidor corriendo en http://localhost:${PORT} - docs en /api-docs`,
+    );
   });
 }
 module.exports = app;

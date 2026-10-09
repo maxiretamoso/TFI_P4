@@ -1,12 +1,7 @@
---
--- DB - Sistema de Incidencias
---
-
+-- DB Sistema de Incidencias
 CREATE SCHEMA IF NOT EXISTS public;
 
---
--- Tabla: areas
---
+-- Tabla areas
 CREATE TABLE public.areas (
     id_area integer NOT NULL,
     descripcion character varying(250) NOT NULL,
@@ -23,9 +18,7 @@ CREATE SEQUENCE public.areas_id_area_seq
 
 ALTER SEQUENCE public.areas_id_area_seq OWNED BY public.areas.id_area;
 
---
--- Tabla: articulos
---
+-- Tabla articulos
 CREATE TABLE public.articulos (
     id_articulo integer NOT NULL,
     id_area integer NOT NULL,
@@ -44,9 +37,7 @@ CREATE SEQUENCE public.articulos_id_articulo_seq
 
 ALTER SEQUENCE public.articulos_id_articulo_seq OWNED BY public.articulos.id_articulo;
 
---
--- Tabla: categorias
---
+-- Tabla categorias
 CREATE TABLE public.categorias (
     id_categoria integer NOT NULL,
     descripcion character varying(255) NOT NULL,
@@ -63,9 +54,7 @@ CREATE SEQUENCE public.categorias_id_categoria_seq
 
 ALTER SEQUENCE public.categorias_id_categoria_seq OWNED BY public.categorias.id_categoria;
 
---
--- Tabla: estados
---
+-- Tabla estados
 CREATE TABLE public.estados (
     id_estado integer NOT NULL,
     descripcion character varying(255) NOT NULL,
@@ -82,9 +71,7 @@ CREATE SEQUENCE public.estados_id_estado_seq
 
 ALTER SEQUENCE public.estados_id_estado_seq OWNED BY public.estados.id_estado;
 
---
--- Tabla: incidencias
---
+-- Tabla incidencias
 CREATE TABLE public.incidencias (
     id_incidencia integer NOT NULL,
     id_articulo integer NOT NULL,
@@ -107,9 +94,7 @@ CREATE SEQUENCE public.incidencias_id_incidencia_seq
 
 ALTER SEQUENCE public.incidencias_id_incidencia_seq OWNED BY public.incidencias.id_incidencia;
 
---
--- Tabla: incidencias_estados
---
+-- Tabla incidencias_estados
 CREATE TABLE public.incidencias_estados (
     id_pedidos_estados integer NOT NULL,
     id_incidencia integer NOT NULL,
@@ -127,9 +112,7 @@ CREATE SEQUENCE public.incidencias_estados_id_pedidos_estados_seq
 
 ALTER SEQUENCE public.incidencias_estados_id_pedidos_estados_seq OWNED BY public.incidencias_estados.id_pedidos_estados;
 
---
--- Tabla: usuarios
---
+-- Tabla usuarios
 CREATE TABLE public.usuarios (
     id_usuario integer NOT NULL,
     id_area integer NOT NULL,
@@ -152,9 +135,7 @@ CREATE SEQUENCE public.usuarios_id_usuario_seq
 
 ALTER SEQUENCE public.usuarios_id_usuario_seq OWNED BY public.usuarios.id_usuario;
 
---
--- Defaults (secuencias conectadas a cada PK)
---
+-- Cada columna de ID toma el número del contador
 ALTER TABLE ONLY public.areas ALTER COLUMN id_area SET DEFAULT nextval('public.areas_id_area_seq'::regclass);
 ALTER TABLE ONLY public.articulos ALTER COLUMN id_articulo SET DEFAULT nextval('public.articulos_id_articulo_seq'::regclass);
 ALTER TABLE ONLY public.categorias ALTER COLUMN id_categoria SET DEFAULT nextval('public.categorias_id_categoria_seq'::regclass);
@@ -163,9 +144,7 @@ ALTER TABLE ONLY public.incidencias ALTER COLUMN id_incidencia SET DEFAULT nextv
 ALTER TABLE ONLY public.incidencias_estados ALTER COLUMN id_pedidos_estados SET DEFAULT nextval('public.incidencias_estados_id_pedidos_estados_seq'::regclass);
 ALTER TABLE ONLY public.usuarios ALTER COLUMN id_usuario SET DEFAULT nextval('public.usuarios_id_usuario_seq'::regclass);
 
---
--- Datos: areas
---
+-- Datos areas 
 INSERT INTO public.areas VALUES (1, 'Legales', 1);
 INSERT INTO public.areas VALUES (2, 'Personal', 1);
 INSERT INTO public.areas VALUES (3, 'Sistemas', 1);
@@ -174,16 +153,12 @@ INSERT INTO public.areas VALUES (5, 'Finanzas', 1);
 INSERT INTO public.areas VALUES (6, 'Salud y Accion Social', 1);
 INSERT INTO public.areas VALUES (7, 'Desarrollo Urbano', 0);
 
---
--- Datos: articulos
---
+-- Datos articulos
 INSERT INTO public.articulos VALUES (1, 1, 1, 'Mouse sin pilas', 1);
 INSERT INTO public.articulos VALUES (2, 1, 1, 'Monitor LG', 1);
 INSERT INTO public.articulos VALUES (3, 1, 1, 'Notebook HP', 1);
 
---
--- Datos: categorias
---
+-- Datos categorias
 INSERT INTO public.categorias VALUES (1, 'Perifericos', 1);
 INSERT INTO public.categorias VALUES (2, 'Notebooks', 1);
 INSERT INTO public.categorias VALUES (3, 'PC Escritorio', 1);
@@ -199,37 +174,25 @@ INSERT INTO public.categorias VALUES (12, 'daw', 1);
 INSERT INTO public.categorias VALUES (13, 'daw', 1);
 INSERT INTO public.categorias VALUES (14, 'ocho', 1);
 
---
--- Datos: estados
---
+-- Datos estados
 INSERT INTO public.estados VALUES (1, 'Pendiente', 1);
 INSERT INTO public.estados VALUES (2, 'En Proceso', 1);
 INSERT INTO public.estados VALUES (3, 'Resuela', 1);
 INSERT INTO public.estados VALUES (4, 'Cancelada', 1);
 
---
--- Datos: incidencias
---
+-- Datos incidencias
 INSERT INTO public.incidencias VALUES (1, 1, 1, 4, 1, '2026-09-11 18:47:38.751684+00', 1, 'descripción pedido', '');
 INSERT INTO public.incidencias VALUES (2, 1, 1, 4, 2, '2026-09-11 18:50:08.269506+00', 1, 'descripción pedido', '');
 INSERT INTO public.incidencias VALUES (3, 2, 1, 4, 1, '2026-09-13 18:52:15.532034+00', 1, 'No enciende', '');
 INSERT INTO public.incidencias VALUES (4, 3, 1, 4, 2, '2026-09-13 18:52:51.346357+00', 1, 'No carga la batería', '');
 
---
--- Datos: incidencias_estados (vacía en el dump original)
---
-
---
--- Datos: usuarios
---
+-- Datos usuarios
 INSERT INTO public.usuarios VALUES (1, 3, 'Carlos', 'Perez', 'carper@correo.com', 'fcaddfce9c7c894c376cf085b51ee37b851e89477a2986d2a26b8cc1f484eaf8', '', 2, 1);
 INSERT INTO public.usuarios VALUES (2, 3, 'Carmen', 'Gomez', 'cargom@correo.com', 'be4288567c04f9b827ff17cad92f29fc8ab6667bf235e7ebba558588e2606ee2', '', 2, 1);
 INSERT INTO public.usuarios VALUES (3, 3, 'Pamela', 'Almeida', 'pamalm@correo.com', 'be39221afb177a35f41e3dc590cc630ed8e58773dbb11a29d7a332b9e1eeaad1', '', 1, 1);
 INSERT INTO public.usuarios VALUES (4, 1, 'Esteban', 'Reniero', 'estren@correo.com', '31c1a3f84de963879b6e6b88e08297fcdeb419133989acf5e91cf5b75db1923f', '', 3, 1);
 
---
--- Ajuste de secuencias (para que el próximo INSERT sin ID continúe desde el número correcto)
---
+--El contador de IDs arranca desde el último insertado
 SELECT pg_catalog.setval('public.areas_id_area_seq', 7, true);
 SELECT pg_catalog.setval('public.articulos_id_articulo_seq', 3, true);
 SELECT pg_catalog.setval('public.categorias_id_categoria_seq', 14, true);
@@ -238,9 +201,7 @@ SELECT pg_catalog.setval('public.incidencias_estados_id_pedidos_estados_seq', 1,
 SELECT pg_catalog.setval('public.incidencias_id_incidencia_seq', 4, true);
 SELECT pg_catalog.setval('public.usuarios_id_usuario_seq', 4, true);
 
---
 -- Primary Keys
---
 ALTER TABLE ONLY public.areas ADD CONSTRAINT areas_pkey PRIMARY KEY (id_area);
 ALTER TABLE ONLY public.articulos ADD CONSTRAINT articulos_pkey PRIMARY KEY (id_articulo);
 ALTER TABLE ONLY public.categorias ADD CONSTRAINT categorias_pkey PRIMARY KEY (id_categoria);
@@ -249,10 +210,48 @@ ALTER TABLE ONLY public.incidencias_estados ADD CONSTRAINT incidencias_estados_p
 ALTER TABLE ONLY public.incidencias ADD CONSTRAINT incidencias_pkey PRIMARY KEY (id_incidencia);
 ALTER TABLE ONLY public.usuarios ADD CONSTRAINT usuarios_pkey PRIMARY KEY (id_usuario);
 
---
--- Constraint adicional: nombre de usuario único
---
+--Constraint: nombre de usuario único
 ALTER TABLE ONLY public.usuarios ADD CONSTRAINT usuarios_usuario_key UNIQUE (usuario);
 
--- Activar extensión para encriptación de contraseñas (pgcrypto) para el login en supabase
+-----------------------------------------------------------------------------------------
+/* Foreign Keys (no estan en el sql original)
+Se agrego para mejorar integridad de la base de datos. 
+Una incidencia no puede apuntar a un artículo inexistente, un artículo no puede colgar de un área inexistente, incidencias_estados (el "historial") no puede quedar huérfano sin su incidencia.
+
+RESTRICT en 8 reglas: no deja borrar un área, usuario, artículo o estado que esté siendo usado (protege los datos reales).
+CASCADE en 1 regla: si se borra una incidencia, su historial se borra con ella.
+No se puso CASCADE en todo porque un DELETE mal hecho podría eliminar varias tablas a la vez.
+*/
+ALTER TABLE ONLY public.articulos ADD CONSTRAINT articulos_id_area_fk
+  FOREIGN KEY (id_area) REFERENCES public.areas(id_area) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY public.articulos ADD CONSTRAINT articulos_id_categoria_fk
+  FOREIGN KEY (id_categoria) REFERENCES public.categorias(id_categoria) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY public.usuarios ADD CONSTRAINT usuarios_id_area_fk
+  FOREIGN KEY (id_area) REFERENCES public.areas(id_area) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY public.incidencias ADD CONSTRAINT incidencias_id_articulo_fk
+  FOREIGN KEY (id_articulo) REFERENCES public.articulos(id_articulo) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY public.incidencias ADD CONSTRAINT incidencias_id_estado_fk
+  FOREIGN KEY (id_estado) REFERENCES public.estados(id_estado) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY public.incidencias ADD CONSTRAINT incidencias_creado_por_fk
+  FOREIGN KEY (creado_por) REFERENCES public.usuarios(id_usuario) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY public.incidencias ADD CONSTRAINT incidencias_asignado_a_fk
+  FOREIGN KEY (asignado_a) REFERENCES public.usuarios(id_usuario) ON DELETE RESTRICT;
+
+ALTER TABLE ONLY public.incidencias_estados ADD CONSTRAINT incidencias_estados_id_incidencia_fk
+  FOREIGN KEY (id_incidencia) REFERENCES public.incidencias(id_incidencia) ON DELETE CASCADE;
+
+ALTER TABLE ONLY public.incidencias_estados ADD CONSTRAINT incidencias_estados_id_estado_fk
+  FOREIGN KEY (id_estado) REFERENCES public.estados(id_estado) ON DELETE RESTRICT;
+
+-- Verificación: deben listarse las 9 claves foráneas nuevas
+SELECT conrelid::regclass AS tabla, conname AS constraint
+FROM pg_constraint WHERE contype = 'f' ORDER BY 1, 2;
+
+-- Extensión necesaria para que funcione el login en supabase (encripta la contraseña)
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
