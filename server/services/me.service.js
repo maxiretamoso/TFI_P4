@@ -1,4 +1,5 @@
 const pool = require("../db");
+const { crearError } = require("../utils/httpError");
 
 async function obtenerPerfil(idUsuario) {
   const resultado = await pool.query(
@@ -15,7 +16,8 @@ async function obtenerPerfil(idUsuario) {
      WHERE usuarios.id_usuario = $1`,
     [idUsuario]
   );
-  return resultado.rows[0] || null;
+  if (resultado.rows.length === 0) throw crearError(404, "Usuario no encontrado");
+  return resultado.rows[0];
 }
 
 module.exports = { obtenerPerfil };

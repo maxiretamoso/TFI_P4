@@ -35,7 +35,6 @@ async function listar(req, res, next) {
 async function obtenerPorId(req, res, next) {
   try {
     const usuario = await usuariosService.obtenerUsuarioPorId(req.params.id);
-    if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
     res.json(usuario);
   } catch (e) { next(e); }
 }
@@ -51,7 +50,6 @@ async function actualizar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     const usuario = await usuariosService.actualizarUsuario(req.params.id, req.body, req.usuario);
-    if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
     res.json(usuario);
   } catch (e) { next(e); }
 }
@@ -59,7 +57,6 @@ async function actualizar(req, res, next) {
 async function eliminar(req, res, next) {
   try {
     const usuario = await usuariosService.desactivarUsuario(req.params.id);
-    if (!usuario) return res.status(404).json({ error: "Usuario no encontrado" });
     res.json({ mensaje: "Usuario desactivado" });
   } catch (e) { next(e); }
 }
@@ -72,16 +69,8 @@ async function subirAvatar(req, res, next) {
       return res.status(403).json({ error: "No autorizado" });
     }
     const previo = await usuariosService.obtenerUsuarioPorId(req.params.id);
-    if (!previo) {
-      borrarArchivoSeguro(req.file.path);
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
     const relPath = `uploads/avatars/${req.file.filename}`;
     const usuario = await usuariosService.actualizarAvatar(req.params.id, relPath);
-    if (!usuario) {
-      borrarArchivoSeguro(req.file.path);
-      return res.status(404).json({ error: "Usuario no encontrado" });
-    }
     if (previo.avatar && previo.avatar !== relPath) borrarAvatarSeguro(previo.avatar);
     res.json(usuario);
   } catch (e) {

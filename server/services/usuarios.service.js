@@ -16,7 +16,8 @@ async function obtenerUsuarioPorId(id) {
     `SELECT id_usuario, nombres, apellidos, usuario, rol, activo, avatar, id_area FROM usuarios WHERE id_usuario=$1`,
     [id]
   );
-  return r.rows[0] || null;
+  if (r.rows.length === 0) throw crearError(404, "Usuario no encontrado");
+  return r.rows[0];
 }
 
 async function crearUsuario(datos) {
@@ -40,7 +41,7 @@ async function actualizarUsuario(id, datos, solicitante) {
     throw crearError(403, "No autorizado");
   }
   const cur = await pool.query(`SELECT * FROM usuarios WHERE id_usuario=$1`, [id]);
-  if (cur.rows.length === 0) return null;
+  if (cur.rows.length === 0) throw crearError(404, "Usuario no encontrado");
   const u = cur.rows[0];
 
   if (solicitante.rol !== 3) {                      
@@ -63,12 +64,14 @@ async function actualizarUsuario(id, datos, solicitante) {
 
 async function desactivarUsuario(id) {
   const r = await pool.query(`UPDATE usuarios SET activo=0 WHERE id_usuario=$1 RETURNING id_usuario`, [id]);
-  return r.rows[0] || null;
+  if (r.rows.length === 0) throw crearError(404, "Usuario no encontrado");
+  return r.rows[0];
 }
 
 async function actualizarAvatar(id, relPath) {
   const r = await pool.query(`UPDATE usuarios SET avatar=$1 WHERE id_usuario=$2 RETURNING id_usuario, avatar`, [relPath, id]);
-  return r.rows[0] || null;
+  if (r.rows.length === 0) throw crearError(404, "Usuario no encontrado");
+  return r.rows[0];
 }
 
 module.exports = { listarUsuarios, obtenerUsuarioPorId, crearUsuario, actualizarUsuario, desactivarUsuario, actualizarAvatar };
