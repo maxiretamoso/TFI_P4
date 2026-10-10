@@ -33,7 +33,7 @@ function Login() {
   }
 
   return (
-    <div className="login-container">
+    <main className="login-container">
       <form onSubmit={manejarEnvio}>
         <label htmlFor="usuario">Usuario:</label>
         <input
@@ -58,7 +58,7 @@ function Login() {
       </form>
 
       {error && <p className="login-error">{error}</p>}
-    </div>
+    </main>
   );
 }
 

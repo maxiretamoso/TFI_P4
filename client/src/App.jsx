@@ -33,13 +33,20 @@ function ConMenu() {
 
   return (
     <>
-      <nav className={"menu-principal" + (menuAbierto ? " abierto" : "")}>
+      <nav
+        id="menu-principal"
+        className={"menu-principal" + (menuAbierto ? " abierto" : "")}
+        onKeyDown={(evento) => {
+          if (evento.key === "Escape") setMenuAbierto(false);
+        }}
+      >
         <button
           type="button"
           className="boton-hamburguesa"
           onClick={() => setMenuAbierto((abierto) => !abierto)}
           aria-label="Abrir o cerrar el menú"
           aria-expanded={menuAbierto}
+          aria-controls="menu-principal"
         >
           ☰
         </button>
@@ -77,7 +84,9 @@ function ConMenu() {
         </button>
       </nav>
 
-      <Outlet />
+      <main id="contenido-principal">
+        <Outlet />
+      </main>
     </>
   );
 }

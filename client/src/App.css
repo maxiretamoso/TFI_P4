@@ -24,7 +24,7 @@
 
 .menu-principal a.active {
     background-color: #8BC756;
-    color: white;
+    color: #333;
 }
 
 .menu-saludo {
@@ -75,7 +75,7 @@
         padding: 10px 12px;
         font-size: 20px;
         background-color: #8BC756;
-        color: #fff;
+        color: #333;
         border: none;
         border-radius: 6px;
         text-align: left;
@@ -158,4 +158,16 @@
     .cargando-bola {
         animation: none;
     }
+}
+
+#root .titulo-container h1 {
+    color: #333;
+}
+
+#root thead th {
+    color: #333;
+}
+
+#root .boton-agregar {
+    color: #333;
 }
