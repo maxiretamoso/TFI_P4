@@ -8,6 +8,13 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
+
+pool.on("error", (err) => {
+  console.error("Error en el pool de conexiones:", err);
 });
 
 module.exports = pool;
