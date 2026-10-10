@@ -127,3 +127,35 @@
         max-width: 100%;
     }
 }
+
+.cargando {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 26px 10px;
+    margin: 12px 0;
+    color: #555;
+    font-weight: bold;
+}
+
+.cargando-bola {
+    width: 18px;
+    height: 18px;
+    border: 3px solid #d9ecd0;
+    border-top-color: #8BC756;
+    border-radius: 50%;
+    animation: girar-carga 0.8s linear infinite;
+}
+
+@keyframes girar-carga {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cargando-bola {
+        animation: none;
+    }
+}

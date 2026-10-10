@@ -5,6 +5,7 @@ import { PRIORIDADES } from "./prioridades.js";
 import "../styles/categorias.css";
 import "./incidencias.css";
 import "./MisIncidencias.css";
+import Cargando from "../components/Cargando.jsx";
 
 function MisIncidencias() {
   const { usuario } = useAuth();
@@ -13,6 +14,7 @@ function MisIncidencias() {
   const [articulos, setArticulos] = useState([]);
   const [usuariosSistemas, setUsuariosSistemas] = useState([]);
   const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(true);
 
   // Formulario de alta
   const [idArticulo, setIdArticulo] = useState("");
@@ -42,9 +44,10 @@ function MisIncidencias() {
   }
 
   useEffect(() => {
-    cargar();
-    cargarArticulos();
+    Promise.all([cargar(), cargarArticulos()]).finally(() => setCargando(false));
   }, []);
+
+  if (cargando) return <Cargando texto="Cargando incidencias..." />;
 
   async function crear(evento) {
     evento.preventDefault();

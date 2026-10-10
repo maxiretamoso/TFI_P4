@@ -3,6 +3,7 @@ import { api } from "../api/cliente.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import "../styles/categorias.css";
 import "./Articulos.css";
+import Cargando from "../components/Cargando.jsx";
 
 // BREAD de artículos: igual que los catálogos simples, pero el formulario
 // además apunta a un área y una categoría (selects con sus listados).
@@ -21,6 +22,7 @@ function Articulos() {
 
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(true);
 
   async function cargarArticulos() {
     try {
@@ -45,9 +47,10 @@ function Articulos() {
   }
 
   useEffect(() => {
-    cargarArticulos();
-    cargarCombos();
+    Promise.all([cargarArticulos(), cargarCombos()]).finally(() => setCargando(false));
   }, []);
+
+  if (cargando) return <Cargando texto="Cargando artículos..." />;
 
   async function guardar(evento) {
     evento.preventDefault();

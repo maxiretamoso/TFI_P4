@@ -3,6 +3,7 @@ import { api } from "../api/cliente.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import "../styles/categorias.css";
 import "./Catalogo.css";
+import Cargando from "../components/Cargando.jsx";
 
 // BREAD genérico para catálogos de texto simple (áreas, categorías, estados).
 // La lógica se escribe UNA vez; cada catálogo la usa con su configuración.
@@ -21,6 +22,7 @@ function Catalogo({
   const [editandoId, setEditandoId] = useState(null);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(true);
 
   async function cargar() {
     try {
@@ -31,8 +33,10 @@ function Catalogo({
   }
 
   useEffect(() => {
-    cargar();
+    cargar().finally(() => setCargando(false));
   }, []);
+
+  if (cargando) return <Cargando texto={`Cargando ${titulo.toLowerCase()}...`} />;
 
   async function guardar(evento) {
     evento.preventDefault();

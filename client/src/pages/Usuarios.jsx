@@ -3,6 +3,7 @@ import { api } from "../api/cliente.js";
 import { useAuth } from "../auth/AuthContext.jsx";
 import "../styles/categorias.css";
 import "./Usuarios.css";
+import Cargando from "../components/Cargando.jsx";
 
 // Etiquetas de los roles según el enunciado (la API guarda números)
 const ROLES = {
@@ -21,6 +22,7 @@ function Usuarios() {
   const [usuarios, setUsuarios] = useState([]);
   const [areas, setAreas] = useState([]);
   const [error, setError] = useState("");
+  const [cargando, setCargando] = useState(true);
 
   // Formulario de alta y edición (la contraseña solo va en alta)
   const [nombres, setNombres] = useState("");
@@ -50,9 +52,10 @@ function Usuarios() {
   }
 
   useEffect(() => {
-    cargar();
-    cargarAreas();
+    Promise.all([cargar(), cargarAreas()]).finally(() => setCargando(false));
   }, []);
+
+  if (cargando) return <Cargando texto="Cargando usuarios..." />;
 
   async function guardar(evento) {
     evento.preventDefault();
