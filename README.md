@@ -12,7 +12,7 @@ Sistema para que un municipio registre, asigne, resuelva y reporte incidencias: 
 - Flujo completo de incidencias: Pendiente → En proceso → Resuelta / Cancelada, con historial de cada cambio.
 - Autenticación JWT con tokens de 8 horas y contraseñas con bcrypt.
 - Reportes en PDF con totales por estado, fecha e incidencias prioritarias.
-- Notificación por email al finalizar o cancelar (si no hay correo configurado, se simula en consola sin romper nada).
+- Notificación por email al finalizar o cancelar; si en el `.env` no hay correo configurado, el mensaje se imprime en la consola del servidor.
 - Documentación Swagger interactiva de todos los endpoints.
 - Soft delete en todas las tablas (columna `activo`): nunca se borran datos físicamente.
 - API versionada bajo `/api/v1/...`, con compatibilidad para `/api/...`.
@@ -161,8 +161,6 @@ TFI_P4/
 - `incidencias.asignado_a` es NOT NULL en el script de la cátedra: al crear una incidencia se autoasigna a quien la creó, hasta que el Director la reasigna a un empleado de Sistemas.
 - La conexión a Supabase requiere SSL (`ssl: { rejectUnauthorized: false }` en `db/index.js`): sin eso falla aunque las credenciales sean correctas.
 - La extensión `pgcrypto` es la que verifica las contraseñas viejas (SHA-256) y las migra a bcrypt en el primer login.
-- El estado 3 figura como "Resuela" en el script de la cátedra (typo del enunciado): el script se conserva intacto y el nombre se corrigió a "Resuelta" en la base con un solo UPDATE, sin tocar código.
-- El email sin configurar no rompe nada: se simula en consola con todos los datos del mensaje.
 
 ## Integrantes del proyecto
 
