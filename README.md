@@ -1,4 +1,4 @@
-# SIM — Sistema de Incidencias Municipales
+# GIM — Gestión de Incidencias Municipales
 
 Trabajo Práctico Integrador — Programación IV · UNER · Facultad de Ciencias de la Administración · Licenciatura en Sistemas · 2026
 

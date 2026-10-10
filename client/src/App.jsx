@@ -102,7 +102,7 @@ export default function App() {
               src={logo}
               alt="Logo Municipalidad de Concordia"
             />
-            <h1>SIM - Sistema de Incidencias Municipales</h1>
+            <h1>GIM - Gestión de Incidencias Municipales</h1>
           </div>
 
           <Routes>
