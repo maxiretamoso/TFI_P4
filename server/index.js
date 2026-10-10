@@ -2,16 +2,33 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const path = require("path");
 
 const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
 const app = express();
+app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(cors({ origin: process.env.CLIENT_URL }));
 app.use(express.json());
 app.use(morgan("dev"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true,
+  message: {
+    error: "Demasiados intentos de inicio de sesión. Esperá unos minutos y volvé a intentar.",
+  },
+});
+
+app.use("/api/v1/auth/login", loginLimiter);
+app.use("/api/login", loginLimiter);
 
 const swaggerSpec = swaggerJsdoc({
   definition: {
