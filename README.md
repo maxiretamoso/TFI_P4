@@ -56,13 +56,23 @@ El archivo real `.env` nunca se sube al repo (lo bloquea `.gitignore`). La plant
 
 ### 3) Base de datos
 
-El script completo de la cátedra (estructura y datos de prueba) está en [`database/TFI_Prog4.sql`](database/TFI_Prog4.sql). En el proyecto de Supabase compartido ya está cargado: si usás esa base, solo necesitás completar tu `.env`.
+El script completo de la cátedra (estructura y datos de prueba) está en [`database/TFI_Prog4.sql`](database/TFI_Prog4.sql).
 
-Para cargarlo en una base nueva:
+**PostgreSQL local (el camino de la consigna):**
 
-1. Supabase → SQL Editor
-2. Ejecutar primero: `CREATE EXTENSION IF NOT EXISTS pgcrypto;` (necesaria para las contraseñas)
-3. Correr el script `TFI_Prog4.sql` completo
+1. Instalar PostgreSQL y un cliente (DBeaver o pgAdmin 4).
+2. Crear la base con el nombre que pide la consigna:
+
+    ```sql
+    CREATE DATABASE incidencias_db;
+    ```
+
+3. Completar el `.env` apuntando a esa base: `DB_NAME=incidencias_db` junto con `DB_HOST`, `DB_PORT`, `DB_USER` y `DB_PASSWORD` de la instalación local.
+4. Ejecutar primero `CREATE EXTENSION IF NOT EXISTS pgcrypto;` (necesaria para las contraseñas) y después el script `TFI_Prog4.sql` completo.
+
+**Supabase (el camino que usa el equipo):**
+
+En el proyecto de Supabase compartido la base ya está cargada: solo completá el `.env`. Supabase gestiona una única base llamada `postgres` y no admite otro nombre, por eso la plantilla trae `DB_NAME=postgres`: **el nombre de la base es un dato del entorno, no del código**, y solo cambia en el `.env`. Para recargarla en un proyecto nuevo: SQL Editor → `CREATE EXTENSION IF NOT EXISTS pgcrypto;` → `TFI_Prog4.sql`.
 
 ### 4) Usuarios de prueba
 
