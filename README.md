@@ -28,7 +28,7 @@ Sistema para que un municipio registre, asigne, resuelva y reporte incidencias: 
 | Reportes | pdfkit |
 | Email | nodemailer (con fallback a consola) |
 | Documentación | Swagger (swagger-jsdoc + swagger-ui-express) |
-| Frontend | Vite (React en construcción) |
+| Frontend | Vite + React |
 
 ## Puesta en marcha
 
@@ -116,7 +116,7 @@ Todas las rutas viven bajo `/api/v1/...` (versión pedida por la consigna) y res
 | GET | `/api/v1/dashboard` | Totales por estado, fecha y prioridades |
 | GET | `/api/v1/reportes/incidencias` | Reporte general en PDF |
 | GET | `/api/v1/health` | Estado del servidor y de la base |
-| POST | `/api/v1/usuarios/:id/avatar` | Subir avatar (máx. 2 MB, Multer) |
+| PATCH | `/api/v1/usuarios/:id/avatar` | Subir avatar (máx. 2 MB, Multer) |
 
 Además hay BREAD completo de áreas, artículos, categorías, estados y usuarios.
 
@@ -126,7 +126,7 @@ Además hay BREAD completo de áreas, artículos, categorías, estados y usuario
 # 1) Loguearse (como Director)
 curl -X POST http://localhost:3000/api/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"usuario":"estren@correo.com","password":"estren"}'
+  -d '{"usuario":"estren@correo.com","contrasenia":"estren"}'
 
 # 2) Usar el token devuelto en el resto de las requests
 curl http://localhost:3000/api/v1/incidencias \
@@ -137,7 +137,7 @@ curl http://localhost:3000/api/v1/incidencias \
 
 ```
 TFI_P4/
-├── client/                # frontend (Vite) en construcción
+├── client/                # frontend (Vite + React)
 ├── database/
 │   └── TFI_Prog4.sql      # script de la base: estructura, datos y claves foráneas
 ├── server/
@@ -161,7 +161,7 @@ TFI_P4/
 - `incidencias.asignado_a` es NOT NULL en el script de la cátedra: al crear una incidencia se autoasigna a quien la creó, hasta que el Director la reasigna a un empleado de Sistemas.
 - La conexión a Supabase requiere SSL (`ssl: { rejectUnauthorized: false }` en `db/index.js`): sin eso falla aunque las credenciales sean correctas.
 - La extensión `pgcrypto` es la que verifica las contraseñas viejas (SHA-256) y las migra a bcrypt en el primer login.
-- El estado 3 figura como "Resuela" en la base de la cátedra: se mantiene tal cual el original.
+- El estado 3 figura como "Resuela" en el script de la cátedra (typo del enunciado): el script se conserva intacto y el nombre se corrigió a "Resuelta" en la base con un solo UPDATE, sin tocar código.
 - El email sin configurar no rompe nada: se simula en consola con todos los datos del mensaje.
 
 ## Integrantes del proyecto
