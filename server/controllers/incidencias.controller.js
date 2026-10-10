@@ -2,8 +2,10 @@ const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 const incidenciasService = require("../services/incidencias.service");
 
 async function listar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    res.json(await incidenciasService.listar(req.usuario.rol, req.usuario.id_usuario));
+    const { rol, id_usuario } = req.usuario;
+    res.json(await incidenciasService.listar(rol, id_usuario, req.query));
   } catch (e) {
     next(e);
   }

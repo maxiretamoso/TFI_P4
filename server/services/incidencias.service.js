@@ -3,6 +3,14 @@ const { crearError } = require("../utils/httpError");
 const { enviarMail } = require("../utils/email");
 const { conTransaccion } = require("../utils/transaccion");
 
+const FROM_BASE = `
+  FROM incidencias
+  JOIN estados ON incidencias.id_estado = estados.id_estado
+  JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
+  JOIN usuarios AS creador ON incidencias.creado_por = creador.id_usuario
+  LEFT JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
+`;
+
 const SELECT_BASE = `
   SELECT
     incidencias.id_incidencia,
@@ -20,33 +28,61 @@ const SELECT_BASE = `
     creador.apellidos AS creado_por_apellido,
     asignado.nombres AS asignado_a_nombre,
     asignado.apellidos AS asignado_a_apellido
-  FROM incidencias
-  JOIN estados ON incidencias.id_estado = estados.id_estado
-  JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
-  JOIN usuarios AS creador ON incidencias.creado_por = creador.id_usuario
-  LEFT JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
+  ${FROM_BASE}
 `;
 
 // Filtrado por rol según enunciado:
 // 1 = empleado municipal -> solo sus incidencias (creado_por = id)
 // 2 = empleado sistemas -> solo asignadas a él (asignado_a = id)
 // 3 = director -> todas
-async function listar(rol, id_usuario) {
-  let where = "";
-  let params = [];
+async function listar(rol, id_usuario, filtros = {}) {
+  const condiciones = [];
+  const params = [];
+
   if (rol === 1) {
-    where = "WHERE incidencias.creado_por = $1";
-    params = [id_usuario];
+    params.push(id_usuario);
+    condiciones.push(`incidencias.creado_por = $${params.length}`);
   } else if (rol === 2) {
-    where = "WHERE incidencias.asignado_a = $1";
-    params = [id_usuario];
-  } else {
-    where = "";
-    params = [];
+    params.push(id_usuario);
+    condiciones.push(`incidencias.asignado_a = $${params.length}`);
   }
-  const q = `${SELECT_BASE} ${where} ORDER BY incidencias.creado DESC`;
-  const resultado = await pool.query(q, params);
-  return resultado.rows;
+
+  if (filtros.estado) {
+    params.push(parseInt(filtros.estado, 10));
+    condiciones.push(`incidencias.id_estado = $${params.length}`);
+  }
+  if (filtros.prioridad) {
+    params.push(parseInt(filtros.prioridad, 10));
+    condiciones.push(`incidencias.prioridad = $${params.length}`);
+  }
+  if (filtros.buscar) {
+    params.push(`%${filtros.buscar}%`);
+    condiciones.push(
+      `(incidencias.descripcion_pedido ILIKE $${params.length} OR articulos.descripcion ILIKE $${params.length})`,
+    );
+  }
+
+  const where = condiciones.length ? `WHERE ${condiciones.join(" AND ")}` : "";
+  const pagina = Math.max(parseInt(filtros.pagina, 10) || 1, 1);
+  const limite = Math.min(Math.max(parseInt(filtros.limite, 10) || 20, 1), 100);
+  const offset = (pagina - 1) * limite;
+
+  const [filas, conteo] = await Promise.all([
+    pool.query(
+      `${SELECT_BASE} ${where} ORDER BY incidencias.creado DESC, incidencias.id_incidencia DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, limite, offset],
+    ),
+    pool.query(`SELECT COUNT(*)::int AS total ${FROM_BASE} ${where}`, params),
+  ]);
+
+  const total = conteo.rows[0].total;
+  return {
+    items: filas.rows,
+    total,
+    pagina,
+    limite,
+    paginas: Math.max(Math.ceil(total / limite), 1),
+  };
 }
 
 async function listarMias(id_usuario) {

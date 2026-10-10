@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const verificarToken = require("../middlewares/verificarToken");
 const verificarRol = require("../middlewares/verificarRol");
-const { body } = require("express-validator");
+const { body, query } = require("express-validator");
 const incidenciasController = require("../controllers/incidencias.controller");
 
 /**
@@ -16,13 +16,31 @@ const incidenciasController = require("../controllers/incidencias.controller");
  * @swagger
  * /api/v1/incidencias:
  *   get:
- *     summary: Lista incidencias filtradas por rol
+ *     summary: Lista incidencias filtradas por rol, con paginación y filtros
  *     tags: [Incidencias]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: query, name: pagina, schema: { type: integer, default: 1 }, description: Página a devolver (desde 1) }
+ *       - { in: query, name: limite, schema: { type: integer, default: 20, maximum: 100 }, description: Ítems por página }
+ *       - { in: query, name: estado, schema: { type: integer }, description: Filtra por id_estado }
+ *       - { in: query, name: prioridad, schema: { type: integer }, description: Filtra por prioridad (1-3) }
+ *       - { in: query, name: buscar, schema: { type: string }, description: Texto a buscar en descripción o artículo }
  *     responses:
- *       200: { description: Lista de incidencias }
+ *       200: { description: Sobre con items, total, pagina, limite y paginas }
+ *       400: { description: Parámetros inválidos }
  */
-router.get("/", verificarToken, incidenciasController.listar);
+router.get(
+  "/",
+  verificarToken,
+  [
+    query("pagina").optional().isInt({ min: 1 }),
+    query("limite").optional().isInt({ min: 1, max: 100 }),
+    query("estado").optional().isInt({ min: 1 }),
+    query("prioridad").optional().isInt({ min: 1, max: 3 }),
+    query("buscar").optional().trim().isLength({ max: 255 }),
+  ],
+  incidenciasController.listar,
+);
 
 // Sub-rutas explícitas (opcional, más prolijo para frontend, pero no reemplaza el filtrado automático)
 router.get("/mias", verificarToken, incidenciasController.listarMias);
