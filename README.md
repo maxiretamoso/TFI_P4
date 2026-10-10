@@ -1,4 +1,4 @@
-# Sistema de Registro de Incidencias
+# SIM — Sistema de Incidencias Municipales
 
 Trabajo Práctico Integrador — Programación IV · UNER · Facultad de Ciencias de la Administración · Licenciatura en Sistemas · 2026
 
