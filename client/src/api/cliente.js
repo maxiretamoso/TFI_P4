@@ -1,6 +1,7 @@
 // Ventanilla única: todos los pedidos a la API pasan por acá
 
-const URL_BASE = "http://localhost:3000/api/v1";
+const URL_BASE =
+  import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
 async function pedir(metodo, ruta, cuerpo) {
   const token = localStorage.getItem("token");
