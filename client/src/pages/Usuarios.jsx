@@ -220,17 +220,18 @@ function Usuarios() {
         placeholder="Buscar usuario..."
       />
 
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Usuario</th>
-            <th>Área</th>
-            <th>Rol</th>
-            {esDirector && <th>Acciones</th>}
-          </tr>
-        </thead>
+      <div className="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Usuario</th>
+              <th>Área</th>
+              <th>Rol</th>
+              {esDirector && <th>Acciones</th>}
+            </tr>
+          </thead>
         <tbody>
           {visibles.length === 0 && (
             <tr>
@@ -269,6 +270,7 @@ function Usuarios() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

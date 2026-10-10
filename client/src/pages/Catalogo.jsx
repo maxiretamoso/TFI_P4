@@ -111,14 +111,15 @@ function Catalogo({
         placeholder={placeholderBuscar}
       />
 
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Descripción</th>
-            {puedeEscribir && <th>Acciones</th>}
-          </tr>
-        </thead>
+      <div className="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Descripción</th>
+              {puedeEscribir && <th>Acciones</th>}
+            </tr>
+          </thead>
         <tbody>
           {visibles.length === 0 && (
             <tr>
@@ -152,6 +153,7 @@ function Catalogo({
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

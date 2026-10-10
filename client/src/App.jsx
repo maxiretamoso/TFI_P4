@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -27,16 +28,46 @@ function Protegida() {
 // Barra de menú + saludo + salir. El contenido va en el Outlet
 function ConMenu() {
   const { usuario, cerrarSesion } = useAuth();
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const navegar = () => setMenuAbierto(false);
 
   return (
     <>
-      <nav className="menu-principal">
-        <NavLink to="/">Mis incidencias</NavLink>
-        {usuario.rol >= 2 && <NavLink to="/asignadas">Mis asignadas</NavLink>}
-        <NavLink to="/catalogos">Catálogos</NavLink>
-        <NavLink to="/usuarios">Usuarios</NavLink>
-        {usuario.rol >= 3 && <NavLink to="/dashboard">Dashboard</NavLink>}
-        {usuario.rol >= 3 && <NavLink to="/reportes">Reportes</NavLink>}
+      <nav className={"menu-principal" + (menuAbierto ? " abierto" : "")}>
+        <button
+          type="button"
+          className="boton-hamburguesa"
+          onClick={() => setMenuAbierto((abierto) => !abierto)}
+          aria-label="Abrir o cerrar el menú"
+          aria-expanded={menuAbierto}
+        >
+          ☰
+        </button>
+
+        <NavLink to="/" onClick={navegar}>
+          Mis incidencias
+        </NavLink>
+        {usuario.rol >= 2 && (
+          <NavLink to="/asignadas" onClick={navegar}>
+            Mis asignadas
+          </NavLink>
+        )}
+        <NavLink to="/catalogos" onClick={navegar}>
+          Catálogos
+        </NavLink>
+        <NavLink to="/usuarios" onClick={navegar}>
+          Usuarios
+        </NavLink>
+        {usuario.rol >= 3 && (
+          <NavLink to="/dashboard" onClick={navegar}>
+            Dashboard
+          </NavLink>
+        )}
+        {usuario.rol >= 3 && (
+          <NavLink to="/reportes" onClick={navegar}>
+            Reportes
+          </NavLink>
+        )}
 
         <span className="menu-saludo">
           Hola, {usuario.nombres} {usuario.apellidos} (rol {usuario.rol})

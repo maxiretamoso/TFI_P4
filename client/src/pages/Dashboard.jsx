@@ -105,16 +105,17 @@ function Dashboard() {
         )}
 
         {resumen.prioritarias.length > 0 && (
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Artículo</th>
-                <th>Pedido</th>
-                <th>Estado</th>
-                <th>Creado</th>
-              </tr>
-            </thead>
+          <div className="tabla-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Artículo</th>
+                  <th>Pedido</th>
+                  <th>Estado</th>
+                  <th>Creado</th>
+                </tr>
+              </thead>
             <tbody>
               {resumen.prioritarias.map((inc) => (
                 <tr key={inc.id_incidencia}>
@@ -133,6 +134,7 @@ function Dashboard() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

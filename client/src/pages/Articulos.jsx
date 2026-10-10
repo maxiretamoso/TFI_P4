@@ -170,16 +170,17 @@ function Articulos() {
         placeholder="Buscar artículo..."
       />
 
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Artículo</th>
-            <th>Área</th>
-            <th>Categoría</th>
-            {puedeEscribir && <th>Acciones</th>}
-          </tr>
-        </thead>
+      <div className="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Artículo</th>
+              <th>Área</th>
+              <th>Categoría</th>
+              {puedeEscribir && <th>Acciones</th>}
+            </tr>
+          </thead>
         <tbody>
           {visibles.length === 0 && (
             <tr>
@@ -217,6 +218,7 @@ function Articulos() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
