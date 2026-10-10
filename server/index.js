@@ -82,6 +82,11 @@ app.use((req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, _next) => {
   console.error("Error no manejado:", err);
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({
+      error: "El archivo supera el tamaño máximo permitido (2 MB)",
+    });
+  }
   // Violación de foreign key en Postgres (código 23503): el pedido traía un id que
   // no existe en la tabla referenciada. Se traduce a 400 con mensaje claro,
   // en vez de un 500 genérico que parecería un crash del servidor.
