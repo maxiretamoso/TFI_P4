@@ -1,0 +1,407 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.titulo-container {
+    background-color: #8BC756;
+    color: white;
+    padding: 20px 35px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.logo-municipalidad {
+    width: 180px;
+    height: auto;
+}
+
+.titulo-container h1 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-size: 30px;
+}
+
+.navbar-gim {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 14px;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.navbar-gim .nav-link {
+    color: #333;
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin: 2px;
+}
+
+.navbar-gim .nav-link:hover {
+    background-color: #e8f3dc;
+}
+
+.navbar-gim .nav-link.active {
+    background-color: #8BC756;
+    color: #333;
+}
+
+.navbar-gim .navbar-text {
+    color: #555;
+}
+
+.btn-salir {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #333;
+}
+
+.btn-salir:hover {
+    background-color: #fce8e8;
+    color: #b42323;
+}
+
+.btn-gim {
+    background-color: #8BC756;
+    border-color: #8BC756;
+    color: #fff;
+}
+
+.btn-gim:hover,
+.btn-gim:focus {
+    background-color: #7ab547;
+    border-color: #75ad43;
+    color: #fff;
+}
+
+.btn-editar {
+    background-color: #e8f3dc;
+    border-color: #e8f3dc;
+    color: #3d7025;
+}
+
+.btn-editar:hover,
+.btn-editar:focus {
+    background-color: #d6e7c3;
+    border-color: #d0e2bb;
+    color: #3d7025;
+}
+
+.btn-eliminar {
+    background-color: #fce8e8;
+    border-color: #fce8e8;
+    color: #b42323;
+}
+
+.btn-eliminar:hover,
+.btn-eliminar:focus {
+    background-color: #f6d2d2;
+    border-color: #f1c7c7;
+    color: #b42323;
+}
+
+.btn-asignar {
+    background-color: #e0edff;
+    border-color: #e0edff;
+    color: #1d4ed8;
+}
+
+.btn-asignar:hover,
+.btn-asignar:focus {
+    background-color: #cadcfb;
+    border-color: #bfd5f9;
+    color: #1d4ed8;
+}
+
+.login-container {
+    max-width: 380px;
+    margin: 20px auto 40px auto;
+}
+
+.tarjeta-lista {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.tarjeta-lista form,
+.categorias-container form {
+    margin-bottom: 30px;
+}
+
+.categorias-container {
+    width: fit-content;
+    min-width: 500px;
+    max-width: 90%;
+    margin: 0 auto 30px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.tarjeta-lista h2,
+.categorias-container h2,
+.dashboard h2,
+.tarjeta-reporte h2 {
+    margin-top: 0;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tarjeta-lista table,
+.categorias-container table,
+.tarjeta-dashboard table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tarjeta-lista thead,
+.categorias-container thead,
+.tarjeta-dashboard thead {
+    background-color: #8BC756;
+}
+
+.tarjeta-lista th,
+.categorias-container th,
+.tarjeta-dashboard th {
+    padding: 12px;
+    text-align: left;
+    color: #333;
+    border: none;
+}
+
+.tarjeta-lista td,
+.categorias-container td,
+.tarjeta-dashboard td {
+    padding: 12px;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.celda-pedido,
+.celda-pedido-larga {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.celda-acciones .btn,
+.categorias-container td .btn {
+    margin-right: 6px;
+    margin-bottom: 4px;
+}
+
+.fila-accion {
+    background-color: #fafafa;
+}
+
+.accion-inline {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.accion-inline label {
+    font-weight: bold;
+}
+
+.estado {
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.estado-1 {
+    background-color: #fff1e0;
+    color: #b45309;
+}
+
+.estado-2 {
+    background-color: #e0edff;
+    color: #1d4ed8;
+}
+
+.estado-3 {
+    background-color: #e8f3dc;
+    color: #3d7025;
+}
+
+.estado-4 {
+    background-color: #f1f1f1;
+    color: #666;
+}
+
+.mensaje-error {
+    color: #b00020;
+    margin: 8px 0;
+}
+
+.cargando {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 26px 10px;
+    margin: 12px 0;
+    color: #555;
+    font-weight: bold;
+}
+
+.cargando .spinner-border {
+    color: #8BC756;
+}
+
+.buscador {
+    max-width: 420px;
+    margin-bottom: 20px;
+}
+
+.dashboard {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.kpis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.kpi {
+    flex: 1;
+    min-width: 140px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+
+.kpi-numero {
+    display: block;
+    font-size: 32px;
+    font-weight: bold;
+    color: #3d7025;
+}
+
+.kpi-etiqueta {
+    color: #555;
+}
+
+.tarjeta-dashboard {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.barra-fila {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.barra-etiqueta {
+    min-width: 90px;
+    color: #333;
+}
+
+.barra-contenedor {
+    flex: 1;
+}
+
+.barra {
+    height: 18px;
+    background-color: #8BC756;
+    border-radius: 4px;
+}
+
+.barra-valor {
+    font-weight: bold;
+    min-width: 20px;
+    text-align: right;
+}
+
+.dashboard-vacio {
+    color: #777;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.tarjeta-reporte {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .titulo-container {
+        padding: 14px 16px;
+    }
+
+    .logo-municipalidad {
+        width: 110px;
+    }
+
+    .titulo-container h1 {
+        position: static;
+        left: auto;
+        transform: none;
+        font-size: 20px;
+        margin-left: 14px;
+    }
+
+    .tarjeta-lista th,
+    .tarjeta-lista td,
+    .categorias-container th,
+    .categorias-container td,
+    .tarjeta-dashboard th,
+    .tarjeta-dashboard td {
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    input,
+    select,
+    textarea {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .categorias-container {
+        box-sizing: border-box;
+        width: auto;
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cargando .spinner-border {
+        animation: none;
+    }
+}

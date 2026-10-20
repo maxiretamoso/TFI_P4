@@ -1,5 +1,3 @@
-// Ventanilla única: todos los pedidos a la API pasan por acá
-
 const URL_BASE =
   import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
@@ -23,20 +21,16 @@ async function pedir(metodo, ruta, cuerpo) {
 
   const respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
 
-  // Sesión vencida: solo si había token y no es el pedido de login
-  // (en el login, 401 = usuario o contraseña incorrectos)
   if (respuesta.status === 401 && token && ruta !== "/auth/login") {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
-    window.location.assign("/login");
+    window.location.hash = "#/login";
     throw new Error("Sesión vencida. Iniciá sesión otra vez.");
   }
 
-  // El backend siempre responde JSON
   const datos = await respuesta.json();
 
   if (!respuesta.ok) {
-    // El backend manda { error: "texto" } o, si falló un campo, { errors: [...] }
     const mensaje =
       datos.error ||
       (Array.isArray(datos.errors) && datos.errors[0]?.msg) ||
@@ -47,7 +41,6 @@ async function pedir(metodo, ruta, cuerpo) {
   return datos;
 }
 
-// Para archivos binarios (PDF): la respuesta NO es JSON, viene en bytes
 async function descargar(ruta) {
   const token = localStorage.getItem("token");
 
@@ -58,11 +51,10 @@ async function descargar(ruta) {
 
   const respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
 
-  // Sesión vencida: mismo criterio que en pedir()
   if (respuesta.status === 401 && token) {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
-    window.location.assign("/login");
+    window.location.hash = "#/login";
     throw new Error("Sesión vencida. Iniciá sesión otra vez.");
   }
 
