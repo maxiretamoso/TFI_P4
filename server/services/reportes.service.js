@@ -1,14 +1,23 @@
 const reportesDatos = require("../datos/reportes.datos");
+const { ESTADOS } = require("../config/estados");
 
-async function obtenerDatosReporte() {
+const FILTROS = {
+  abiertas: { titulo: "Incidencias abiertas", estados: [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO] },
+  resueltas: { titulo: "Incidencias resueltas", estados: [ESTADOS.RESUELTA] },
+  canceladas: { titulo: "Incidencias canceladas", estados: [ESTADOS.CANCELADA] },
+};
+const SIN_FILTRO = { titulo: "Todas las incidencias", estados: null };
+
+async function obtenerDatosReporte(filtro) {
+  const { titulo, estados } = FILTROS[filtro] ?? SIN_FILTRO;
   const [porEstado, porPrioridad, porArea, detalle] = await Promise.all([
-    reportesDatos.totalesPorEstado(),
-    reportesDatos.totalesPorPrioridad(),
-    reportesDatos.totalesPorArea(),
-    reportesDatos.detalle(),
+    reportesDatos.totalesPorEstado(estados),
+    reportesDatos.totalesPorPrioridad(estados),
+    reportesDatos.totalesPorArea(estados),
+    reportesDatos.detalle(estados),
   ]);
 
-  return { porEstado, porPrioridad, porArea, detalle };
+  return { titulo, porEstado, porPrioridad, porArea, detalle };
 }
 
-module.exports = { obtenerDatosReporte };
+module.exports = { obtenerDatosReporte, FILTROS_DE_REPORTE: Object.keys(FILTROS) };

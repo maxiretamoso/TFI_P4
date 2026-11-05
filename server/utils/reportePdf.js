@@ -40,7 +40,7 @@ function anchoUtil(doc) {
   return doc.page.width - MARGEN * 2;
 }
 
-function encabezado(doc) {
+function encabezado(doc, subtitulo) {
   const ancho = doc.page.width;
   doc.rect(0, 0, ancho, 96).fill(COLOR.verde);
   doc.image(LOGO, MARGEN, 26, { height: 44 });
@@ -48,7 +48,7 @@ function encabezado(doc) {
   doc.fillColor("#ffffff").font("Helvetica-Bold").fontSize(20)
     .text("Reporte de incidencias", 0, 30, { width: ancho - MARGEN, align: "right" });
   doc.font("Helvetica").fontSize(9.5)
-    .text("Gestión de Incidencias Municipales", 0, 56, { width: ancho - MARGEN, align: "right" })
+    .text(subtitulo, 0, 56, { width: ancho - MARGEN, align: "right" })
     .text(`Generado el ${formatoFechaHora.format(new Date())}`, 0, 70, { width: ancho - MARGEN, align: "right" });
 
   doc.y = 96;
@@ -173,8 +173,6 @@ function pieDePagina(doc) {
     const y = doc.page.height - MARGEN + 10;
     doc.moveTo(MARGEN, y - 6).lineTo(doc.page.width - MARGEN, y - 6).lineWidth(0.5).stroke(COLOR.borde);
     doc.fillColor(COLOR.textoSuave).font("Helvetica").fontSize(8)
-      .text("Municipalidad de Concordia · Área de Sistemas", MARGEN, y, { lineBreak: false });
-    doc
       .text(`Página ${i + 1} de ${rango.count}`, MARGEN, y, {
         width: anchoUtil(doc),
         align: "right",
@@ -183,10 +181,10 @@ function pieDePagina(doc) {
   }
 }
 
-function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) {
+function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, porArea, detalle }) {
   const doc = new PDFDocument({ margin: MARGEN, size: "A4", bufferPages: true });
 
-  encabezado(doc);
+  encabezado(doc, subtitulo);
 
   titulo(doc, "Detalle de incidencias", { espacioAntes: 28 });
   tabla(

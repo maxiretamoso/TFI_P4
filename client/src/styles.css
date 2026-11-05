@@ -1041,6 +1041,37 @@ a.indicador:focus-visible {
     border-color: var(--gim-verde);
 }
 
+.opciones-reporte {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.opcion-reporte {
+    border: 1px solid var(--gim-borde);
+    border-radius: 20px;
+    padding: 6px 16px;
+    color: var(--gim-verde-texto);
+    background-color: transparent;
+}
+
+.opcion-reporte:hover {
+    background-color: var(--gim-verde-suave);
+    color: var(--gim-verde-texto);
+}
+
+.btn-check:checked + .opcion-reporte {
+    background-color: var(--gim-verde);
+    border-color: var(--gim-verde);
+    color: #fff;
+}
+
+.btn-check:focus-visible + .opcion-reporte {
+    outline: 3px solid var(--gim-verde);
+    outline-offset: 2px;
+}
+
 .filtro-activo {
     display: flex;
     flex-wrap: wrap;

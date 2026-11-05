@@ -1,13 +1,17 @@
 const reportesService = require("../services/reportes.service");
 const { crearReporteIncidencias } = require("../utils/reportePdf");
+const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 
 async function generarReporteIncidencias(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    const datos = await reportesService.obtenerDatosReporte();
+    const filtro = req.query.filtro;
+    const datos = await reportesService.obtenerDatosReporte(filtro);
     const doc = crearReporteIncidencias(datos);
+    const nombre = filtro ? `reporte-incidencias-${filtro}.pdf` : "reporte-incidencias.pdf";
 
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", 'attachment; filename="reporte-incidencias.pdf"');
+    res.setHeader("Content-Disposition", `attachment; filename="${nombre}"`);
     doc.pipe(res);
     doc.end();
   } catch (error) {

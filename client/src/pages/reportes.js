@@ -1,6 +1,13 @@
 import { api } from "../api.js";
 import { mensajeError } from "../ui.js";
 
+const OPCIONES = [
+  ["", "Todas"],
+  ["abiertas", "Abiertas"],
+  ["resueltas", "Resueltas"],
+  ["canceladas", "Canceladas"],
+];
+
 let contenedor = null;
 
 export async function pintar(zona) {
@@ -11,37 +18,41 @@ export async function pintar(zona) {
       <h2>Reportes</h2>
 
       <p>
-        Descargá un PDF con el listado de todas las incidencias y un resumen
-        por estado, por prioridad y por área.
+        Descargá un PDF con el listado de incidencias y un resumen por estado,
+        por prioridad y por área. Elegí qué incidencias incluir.
       </p>
+
+      <div class="opciones-reporte" role="radiogroup" aria-label="Incidencias a incluir">
+        ${OPCIONES.map(
+          ([valor, texto], i) => `<input type="radio" class="btn-check" name="filtro-reporte" id="filtro-${valor || "todas"}" value="${valor}"${i === 0 ? " checked" : ""}>
+          <label class="btn opcion-reporte" for="filtro-${valor || "todas"}">${texto}</label>`
+        ).join("")}
+      </div>
 
       <div class="zona-error"></div>
 
-      <button class="btn btn-gim" type="button" id="boton-descargar">
-        Descargar reporte
-      </button>
+      <button class="btn btn-gim" type="button" id="boton-descargar">Descargar reporte</button>
     </div>`;
 
-  contenedor
-    .querySelector("#boton-descargar")
-    .addEventListener("click", descargar);
+  contenedor.querySelector("#boton-descargar").addEventListener("click", descargar);
 }
 
 async function descargar() {
   const boton = contenedor.querySelector("#boton-descargar");
   const zona = contenedor.querySelector(".zona-error");
+  const filtro = contenedor.querySelector("[name=filtro-reporte]:checked").value;
 
   boton.disabled = true;
   boton.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Generando...`;
   zona.innerHTML = "";
 
   try {
-    const blob = await api.descargar("/reportes/incidencias");
+    const blob = await api.descargar(`/reportes/incidencias${filtro ? `?filtro=${filtro}` : ""}`);
 
     const url = URL.createObjectURL(blob);
     const enlace = document.createElement("a");
     enlace.href = url;
-    enlace.download = "reporte-incidencias.pdf";
+    enlace.download = filtro ? `reporte-incidencias-${filtro}.pdf` : "reporte-incidencias.pdf";
     enlace.click();
 
     URL.revokeObjectURL(url);
