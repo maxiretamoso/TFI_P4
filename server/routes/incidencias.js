@@ -29,9 +29,11 @@ router.use(verificarToken);
  *     parameters:
  *       - { in: query, name: pagina,    schema: { type: integer, minimum: 1, default: 1 } }
  *       - { in: query, name: limite,    schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
- *       - { in: query, name: estado,    schema: { type: integer }, description: Filtra por id_estado }
+ *       - { in: query, name: estado,    schema: { type: string, example: "1,2" }, description: Uno o varios id_estado separados por coma }
  *       - { in: query, name: prioridad, schema: { type: integer, minimum: 1, maximum: 3 } }
  *       - { in: query, name: buscar,    schema: { type: string }, description: Texto en el pedido o el artículo }
+ *       - { in: query, name: desde,     schema: { type: string, format: date }, description: Creadas desde esa fecha (AAAA-MM-DD) }
+ *       - { in: query, name: sin_asignar, schema: { type: boolean }, description: Solo las pendientes que siguen a cargo del Director }
  *     responses:
  *       200:
  *         description: Página de incidencias
@@ -53,9 +55,14 @@ router.get(
   [
     query("pagina").optional().isInt({ min: 1 }),
     query("limite").optional().isInt({ min: 1, max: 100 }),
-    query("estado").optional().isInt({ min: 1 }),
+    query("estado")
+      .optional()
+      .matches(/^\d+(,\d+)*$/)
+      .withMessage("estado debe ser uno o varios números separados por coma"),
     query("prioridad").optional().isInt({ min: 1, max: 3 }),
     query("buscar").optional().trim().isLength({ max: 255 }),
+    query("desde").optional().isISO8601({ strict: true }).withMessage("desde debe ser una fecha AAAA-MM-DD"),
+    query("sin_asignar").optional().isBoolean().withMessage("sin_asignar debe ser true o false"),
   ],
   incidenciasController.listar
 );

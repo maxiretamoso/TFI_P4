@@ -28,7 +28,7 @@ const SELECCION = `
   ${DESDE}
 `;
 
-function armarFiltros({ creadoPor, asignadoA, estado, prioridad, buscar }) {
+function armarFiltros({ creadoPor, asignadoA, estados, prioridad, buscar, desde, sinAsignar, pendiente, rolDirector }) {
   const condiciones = [];
   const valores = [];
 
@@ -40,9 +40,9 @@ function armarFiltros({ creadoPor, asignadoA, estado, prioridad, buscar }) {
     valores.push(asignadoA);
     condiciones.push(`incidencias.asignado_a = $${valores.length}`);
   }
-  if (estado) {
-    valores.push(estado);
-    condiciones.push(`incidencias.id_estado = $${valores.length}`);
+  if (estados) {
+    valores.push(estados);
+    condiciones.push(`incidencias.id_estado = ANY($${valores.length})`);
   }
   if (prioridad) {
     valores.push(prioridad);
@@ -52,6 +52,18 @@ function armarFiltros({ creadoPor, asignadoA, estado, prioridad, buscar }) {
     valores.push(`%${buscar}%`);
     condiciones.push(
       `(incidencias.descripcion_pedido ILIKE $${valores.length} OR articulos.descripcion ILIKE $${valores.length})`
+    );
+  }
+
+  if (desde) {
+    valores.push(desde);
+    condiciones.push(`incidencias.creado >= $${valores.length}::date`);
+  }
+  if (sinAsignar) {
+    valores.push(pendiente, rolDirector);
+    condiciones.push(
+      `incidencias.id_estado = $${valores.length - 1}
+       AND incidencias.asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $${valores.length})`
     );
   }
 

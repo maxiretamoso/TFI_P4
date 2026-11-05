@@ -32,9 +32,13 @@ async function listar(solicitante, consulta = {}) {
 
   const { items, total } = await incidenciasDatos.listar({
     ...filtroSegunRol(solicitante),
-    estado: consulta.estado ? aEntero(consulta.estado, null) : null,
+    estados: consulta.estado ? consulta.estado.split(",").map(Number) : null,
     prioridad: consulta.prioridad ? aEntero(consulta.prioridad, null) : null,
     buscar: consulta.buscar || null,
+    desde: consulta.desde || null,
+    sinAsignar: consulta.sin_asignar === "true" || consulta.sin_asignar === "1",
+    pendiente: ESTADOS.PENDIENTE,
+    rolDirector: ROLES.DIRECTOR,
     pagina,
     limite,
   });
