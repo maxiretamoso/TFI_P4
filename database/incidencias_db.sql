@@ -253,5 +253,5 @@ ALTER TABLE ONLY public.incidencias_estados ADD CONSTRAINT incidencias_estados_i
 SELECT conrelid::regclass AS tabla, conname AS constraint
 FROM pg_constraint WHERE contype = 'f' ORDER BY 1, 2;
 
--- Extensión necesaria para que funcione el login en supabase (encripta la contraseña)
+-- Extensión que usa la cátedra para verificar las contraseñas en SHA-256
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
