@@ -11,7 +11,7 @@ import {
 } from "../permisos.js";
 
 const POR_PAGINA = 10;
-const FILTROS_ADMITIDOS = ["estado", "prioridad", "desde", "sin_asignar"];
+const FILTROS_ADMITIDOS = ["estado", "prioridad", "desde", "sin_asignar", "area", "categoria", "asignado"];
 const NOMBRES_ESTADO_PLURAL = {
   [ESTADOS.PENDIENTE]: "Pendientes",
   [ESTADOS.EN_PROCESO]: "En proceso",
@@ -28,6 +28,8 @@ let error = "";
 let finalizandoId = null;
 let asignandoId = null;
 let filtros = new URLSearchParams();
+// Texto legible de los filtros por id (área, categoría, responsable), que llega en la URL.
+let etiqueta = "";
 
 function tituloDeLista() {
   if (esDirector(usuario)) return "Todas las incidencias";
@@ -46,6 +48,7 @@ function descripcionDelFiltro() {
   if (filtros.get("prioridad")) partes.push(`prioridad ${PRIORIDADES[filtros.get("prioridad")] ?? ""}`);
   if (filtros.get("sin_asignar")) partes.push("sin asignar");
   if (filtros.get("desde")) partes.push(`creadas desde el ${fecha(filtros.get("desde"))}`);
+  if (etiqueta) partes.push(etiqueta);
   return partes.join(" · ");
 }
 
@@ -62,6 +65,7 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
   filtros = new URLSearchParams(
     [...parametros].filter(([clave]) => FILTROS_ADMITIDOS.includes(clave))
   );
+  etiqueta = parametros.get("etiqueta") ?? "";
   usuario = leerUsuario();
   incidencias = [];
   paginado = { pagina: 1, paginas: 1, total: 0, limite: POR_PAGINA };

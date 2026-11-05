@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { esc, fecha, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fechaHora } from "../ui.js";
+import { esc, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fechaHora } from "../ui.js";
 
 const COLOR_ESTADO = {
   [ESTADOS.PENDIENTE]: "var(--gim-pendiente)",
@@ -16,6 +16,12 @@ function fechaHaceDias(dias) {
   dia.setDate(dia.getDate() - dias);
   const mes = String(dia.getMonth() + 1).padStart(2, "0");
   return `${dia.getFullYear()}-${mes}-${String(dia.getDate()).padStart(2, "0")}`;
+}
+
+function enlaceALista(filtros, etiqueta) {
+  const consulta = new URLSearchParams(filtros);
+  if (etiqueta) consulta.set("etiqueta", etiqueta);
+  return `#/?${consulta}`;
 }
 
 function porcentaje(parte, total) {
@@ -67,9 +73,11 @@ function barrasHorizontales(filas) {
   return `<ul class="barras">${filas
     .map(
       (f) => `<li>
-        <span class="barra-nombre">${esc(f.nombre)}</span>
-        <span class="barra-pista"><span class="barra-relleno" style="width: ${(f.total / maximo) * 100}%"></span></span>
-        <span class="barra-total">${f.total}</span>
+        <a class="fila-enlace" href="${f.enlace}" title="Ver estas incidencias">
+          <span class="barra-nombre">${esc(f.nombre)}</span>
+          <span class="barra-pista"><span class="barra-relleno" style="width: ${(f.total / maximo) * 100}%"></span></span>
+          <span class="barra-total">${f.total}</span>
+        </a>
       </li>`
     )
     .join("")}</ul>`;
@@ -79,21 +87,31 @@ function graficoPorPrioridad(resumen) {
   const totales = new Map(resumen.porPrioridad.map((f) => [f.prioridad, f.total]));
   const filas = Object.entries(PRIORIDADES)
     .reverse()
-    .map(([valor, nombre]) => ({ nombre, total: totales.get(Number(valor)) ?? 0 }));
+    .map(([valor, nombre]) => ({
+      nombre,
+      total: totales.get(Number(valor)) ?? 0,
+      enlace: enlaceALista({ prioridad: valor }),
+    }));
   return barrasHorizontales(filas);
 }
 
 function graficoPorArea(resumen) {
-  return barrasHorizontales(resumen.porArea.map((f) => ({ nombre: f.area, total: f.total })));
-}
-
-function totalesPorFecha(resumen) {
-  return barrasHorizontales(resumen.porFecha.map((f) => ({ nombre: fecha(f.fecha), total: f.total })));
+  return barrasHorizontales(
+    resumen.porArea.map((f) => ({
+      nombre: f.area,
+      total: f.total,
+      enlace: enlaceALista({ area: f.id_area }, `área ${f.area}`),
+    }))
+  );
 }
 
 function graficoPorCategoria(resumen) {
   return barrasHorizontales(
-    resumen.porCategoria.map((f) => ({ nombre: f.categoria, total: f.total }))
+    resumen.porCategoria.map((f) => ({
+      nombre: f.categoria,
+      total: f.total,
+      enlace: enlaceALista({ categoria: f.id_categoria }, `categoría ${f.categoria}`),
+    }))
   );
 }
 
@@ -131,7 +149,7 @@ function tablaDePrioritarias(resumen) {
   }
   const filas = resumen.prioritarias
     .map(
-      (inc) => `<tr>
+      (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: ABIERTAS, prioridad: PRIORIDAD_ALTA })}" title="Ver las incidencias prioritarias">
         <td>${inc.id_incidencia}</td>
         <td>${esc(inc.articulo)}</td>
         <td class="celda-pedido" title="${esc(inc.descripcion_pedido)}">${esc(inc.descripcion_pedido)}</td>
@@ -160,18 +178,20 @@ function cargaDeEmpleados(resumen) {
   const filas = resumen.cargaPorEmpleado
     .map(
       (e) => `<li>
-        <span class="barra-nombre carga-nombre">${esc(e.nombres)} ${esc(e.apellidos)}</span>
-        <span class="barra-pista carga-pista">
-          <span class="carga-abiertas" style="width: ${(e.abiertas / maximo) * 100}%"></span>
-          <span class="carga-resueltas" style="width: ${(e.resueltas / maximo) * 100}%"></span>
-        </span>
-        <span class="carga-numeros" title="abiertas / resueltas">${e.abiertas} / ${e.resueltas}</span>
+        <a class="fila-enlace" href="${enlaceALista({ asignado: e.id_usuario }, `asignadas a ${e.nombres} ${e.apellidos}`)}" title="Ver las incidencias de ${esc(e.nombres)}">
+          <span class="barra-nombre carga-nombre">${esc(e.nombres)} ${esc(e.apellidos)}</span>
+          <span class="barra-pista carga-pista">
+            <span class="carga-abiertas" style="width: ${(e.abiertas / maximo) * 100}%"></span>
+            <span class="carga-resueltas" style="width: ${(e.resueltas / maximo) * 100}%"></span>
+          </span>
+          <span class="carga-numeros" title="abiertas / resueltas">${e.abiertas} / ${e.resueltas}</span>
+        </a>
       </li>`
     )
     .join("");
   return `<ul class="barras">${filas}</ul>
     <p class="referencias-linea">
-      <span><span class="punto" style="background: var(--gim-pendiente)"></span>Abiertas (sin terminar)</span>
+      <span><span class="punto" style="background: var(--gim-pendiente)"></span>Abiertas</span>
       <span><span class="punto" style="background: var(--gim-resuelta)"></span>Resueltas</span>
     </p>`;
 }
@@ -203,7 +223,7 @@ export async function pintar(zona) {
       ${tablaDePrioritarias(resumen)}
     </section>
 
-    <div class="grilla-tres">
+    <div class="grilla-dos">
       <section class="tarjeta-grafico">
         <h3>Por prioridad</h3>
         ${graficoPorPrioridad(resumen)}
@@ -212,21 +232,21 @@ export async function pintar(zona) {
         <h3>Por área</h3>
         ${graficoPorArea(resumen)}
       </section>
-      <section class="tarjeta-grafico">
-        <h3>Por categoría</h3>
-        ${graficoPorCategoria(resumen)}
-      </section>
     </div>
 
     <div class="grilla-dos">
       <section class="tarjeta-grafico">
-        <h3>Por fecha</h3>
-        <p class="texto-ayuda">Últimos días con incidencias creadas</p>
-        ${totalesPorFecha(resumen)}
+        <h3>Por categoría</h3>
+        ${graficoPorCategoria(resumen)}
       </section>
       <section class="tarjeta-grafico">
         <h3>Carga de trabajo del equipo de Sistemas</h3>
         ${cargaDeEmpleados(resumen)}
       </section>
     </div>`;
+
+  zona.querySelector(".tabla-dashboard")?.addEventListener("click", (evento) => {
+    const fila = evento.target.closest("tr[data-enlace]");
+    if (fila) window.location.hash = fila.dataset.enlace;
+  });
 }

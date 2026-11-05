@@ -972,6 +972,34 @@ a.indicador:focus-visible {
     width: 1%;
 }
 
+.fila-enlace {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    padding: 4px 6px;
+    margin: -4px -6px;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 0.15s ease;
+}
+
+.fila-enlace:hover,
+.fila-enlace:focus-visible {
+    background-color: var(--gim-verde-suave);
+    color: inherit;
+}
+
+.fila-clicable {
+    cursor: pointer;
+}
+
+.fila-clicable:hover td {
+    background-color: var(--gim-verde-suave);
+}
+
 .filtro-activo {
     display: flex;
     flex-wrap: wrap;
@@ -1008,12 +1036,6 @@ a.indicador:focus-visible {
     margin-top: 16px;
 }
 
-.grilla-tres {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
-    margin-top: 16px;
-}
 
 .tabla-dashboard table {
     width: 100%;
@@ -1099,7 +1121,6 @@ a.indicador:focus-visible {
 
 @media (max-width: 991.98px) {
     .grilla-resumen,
-    .grilla-tres,
     .grilla-dos {
         grid-template-columns: minmax(0, 1fr);
     }
