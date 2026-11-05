@@ -3,8 +3,10 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles.css";
 import { enrutar } from "./router.js";
 import { activarCierreDeAvisos } from "./avisos.js";
+import { activarAyudas } from "./ayudas.js";
 
 activarCierreDeAvisos();
+activarAyudas();
 window.addEventListener("hashchange", enrutar);
 
 enrutar();

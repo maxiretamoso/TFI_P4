@@ -45,7 +45,7 @@ function graficoPorEstado(resumen) {
   const referencias = resumen.porEstado
     .map(
       (f) => `<li>
-        <a class="referencia-enlace" href="#/?estado=${f.id_estado}" title="Ver las incidencias en este estado">
+        <a class="referencia-enlace" href="#/?estado=${f.id_estado}">
           <span class="punto" style="background: ${COLOR_ESTADO[f.id_estado]}"></span>
           ${esc(f.estado)} <strong>${f.total}</strong>
           <span class="porcentaje">${porcentaje(f.total, resumen.total)}%</span>
@@ -73,7 +73,7 @@ function barrasHorizontales(filas) {
   return `<ul class="barras">${filas
     .map(
       (f) => `<li>
-        <a class="fila-enlace" href="${f.enlace}" title="Ver estas incidencias">
+        <a class="fila-enlace" href="${f.enlace}">
           <span class="barra-nombre">${esc(f.nombre)}</span>
           <span class="barra-pista"><span class="barra-relleno" style="width: ${(f.total / maximo) * 100}%"></span></span>
           <span class="barra-total">${f.total}</span>
@@ -119,18 +119,19 @@ function tarjetasDeIndicadores(resumen) {
   const resueltas = resumen.porEstado.find((f) => f.id_estado === ESTADOS.RESUELTA)?.total ?? 0;
   const { abiertas, altas_abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
   const indicadores = [
-    ["Total", resumen.total, "Incidencias registradas", ""],
-    ["Abiertas", abiertas, "Sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
-    ["Alta sin resolver", altas_abiertas, "Abiertas de prioridad Alta", `estado=${ABIERTAS}&prioridad=${PRIORIDAD_ALTA}`],
-    ["Últimos 7 días", ultimos_7_dias, "Incidencias creadas en la última semana", `desde=${fechaHaceDias(6)}`],
-    ["Sin asignar", sin_asignar, "Pendientes que siguen a cargo del Director", "sin_asignar=true"],
-    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "Porcentaje de resueltas sobre el total", `estado=${ESTADOS.RESUELTA}`],
+    ["Total", resumen.total, "incidencias registradas", ""],
+    ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
+    ["Alta sin resolver", altas_abiertas, "abiertas de prioridad Alta", `estado=${ABIERTAS}&prioridad=${PRIORIDAD_ALTA}`],
+    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
+    ["Sin asignar", sin_asignar, "pendientes a cargo del Director", "sin_asignar=true"],
+    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
   ];
   return `<div class="indicadores">${indicadores
     .map(
-      ([titulo, valor, detalle, filtro]) => `<a class="indicador" href="#/${filtro ? `?${filtro}` : ""}" title="${detalle}. Tocá para ver la lista.">
+      ([titulo, valor, detalle, filtro]) => `<a class="indicador" href="#/${filtro ? `?${filtro}` : ""}">
         <span class="indicador-valor">${valor}</span>
         <span class="indicador-titulo">${titulo}</span>
+        <span class="indicador-detalle">${detalle}</span>
       </a>`
     )
     .join("")}</div>`;
@@ -148,14 +149,14 @@ function tablaDePrioritarias(resumen) {
   }
   const filas = resumen.prioritarias
     .map(
-      (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: ABIERTAS, prioridad: PRIORIDAD_ALTA })}" title="Ver las incidencias prioritarias">
+      (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: ABIERTAS, prioridad: PRIORIDAD_ALTA })}">
         <td>${inc.id_incidencia}</td>
         <td>${esc(inc.articulo)}</td>
-        <td class="celda-pedido" title="${esc(inc.descripcion_pedido)}">${esc(inc.descripcion_pedido)}</td>
+        <td class="celda-pedido" data-ayuda-si-cortado>${esc(inc.descripcion_pedido)}</td>
         <td>${badgeEstado(inc)}</td>
         <td>${esc(inc.asignado_nombres)} ${esc(inc.asignado_apellidos)}</td>
         <td>${esc(inc.creador_nombres)} ${esc(inc.creador_apellidos)}</td>
-        <td title="${fechaHora(inc.creado)}">${antiguedad(inc.creado)}</td>
+        <td data-ayuda="${fechaHora(inc.creado)}">${antiguedad(inc.creado)}</td>
       </tr>`
     )
     .join("");
@@ -177,13 +178,13 @@ function cargaDeEmpleados(resumen) {
   const filas = resumen.cargaPorEmpleado
     .map(
       (e) => `<li>
-        <a class="fila-enlace" href="${enlaceALista({ asignado: e.id_usuario }, `asignadas a ${e.nombres} ${e.apellidos}`)}" title="Ver las incidencias de ${esc(e.nombres)}">
+        <a class="fila-enlace" href="${enlaceALista({ asignado: e.id_usuario }, `asignadas a ${e.nombres} ${e.apellidos}`)}">
           <span class="barra-nombre carga-nombre">${esc(e.nombres)} ${esc(e.apellidos)}</span>
           <span class="barra-pista carga-pista">
             <span class="carga-abiertas" style="width: ${(e.abiertas / maximo) * 100}%"></span>
             <span class="carga-resueltas" style="width: ${(e.resueltas / maximo) * 100}%"></span>
           </span>
-          <span class="carga-numeros" title="abiertas / resueltas">${e.abiertas} / ${e.resueltas}</span>
+          <span class="carga-numeros" data-ayuda="Abiertas / resueltas">${e.abiertas} / ${e.resueltas}</span>
         </a>
       </li>`
     )

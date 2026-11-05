@@ -19,7 +19,7 @@ function alternarTema() {
 
 export function botonTema() {
   return `<button type="button" class="interruptor-tema" id="boton-tema" role="switch"
-      aria-checked="${temaOscuro()}" aria-label="Modo oscuro" title="Cambiar entre modo claro y oscuro">
+      aria-checked="${temaOscuro()}" aria-label="Modo oscuro" data-ayuda="Claro / oscuro">
     <span class="interruptor-perilla">
       <span class="interruptor-icono icono-sol">${ICONO_SOL}</span>
       <span class="interruptor-icono icono-luna">${ICONO_LUNA}</span>

@@ -21,7 +21,6 @@ function cerrar(aviso) {
 function mostrarFlotante(aviso) {
   if (aviso.dataset.flotante) return;
   aviso.dataset.flotante = "1";
-  aviso.title = "Tocá para cerrar";
   aviso.addEventListener("click", () => cerrar(aviso));
 
   // Se saca del formulario donde lo puso la pantalla para que no mueva el resto.
