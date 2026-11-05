@@ -179,19 +179,34 @@ async function cambiarPagina(evento) {
   contenedor.querySelector("h2:last-of-type")?.scrollIntoView({ block: "start" });
 }
 
-function manejarAccion(evento) {
+const ACCIONES_CON_ESPERA = {
+  cancelar,
+  "aceptar-finalizar": finalizar,
+  "aceptar-asignar": asignar,
+};
+
+async function manejarAccion(evento) {
   const boton = evento.target.closest("button[data-accion]");
-  if (!boton) return;
+  if (!boton || boton.disabled) return;
 
   const accion = boton.dataset.accion;
   const inc = incidencias.find((i) => i.id_incidencia === Number(boton.dataset.id));
 
-  if (accion === "cancelar") cancelar(inc);
   if (accion === "abrir-finalizar") abrirPanel("finalizar", inc);
   if (accion === "abrir-asignar") abrirPanel("asignar", inc);
-  if (accion === "aceptar-finalizar") finalizar(inc);
-  if (accion === "aceptar-asignar") asignar(inc);
   if (accion === "cerrar") cerrarPaneles();
+
+  const ejecutar = ACCIONES_CON_ESPERA[accion];
+  if (!ejecutar) return;
+
+  const texto = boton.textContent;
+  boton.disabled = true;
+  boton.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> ${texto}`;
+  await ejecutar(inc);
+  if (boton.isConnected) {
+    boton.disabled = false;
+    boton.textContent = texto;
+  }
 }
 
 function abrirPanel(cual, inc) {
