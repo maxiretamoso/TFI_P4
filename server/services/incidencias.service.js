@@ -101,7 +101,8 @@ async function finalizar(id, descripcionResolucion, solicitante) {
     descripcion_resolucion: descripcionResolucion,
   });
 
-  await enviarNotificacionDeIncidencia({
+  // El correo sale en segundo plano para no demorar la respuesta.
+  enviarNotificacionDeIncidencia({
     incidencia,
     estado: "finalizada",
     resolucion: descripcionResolucion,
@@ -127,7 +128,7 @@ async function cancelar(id, solicitante) {
 
   const actualizada = await incidenciasDatos.cambiarEstado(id, ESTADOS.CANCELADA);
 
-  await enviarNotificacionDeIncidencia({ incidencia, estado: "cancelada" });
+  enviarNotificacionDeIncidencia({ incidencia, estado: "cancelada" });
 
   return actualizada;
 }
