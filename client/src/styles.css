@@ -70,6 +70,7 @@ h3 {
 .app-con-menu {
     display: flex;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 .lateral {
@@ -402,6 +403,7 @@ h3 {
 .pantalla-login {
     display: flex;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 .login-marca {
