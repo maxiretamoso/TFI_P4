@@ -5,26 +5,24 @@ async function login(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.json(await authService.login(req.body.usuario, req.body.contrasenia));
-  } catch (e) {
-    if (e.status) return next(e);
-    console.error(e);
-    const generico = new Error("Error al iniciar sesión");
-    generico.status = 500;
-    next(generico);
+  } catch (error) {
+    next(error);
   }
 }
 
-async function register(req, res, next) {
+async function cambiarContrasenia(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    res.status(201).json(await authService.register(req.body, req.usuario));
-  } catch (e) {
-    if (e.status) return next(e);
-    console.error(e);
-    const generico = new Error("Error al registrar usuario");
-    generico.status = 500;
-    next(generico);
+    res.json(
+      await authService.cambiarContrasenia(
+        req.usuario.id_usuario,
+        req.body.contrasenia_actual,
+        req.body.contrasenia_nueva
+      )
+    );
+  } catch (error) {
+    next(error);
   }
 }
 
-module.exports = { login, register };
+module.exports = { login, cambiarContrasenia };

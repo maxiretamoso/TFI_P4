@@ -1,21 +1,22 @@
 const express = require("express");
-const router = express.Router();
 const { body } = require("express-validator");
 const verificarToken = require("../middlewares/verificarToken");
 const authController = require("../controllers/auth.controller");
+
+const router = express.Router();
 
 /**
  * @swagger
  * tags:
  *   name: Auth
- *   description: Autenticación y registro
+ *   description: Inicio de sesión y contraseña
  */
 
 /**
  * @swagger
- * /api/v1/auth/login:
+ * /auth/login:
  *   post:
- *     summary: Login y obtención de JWT
+ *     summary: Inicia sesión y devuelve un token JWT
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -25,41 +26,68 @@ const authController = require("../controllers/auth.controller");
  *             type: object
  *             required: [usuario, contrasenia]
  *             properties:
- *               usuario: { type: string }
- *               contrasenia: { type: string }
+ *               usuario:
+ *                 type: string
+ *                 example: pamalm@correo.com
+ *               contrasenia:
+ *                 type: string
+ *                 example: pamalm
  *     responses:
- *       200: { description: Token JWT }
- *       401: { description: Credenciales inválidas }
+ *       200:
+ *         description: Token y datos del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token: { type: string }
+ *                 usuario: { $ref: '#/components/schemas/Usuario' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
+ *       401: { description: Usuario o contraseña incorrectos }
+ *       403: { description: El usuario está dado de baja }
  */
 router.post(
   "/login",
   [
-    body("usuario").isString().trim().notEmpty(),
-    body("contrasenia").isString().notEmpty(),
+    body("usuario").isString().trim().notEmpty().withMessage("El usuario es obligatorio"),
+    body("contrasenia").isString().notEmpty().withMessage("La contraseña es obligatoria"),
   ],
   authController.login
 );
 
 /**
  * @swagger
- * /api/v1/auth/register:
- *   post:
- *     summary: Crea un usuario (hashea contraseña con bcrypt)
+ * /auth/contrasenia:
+ *   patch:
+ *     summary: Cambia la contraseña del usuario autenticado
  *     tags: [Auth]
  *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [contrasenia_actual, contrasenia_nueva]
+ *             properties:
+ *               contrasenia_actual: { type: string }
+ *               contrasenia_nueva: { type: string, minLength: 6 }
+ *     responses:
+ *       200: { description: Contraseña actualizada }
+ *       400: { description: La contraseña actual no es correcta }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
-router.post(
-  "/register",
+router.patch(
+  "/contrasenia",
   verificarToken,
   [
-    body("id_area").isInt(),
-    body("nombres").isString().trim().isLength({ min: 1, max: 100 }),
-    body("apellidos").isString().trim().isLength({ min: 1, max: 100 }),
-    body("usuario").isString().trim().isLength({ min: 1, max: 100 }),
-    body("contrasenia").isString().isLength({ min: 6, max: 100 }),
-    body("rol").isInt({ min: 1, max: 3 }),
+    body("contrasenia_actual").isString().notEmpty(),
+    body("contrasenia_nueva")
+      .isString()
+      .isLength({ min: 6, max: 100 })
+      .withMessage("La contraseña nueva debe tener entre 6 y 100 caracteres"),
   ],
-  authController.register
+  authController.cambiarContrasenia
 );
 
 module.exports = router;

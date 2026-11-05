@@ -4,21 +4,27 @@ const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 async function listar(req, res, next) {
   try {
     res.json(await areasService.listarAreas());
-  } catch (e) { next(e); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function obtenerPorId(req, res, next) {
   try {
     const area = await areasService.obtenerAreaPorId(req.params.id);
     res.json(area);
-  } catch (e) { next(e); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function crear(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.status(201).json(await areasService.crearArea(req.body.descripcion));
-  } catch (e) { next(e); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function actualizar(req, res, next) {
@@ -26,14 +32,18 @@ async function actualizar(req, res, next) {
   try {
     const area = await areasService.actualizarArea(req.params.id, req.body.descripcion);
     res.json(area);
-  } catch (e) { next(e); }
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function eliminar(req, res, next) {
   try {
-    const area = await areasService.desactivarArea(req.params.id);
-    res.json({ mensaje: "Área desactivada", area });
-  } catch (e) { next(e); }
+    await areasService.desactivarArea(req.params.id);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
 }
 
 module.exports = { listar, obtenerPorId, crear, actualizar, eliminar };

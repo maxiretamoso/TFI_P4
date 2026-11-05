@@ -1,81 +1,94 @@
 const fs = require("fs");
 const path = require("path");
 const usuariosService = require("../services/usuarios.service");
+const { uploadDir } = require("../utils/avatarUpload");
 const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 
-// Borra un archivo subido sin romper el request si falla (best-effort).
-function borrarArchivoSeguro(filePath) {
+function borrarArchivo(ruta) {
   try {
-    if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
-  } catch (_) {
-    // limpieza best-effort: no debe fallar el request
+    if (ruta && fs.existsSync(ruta)) fs.unlinkSync(ruta);
+  } catch {
+    // la limpieza no debe hacer fallar el pedido
   }
 }
 
-// Carpeta física de avatares: el único lugar permitido para borrar.
-const AVATAR_DIR = path.resolve(__dirname, "..", "uploads", "avatars");
-
-// Borra el avatar anterior solo si, tras resolver la ruta, queda DENTRO de
-// uploads/avatars. basename() descarta cualquier "../" del nombre guardado,
-// así un valor malicioso no puede escaparse de la carpeta (path traversal).
-function borrarAvatarSeguro(relPath) {
-  if (!relPath || typeof relPath !== "string") return;
-  const destino = path.resolve(AVATAR_DIR, path.basename(relPath));
-  if (destino.startsWith(AVATAR_DIR + path.sep) && fs.existsSync(destino)) {
-    borrarArchivoSeguro(destino);
-  }
+// basename() descarta cualquier "../" guardado en la base, así el borrado
+// no puede salirse de la carpeta de avatares.
+function borrarAvatarAnterior(nombreArchivo) {
+  if (!nombreArchivo) return;
+  borrarArchivo(path.join(uploadDir, path.basename(nombreArchivo)));
 }
 
 async function listar(req, res, next) {
   try {
-    res.json(await usuariosService.listarUsuarios());
-  } catch (e) { next(e); }
+    const soloSistemas = req.query.rol === "sistemas";
+    res.json(
+      soloSistemas
+        ? await usuariosService.listarEmpleadosDeSistemas()
+        : await usuariosService.listarUsuarios()
+    );
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function obtenerPorId(req, res, next) {
   try {
-    const usuario = await usuariosService.obtenerUsuarioPorId(req.params.id);
-    res.json(usuario);
-  } catch (e) { next(e); }
+    res.json(await usuariosService.obtenerUsuarioPorId(req.params.id));
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function crear(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    res.status(201).json(await usuariosService.crearUsuario(req.body));
-  } catch (e) { next(e); }
+    const usuario = await usuariosService.crearUsuario(req.body);
+    res.status(201).location(`/api/v1/usuarios/${usuario.id_usuario}`).json(usuario);
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function actualizar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    const usuario = await usuariosService.actualizarUsuario(req.params.id, req.body, req.usuario);
-    res.json(usuario);
-  } catch (e) { next(e); }
+    res.json(await usuariosService.actualizarUsuario(req.params.id, req.body, req.usuario));
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function eliminar(req, res, next) {
   try {
-    const usuario = await usuariosService.desactivarUsuario(req.params.id);
-    res.json({ mensaje: "Usuario desactivado" });
-  } catch (e) { next(e); }
+    await usuariosService.desactivarUsuario(req.params.id, req.usuario);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
 }
 
 async function subirAvatar(req, res, next) {
   try {
-    if (!req.file) return res.status(400).json({ error: "Debe enviar un archivo 'avatar'" });
-    if (req.usuario.rol !== 3 && parseInt(req.params.id, 10) !== req.usuario.id_usuario) {
-      borrarArchivoSeguro(req.file.path);
-      return res.status(403).json({ error: "No autorizado" });
+    if (!req.file) {
+      return res.status(400).json({ error: "Falta el archivo en el campo 'avatar'" });
     }
-    const previo = await usuariosService.obtenerUsuarioPorId(req.params.id);
-    const relPath = `uploads/avatars/${req.file.filename}`;
-    const usuario = await usuariosService.actualizarAvatar(req.params.id, relPath);
-    if (previo.avatar && previo.avatar !== relPath) borrarAvatarSeguro(previo.avatar);
+
+    const anterior = await usuariosService.obtenerUsuarioPorId(req.params.id);
+    const usuario = await usuariosService.actualizarAvatar(
+      req.params.id,
+      req.file.filename,
+      req.usuario
+    );
+
+    if (anterior.avatar && anterior.avatar !== req.file.filename) {
+      borrarAvatarAnterior(anterior.avatar);
+    }
+
     res.json(usuario);
-  } catch (e) {
-    if (req.file) borrarArchivoSeguro(req.file.path);
-    next(e);
+  } catch (error) {
+    if (req.file) borrarArchivo(req.file.path);
+    next(error);
   }
 }
 

@@ -1,9 +1,13 @@
 const express = require("express");
-const router = express.Router();
+const { body, param } = require("express-validator");
 const verificarToken = require("../middlewares/verificarToken");
 const verificarRol = require("../middlewares/verificarRol");
-const { body } = require("express-validator");
 const categoriasController = require("../controllers/categorias.controller");
+const { ROLES } = require("../config/roles");
+
+const router = express.Router();
+
+const PUEDEN_GESTIONAR = [ROLES.EMPLEADO_SISTEMAS, ROLES.DIRECTOR];
 
 /**
  * @swagger
@@ -14,43 +18,100 @@ const categoriasController = require("../controllers/categorias.controller");
 
 /**
  * @swagger
- * /api/v1/categorias:
+ * /categorias:
  *   get:
- *     summary: Listar categorías activas
- *     tags: [Categorias]
- *   post:
- *     summary: Crear categoría (rol 2/3)
+ *     summary: Lista categorías activas
  *     tags: [Categorias]
  *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Lista de categorías }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *   post:
+ *     summary: Crea una categorias
+ *     tags: [Categorias]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [descripcion]
+ *             properties:
+ *               descripcion: { type: string, maxLength: 250 }
+ *     responses:
+ *       201: { description: Creada }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
  */
-// GET /api/v1/categorias -> lista activas (Browse)
-router.get("/", categoriasController.listar);
+router.get("/", verificarToken, categoriasController.listar);
+
+router.post(
+  "/",
+  verificarToken,
+  verificarRol(...PUEDEN_GESTIONAR),
+  [body("descripcion").isString().trim().isLength({ min: 1, max: 250 })],
+  categoriasController.crear
+);
 
 /**
  * @swagger
- * /api/v1/categorias/{id}:
+ * /categorias/{id}:
  *   get:
- *     summary: Obtener categoría
+ *     summary: Obtiene una categorias por id
  *     tags: [Categorias]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     responses:
+ *       200: { description: El recurso pedido }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   put:
- *     summary: Editar categoría (rol 2/3)
+ *     summary: Modifica una categorias
  *     tags: [Categorias]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [descripcion]
+ *             properties:
+ *               descripcion: { type: string, maxLength: 250 }
+ *     responses:
+ *       200: { description: Modificada }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   delete:
- *     summary: Soft delete categoría
+ *     summary: Da de baja una categorias (soft delete, activo = 0)
  *     tags: [Categorias]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     responses:
+ *       204: { description: Dada de baja }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
  */
-// GET /:id -> Read
-router.get("/:id", categoriasController.obtenerPorId);
+router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], categoriasController.obtenerPorId);
 
-// POST / -> Add (solo sistemas 2 y director 3)
-router.post("/", verificarToken, verificarRol(2, 3), [body("descripcion").isString().trim().isLength({ min: 1, max: 100 })], categoriasController.crear);
+router.put(
+  "/:id",
+  verificarToken,
+  verificarRol(...PUEDEN_GESTIONAR),
+  [param("id").isInt({ min: 1 }), body("descripcion").isString().trim().isLength({ min: 1, max: 250 })],
+  categoriasController.actualizar
+);
 
-// PUT /:id -> Edit
-router.put("/:id", verificarToken, verificarRol(2, 3), [body("descripcion").isString().trim().isLength({ min: 1, max: 100 })], categoriasController.actualizar);
-
-// DELETE /:id -> soft delete activo=false
-router.delete("/:id", verificarToken, verificarRol(2, 3), categoriasController.eliminar);
+router.delete(
+  "/:id",
+  verificarToken,
+  verificarRol(...PUEDEN_GESTIONAR),
+  [param("id").isInt({ min: 1 })],
+  categoriasController.eliminar
+);
 
 module.exports = router;

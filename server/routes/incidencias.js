@@ -1,37 +1,55 @@
 const express = require("express");
-const router = express.Router();
+const { body, param, query } = require("express-validator");
 const verificarToken = require("../middlewares/verificarToken");
 const verificarRol = require("../middlewares/verificarRol");
-const { body, query } = require("express-validator");
 const incidenciasController = require("../controllers/incidencias.controller");
+const { ROLES } = require("../config/roles");
+
+const router = express.Router();
+
+router.use(verificarToken);
 
 /**
  * @swagger
  * tags:
  *   name: Incidencias
- *   description: Gestión de incidencias
+ *   description: Alta, asignación, resolución y cancelación de incidencias
  */
 
 /**
  * @swagger
- * /api/v1/incidencias:
+ * /incidencias:
  *   get:
- *     summary: Lista incidencias filtradas por rol, con paginación y filtros
+ *     summary: Lista las incidencias que corresponden al rol del usuario
+ *     description: >
+ *       El Empleado Municipal ve las que creó, el Empleado de Sistemas las que
+ *       tiene asignadas y el Director todas.
  *     tags: [Incidencias]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
- *       - { in: query, name: pagina, schema: { type: integer, default: 1 }, description: Página a devolver (desde 1) }
- *       - { in: query, name: limite, schema: { type: integer, default: 20, maximum: 100 }, description: Ítems por página }
- *       - { in: query, name: estado, schema: { type: integer }, description: Filtra por id_estado }
- *       - { in: query, name: prioridad, schema: { type: integer }, description: Filtra por prioridad (1-3) }
- *       - { in: query, name: buscar, schema: { type: string }, description: Texto a buscar en descripción o artículo }
+ *       - { in: query, name: pagina,    schema: { type: integer, minimum: 1, default: 1 } }
+ *       - { in: query, name: limite,    schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+ *       - { in: query, name: estado,    schema: { type: integer }, description: Filtra por id_estado }
+ *       - { in: query, name: prioridad, schema: { type: integer, minimum: 1, maximum: 3 } }
+ *       - { in: query, name: buscar,    schema: { type: string }, description: Texto en el pedido o el artículo }
  *     responses:
- *       200: { description: Sobre con items, total, pagina, limite y paginas }
- *       400: { description: Parámetros inválidos }
+ *       200:
+ *         description: Página de incidencias
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:   { type: array, items: { $ref: '#/components/schemas/Incidencia' } }
+ *                 total:   { type: integer }
+ *                 pagina:  { type: integer }
+ *                 limite:  { type: integer }
+ *                 paginas: { type: integer }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.get(
   "/",
-  verificarToken,
   [
     query("pagina").optional().isInt({ min: 1 }),
     query("limite").optional().isInt({ min: 1, max: 100 }),
@@ -39,84 +57,185 @@ router.get(
     query("prioridad").optional().isInt({ min: 1, max: 3 }),
     query("buscar").optional().trim().isLength({ max: 255 }),
   ],
-  incidenciasController.listar,
+  incidenciasController.listar
 );
 
-// Sub-rutas explícitas (opcional, más prolijo para frontend, pero no reemplaza el filtrado automático)
-router.get("/mias", verificarToken, incidenciasController.listarMias);
-router.get("/asignadas", verificarToken, verificarRol(2, 3), incidenciasController.listarAsignadas);
-router.get("/todas", verificarToken, verificarRol(3), incidenciasController.listarTodas);
-
 /**
  * @swagger
- * /api/v1/incidencias/{id}:
- *   get:
- *     summary: Obtiene una incidencia por id
- *     tags: [Incidencias]
- */
-router.get("/:id", verificarToken, incidenciasController.obtenerPorId);
-
-/**
- * @swagger
- * /api/v1/incidencias:
+ * /incidencias:
  *   post:
- *     summary: Crea una incidencia (empleado municipal)
+ *     summary: Crea una incidencia
+ *     description: Nace en estado Pendiente y a cargo del Director, que luego la asigna.
  *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [id_articulo, prioridad, descripcion_pedido]
+ *             properties:
+ *               id_articulo:        { type: integer, example: 1 }
+ *               prioridad:          { type: integer, minimum: 1, maximum: 3, example: 2 }
+ *               descripcion_pedido: { type: string, maxLength: 250, example: El monitor no enciende }
+ *     responses:
+ *       201:
+ *         description: Incidencia creada
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Incidencia' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
  */
 router.post(
   "/",
-  verificarToken,
+  verificarRol(ROLES.EMPLEADO_MUNICIPAL),
   [
-    body("id_articulo").isInt(),
-    body("prioridad").isInt({ min: 1, max: 3 }),
-    body("descripcion_pedido").isString().trim().isLength({ min: 1, max: 255 }),
-    body("id_estado").optional().isInt(),
+    body("id_articulo").isInt({ min: 1 }).withMessage("El artículo es obligatorio"),
+    body("prioridad").isInt({ min: 1, max: 3 }).withMessage("La prioridad va de 1 a 3"),
+    body("descripcion_pedido")
+      .isString()
+      .trim()
+      .isLength({ min: 1, max: 250 })
+      .withMessage("La descripción del pedido es obligatoria (máximo 250 caracteres)"),
   ],
-  incidenciasController.crear,
+  incidenciasController.crear
 );
 
 /**
  * @swagger
- * /api/v1/incidencias/{id}/cancelar:
- *   patch:
- *     summary: Cancelar incidencia pendiente (municipal propia o director cualquiera)
+ * /incidencias/{id}:
+ *   get:
+ *     summary: Obtiene una incidencia
  *     tags: [Incidencias]
  *     security: [{ bearerAuth: [] }]
- * /api/v1/incidencias/{id}/finalizar:
- *   patch:
- *     summary: Finalizar incidencia (rol 2/3, requiere descripcion_resolucion, envía email)
- *     tags: [Incidencias]
- *     security: [{ bearerAuth: [] }]
- * /api/v1/incidencias/{id}/asignar:
- *   patch:
- *     summary: Asignar incidencia a empleado sistemas (solo director)
- *     tags: [Incidencias]
- *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Incidencia' }
+ *         description: La incidencia pedida
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
  */
-// PATCH /:id/cancelar
-router.patch("/:id/cancelar", verificarToken, incidenciasController.cancelar);
+router.get("/:id", [param("id").isInt({ min: 1 })], incidenciasController.obtenerPorId);
 
-// PATCH /:id/finalizar - solo empleado sistemas (2) o director (3) si quiere finalizar? enunciado dice empleado sistemas finaliza
+/**
+ * @swagger
+ * /incidencias/{id}/estados:
+ *   get:
+ *     summary: Historial de estados de una incidencia
+ *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     responses:
+ *       200: { description: Lista de cambios de estado }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
+ */
+router.get("/:id/estados", [param("id").isInt({ min: 1 })], incidenciasController.obtenerHistorial);
+
+/**
+ * @swagger
+ * /incidencias/{id}/asignacion:
+ *   patch:
+ *     summary: Asigna la incidencia a un empleado del área de Sistemas
+ *     description: Solo el Director. La incidencia pasa a En Proceso.
+ *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [asignado_a]
+ *             properties:
+ *               asignado_a: { type: integer, description: id_usuario de un empleado de Sistemas }
+ *     responses:
+ *       200: { description: Incidencia asignada }
+ *       400: { description: El usuario indicado no es un empleado de Sistemas }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       409: { description: La incidencia ya está resuelta o cancelada }
+ */
 router.patch(
-  "/:id/finalizar",
-  verificarToken,
-  verificarRol(2, 3),
+  "/:id/asignacion",
+  verificarRol(ROLES.DIRECTOR),
   [
+    param("id").isInt({ min: 1 }),
+    body("asignado_a").isInt({ min: 1 }).withMessage("Hay que indicar a quién se asigna"),
+  ],
+  incidenciasController.asignar
+);
+
+/**
+ * @swagger
+ * /incidencias/{id}/resolucion:
+ *   patch:
+ *     summary: Finaliza la incidencia
+ *     description: Solo el Empleado de Sistemas que la tiene asignada. Envía un correo al creador.
+ *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [descripcion_resolucion]
+ *             properties:
+ *               descripcion_resolucion: { type: string, maxLength: 250 }
+ *     responses:
+ *       200: { description: Incidencia resuelta }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       409: { description: La incidencia ya estaba resuelta o cancelada }
+ */
+router.patch(
+  "/:id/resolucion",
+  verificarRol(ROLES.EMPLEADO_SISTEMAS),
+  [
+    param("id").isInt({ min: 1 }),
     body("descripcion_resolucion")
       .isString()
       .trim()
-      .isLength({ min: 1, max: 255 }),
+      .isLength({ min: 1, max: 250 })
+      .withMessage("Hay que describir cómo se resolvió (máximo 250 caracteres)"),
   ],
-  incidenciasController.finalizar,
+  incidenciasController.finalizar
 );
 
-// PATCH /:id/asignar - solo director
+/**
+ * @swagger
+ * /incidencias/{id}/cancelacion:
+ *   patch:
+ *     summary: Cancela una incidencia pendiente
+ *     description: El Empleado Municipal solo las propias; el Director, cualquiera. Envía un correo al creador.
+ *     tags: [Incidencias]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     responses:
+ *       200: { description: Incidencia cancelada }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       409: { description: La incidencia no está pendiente }
+ */
 router.patch(
-  "/:id/asignar",
-  verificarToken,
-  verificarRol(3),
-  [body("asignado_a").isInt()],
-  incidenciasController.asignar,
+  "/:id/cancelacion",
+  verificarRol(ROLES.DIRECTOR, ROLES.EMPLEADO_MUNICIPAL),
+  [param("id").isInt({ min: 1 })],
+  incidenciasController.cancelar
 );
 
 module.exports = router;

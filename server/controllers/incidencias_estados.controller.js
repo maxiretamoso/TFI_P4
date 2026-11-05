@@ -1,10 +1,10 @@
-const incidenciasEstadosService = require("../services/incidencias_estados.service");
+const historialService = require("../services/incidencias_estados.service");
 
 async function listar(req, res, next) {
   try {
-    res.json(await incidenciasEstadosService.listarHistorial());
-  } catch (e) {
-    next(e);
+    res.json(await historialService.listarHistorial());
+  } catch (error) {
+    next(error);
   }
 }
 

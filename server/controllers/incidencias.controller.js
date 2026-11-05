@@ -1,73 +1,49 @@
-const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 const incidenciasService = require("../services/incidencias.service");
+const historialService = require("../services/incidencias_estados.service");
+const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 
 async function listar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    const { rol, id_usuario } = req.usuario;
-    res.json(await incidenciasService.listar(rol, id_usuario, req.query));
-  } catch (e) {
-    next(e);
-  }
-}
-
-async function listarMias(req, res, next) {
-  try {
-    res.json(await incidenciasService.listarMias(req.usuario.id_usuario));
-  } catch (e) {
-    next(e);
-  }
-}
-
-async function listarAsignadas(req, res, next) {
-  try {
-    res.json(await incidenciasService.listarAsignadas(req.usuario.id_usuario));
-  } catch (e) {
-    next(e);
-  }
-}
-
-async function listarTodas(req, res, next) {
-  try {
-    res.json(await incidenciasService.listarTodas());
-  } catch (e) {
-    next(e);
+    res.json(await incidenciasService.listar(req.usuario, req.query));
+  } catch (error) {
+    next(error);
   }
 }
 
 async function obtenerPorId(req, res, next) {
   try {
-    const { rol, id_usuario } = req.usuario;
-    res.json(await incidenciasService.obtenerPorId(req.params.id, { rol, id_usuario }));
-  } catch (e) {
-    next(e);
+    res.json(await incidenciasService.obtenerPorId(req.params.id, req.usuario));
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function obtenerHistorial(req, res, next) {
+  try {
+    await incidenciasService.obtenerPorId(req.params.id, req.usuario);
+    res.json(await historialService.listarHistorialDeIncidencia(req.params.id));
+  } catch (error) {
+    next(error);
   }
 }
 
 async function crear(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    const { id_articulo, prioridad, descripcion_pedido, descripcion_resolucion, id_estado } = req.body;
-    const inc = await incidenciasService.crear({
-      id_articulo,
-      prioridad,
-      descripcion_pedido,
-      descripcion_resolucion,
-      id_estado,
-      creado_por: req.usuario.id_usuario,
-    });
-    res.status(201).json(inc);
-  } catch (e) {
-    next(e);
+    const incidencia = await incidenciasService.crear(req.body, req.usuario);
+    res.status(201).location(`/api/v1/incidencias/${incidencia.id_incidencia}`).json(incidencia);
+  } catch (error) {
+    next(error);
   }
 }
 
-async function cancelar(req, res, next) {
+async function asignar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    const { rol, id_usuario } = req.usuario;
-    res.json(await incidenciasService.cancelar(parseInt(req.params.id, 10), { rol, id_usuario }));
-  } catch (e) {
-    next(e);
+    res.json(await incidenciasService.asignar(req.params.id, req.body.asignado_a));
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -75,36 +51,19 @@ async function finalizar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.json(
-      await incidenciasService.finalizar(parseInt(req.params.id, 10), {
-        descripcion_resolucion: req.body.descripcion_resolucion,
-        rol: req.usuario.rol,
-        id_usuario: req.usuario.id_usuario,
-      }),
+      await incidenciasService.finalizar(req.params.id, req.body.descripcion_resolucion, req.usuario)
     );
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 }
 
-async function asignar(req, res, next) {
-  if (responderSiHayErroresDeValidacion(req, res)) return;
+async function cancelar(req, res, next) {
   try {
-    res.json(
-      await incidenciasService.asignar(parseInt(req.params.id, 10), { asignado_a: req.body.asignado_a }),
-    );
-  } catch (e) {
-    next(e);
+    res.json(await incidenciasService.cancelar(req.params.id, req.usuario));
+  } catch (error) {
+    next(error);
   }
 }
 
-module.exports = {
-  listar,
-  listarMias,
-  listarAsignadas,
-  listarTodas,
-  obtenerPorId,
-  crear,
-  cancelar,
-  finalizar,
-  asignar,
-};
+module.exports = { listar, obtenerPorId, obtenerHistorial, crear, asignar, finalizar, cancelar };

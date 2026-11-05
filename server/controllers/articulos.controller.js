@@ -4,16 +4,16 @@ const articulosService = require("../services/articulos.service");
 async function listar(req, res, next) {
   try {
     res.json(await articulosService.listarArticulos());
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 }
 
 async function obtenerPorId(req, res, next) {
   try {
     res.json(await articulosService.obtenerArticuloPorId(req.params.id));
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -22,8 +22,8 @@ async function crear(req, res, next) {
   try {
     const { id_area, id_categoria, descripcion } = req.body;
     res.status(201).json(await articulosService.crearArticulo({ id_area, id_categoria, descripcion }));
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 }
 
@@ -37,17 +37,17 @@ async function actualizar(req, res, next) {
         descripcion: req.body.descripcion,
       }),
     );
-  } catch (e) {
-    next(e);
+  } catch (error) {
+    next(error);
   }
 }
 
 async function eliminar(req, res, next) {
   try {
-    const articulo = await articulosService.desactivarArticulo(req.params.id);
-    res.json({ mensaje: "Artículo desactivado", articulo });
-  } catch (e) {
-    next(e);
+    await articulosService.desactivarArticulo(req.params.id);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
   }
 }
 

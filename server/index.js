@@ -1,133 +1,99 @@
 require("dotenv").config();
 require("./utils/validarEntorno")();
+
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
-const path = require("path");
-
-const swaggerJsdoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
+const { especificacion, PREFIJO_API } = require("./config/swagger");
+
 const app = express();
+
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
-app.use(cors({ origin: process.env.CLIENT_URL }));
+
+// CLIENT_URL admite varios orígenes separados por coma. Sin lista, se permite
+// cualquiera (sirve para probar con Swagger o Postman en desarrollo).
+const origenesPermitidos = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((origen) => origen.trim())
+  .filter(Boolean);
+
+app.use(
+  cors({
+    origin(origen, devolver) {
+      if (!origen || origenesPermitidos.length === 0) return devolver(null, true);
+      if (origenesPermitidos.includes(origen)) return devolver(null, true);
+      devolver(new Error(`Origen no permitido por CORS: ${origen}`));
+    },
+  })
+);
 app.use(express.json());
 app.use(morgan("dev"));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const loginLimiter = rateLimit({
+// Archivos subidos por los usuarios (avatares)
+app.use("/publico", express.static(path.join(__dirname, "publico")));
+
+const limitadorDeLogin = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
-  message: {
-    error: "Demasiados intentos de inicio de sesión. Esperá unos minutos y volvé a intentar.",
-  },
+  message: { error: "Demasiados intentos de inicio de sesión. Esperá unos minutos." },
 });
+app.use(`${PREFIJO_API}/auth/login`, limitadorDeLogin);
 
-app.use("/api/v1/auth/login", loginLimiter);
-app.use("/api/login", loginLimiter);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(especificacion));
+app.get("/api-docs.json", (req, res) => res.json(especificacion));
 
-const swaggerSpec = swaggerJsdoc({
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "API Incidencias TFI P4",
-      version: "1.0.0",
-      description: "API REST - Trabajo Final Integrador Programación IV",
-    },
-    components: {
-      securitySchemes: {
-        bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
-      },
-    },
-  },
-  apis: ["./routes/*.js"],
-});
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.get("/api-docs.json", (req, res) => res.json(swaggerSpec));
-
-const areasRouter = require("./routes/areas");
-const categoriasRouter = require("./routes/categorias");
-const estadosRouter = require("./routes/estados");
-const articulosRouter = require("./routes/articulos");
-const usuariosRouter = require("./routes/usuarios");
-const incidenciasRouter = require("./routes/incidencias");
-const incidenciasEstadosRouter = require("./routes/incidencias_estados");
-const authRouter = require("./routes/auth");
-const healthRouter = require("./routes/health");
-const meRouter = require("./routes/me");
-const dashboardRouter = require("./routes/dashboard");
-const reportesRouter = require("./routes/reportes");
-
-function mountVersioned(prefix, router) {
-  app.use(`/api/v1${prefix}`, router);
-  app.use(`/api${prefix}`, router);
-}
-mountVersioned("/areas", areasRouter);
-mountVersioned("/categorias", categoriasRouter);
-mountVersioned("/estados", estadosRouter);
-mountVersioned("/articulos", articulosRouter);
-mountVersioned("/usuarios", usuariosRouter);
-mountVersioned("/incidencias", incidenciasRouter);
-mountVersioned("/incidencias_estados", incidenciasEstadosRouter);
-mountVersioned("/dashboard", dashboardRouter);
-mountVersioned("/reportes", reportesRouter);
-
-app.use("/api/v1/auth", authRouter);
-app.use("/api", authRouter);
-
-app.use("/api/v1/health", healthRouter);
-app.use("/api/health", healthRouter);
-app.use("/api/v1/me", meRouter);
-app.use("/api/me", meRouter);
+app.use(`${PREFIJO_API}/auth`, require("./routes/auth"));
+app.use(`${PREFIJO_API}/health`, require("./routes/health"));
+app.use(`${PREFIJO_API}/me`, require("./routes/me"));
+app.use(`${PREFIJO_API}/areas`, require("./routes/areas"));
+app.use(`${PREFIJO_API}/categorias`, require("./routes/categorias"));
+app.use(`${PREFIJO_API}/estados`, require("./routes/estados"));
+app.use(`${PREFIJO_API}/articulos`, require("./routes/articulos"));
+app.use(`${PREFIJO_API}/usuarios`, require("./routes/usuarios"));
+app.use(`${PREFIJO_API}/incidencias`, require("./routes/incidencias"));
+app.use(`${PREFIJO_API}/incidencias-estados`, require("./routes/incidencias_estados"));
+app.use(`${PREFIJO_API}/dashboard`, require("./routes/dashboard"));
+app.use(`${PREFIJO_API}/reportes`, require("./routes/reportes"));
 
 app.get("/", (req, res) => {
-  res.json({
-    mensaje: "¡La API de Incidencias está funcionando!",
-    version: "v1",
-    docs: "/api-docs",
-  });
+  res.json({ api: "Gestión de Incidencias", version: "v1", documentacion: "/api-docs" });
 });
 
 app.use((req, res) => {
-  res.status(404).json({ error: "Ruta no encontrada", path: req.originalUrl });
+  res.status(404).json({ error: "Ruta no encontrada", ruta: req.originalUrl });
 });
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, _next) => {
-  console.error("Error no manejado:", err);
+app.use((err, req, res, next) => {
   if (err.code === "LIMIT_FILE_SIZE") {
-    return res.status(400).json({
-      error: "El archivo supera el tamaño máximo permitido (2 MB)",
-    });
+    return res.status(400).json({ error: "El archivo supera el tamaño máximo de 2 MB" });
   }
-  // Violación de foreign key en Postgres (código 23503): el pedido traía un id que
-  // no existe en la tabla referenciada. Se traduce a 400 con mensaje claro,
-  // en vez de un 500 genérico que parecería un crash del servidor.
+  // 23503: violación de clave foránea en PostgreSQL
   if (err.code === "23503") {
-    return res
-      .status(400)
-      .json({
-        error:
-          "Referencia inexistente: uno de los ids enviados no existe en la base",
-      });
+    return res.status(400).json({ error: "Alguno de los ids enviados no existe en la base" });
   }
+
   const status = err.status || 500;
-  res
-    .status(status)
-    .json({ error: err.message || "Error interno del servidor" });
+  if (status >= 500) console.error(err);
+
+  res.status(status).json({
+    error: status >= 500 ? "Error interno del servidor" : err.message,
+  });
 });
 
-const PORT = process.env.PORT || 3000;
+const PUERTO = process.env.PORT || 3000;
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(
-      `Servidor corriendo en http://localhost:${PORT} - docs en /api-docs`,
-    );
+  app.listen(PUERTO, () => {
+    console.log(`API escuchando en http://localhost:${PUERTO}${PREFIJO_API}`);
+    console.log(`Documentación en http://localhost:${PUERTO}/api-docs`);
   });
 }
+
 module.exports = app;

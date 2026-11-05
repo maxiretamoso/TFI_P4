@@ -1,24 +1,31 @@
 const express = require("express");
-const router = express.Router();
 const verificarToken = require("../middlewares/verificarToken");
-const incidenciasEstadosController = require("../controllers/incidencias_estados.controller");
+const verificarRol = require("../middlewares/verificarRol");
+const historialController = require("../controllers/incidencias_estados.controller");
+const { ROLES } = require("../config/roles");
+
+const router = express.Router();
 
 /**
  * @swagger
  * tags:
- *   name: IncidenciasEstados
- *   description: Historial de cambios de estado de las incidencias
+ *   name: Historial
+ *   description: Historial de cambios de estado de todas las incidencias
  */
 
 /**
  * @swagger
- * /api/v1/incidencias_estados:
+ * /incidencias-estados:
  *   get:
- *     summary: Historial de cambios de estado (requiere token)
- *     tags: [IncidenciasEstados]
+ *     summary: Lista el historial completo de cambios de estado
+ *     description: El historial de una incidencia puntual está en /incidencias/{id}/estados.
+ *     tags: [Historial]
  *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Historial completo }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
  */
-// GET /api/v1/incidencias_estados -> Historial de cambios de estado de las incidencias
-router.get("/", verificarToken, incidenciasEstadosController.listar);
+router.get("/", verificarToken, verificarRol(ROLES.DIRECTOR), historialController.listar);
 
 module.exports = router;

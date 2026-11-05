@@ -1,51 +1,117 @@
 const express = require("express");
-const router = express.Router();
+const { body, param } = require("express-validator");
 const verificarToken = require("../middlewares/verificarToken");
 const verificarRol = require("../middlewares/verificarRol");
-const { body } = require("express-validator");
 const estadosController = require("../controllers/estados.controller");
+const { ROLES } = require("../config/roles");
+
+const router = express.Router();
+
+const PUEDEN_GESTIONAR = [ROLES.DIRECTOR];
 
 /**
  * @swagger
  * tags:
  *   name: Estados
- *   description: BREAD de estados de incidencia
+ *   description: BREAD de estados
  */
 
 /**
  * @swagger
- * /api/v1/estados:
+ * /estados:
  *   get:
- *     summary: Listar estados activos
+ *     summary: Lista estados activas
  *     tags: [Estados]
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200: { description: Lista de estados }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  *   post:
- *     summary: Crear estado (rol 2/3)
+ *     summary: Crea una estados
  *     tags: [Estados]
  *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [descripcion]
+ *             properties:
+ *               descripcion: { type: string, maxLength: 250 }
+ *     responses:
+ *       201: { description: Creada }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
  */
-router.get("/", estadosController.listar);
+router.get("/", verificarToken, estadosController.listar);
+
+router.post(
+  "/",
+  verificarToken,
+  verificarRol(...PUEDEN_GESTIONAR),
+  [body("descripcion").isString().trim().isLength({ min: 1, max: 250 })],
+  estadosController.crear
+);
 
 /**
  * @swagger
- * /api/v1/estados/{id}:
+ * /estados/{id}:
  *   get:
- *     summary: Obtener estado
+ *     summary: Obtiene una estados por id
  *     tags: [Estados]
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     responses:
+ *       200: { description: El recurso pedido }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   put:
- *     summary: Editar estado (rol 2/3)
+ *     summary: Modifica una estados
  *     tags: [Estados]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [descripcion]
+ *             properties:
+ *               descripcion: { type: string, maxLength: 250 }
+ *     responses:
+ *       200: { description: Modificada }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   delete:
- *     summary: Soft delete de estado
+ *     summary: Da de baja una estados (soft delete, activo = 0)
  *     tags: [Estados]
  *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: integer } }
+ *     responses:
+ *       204: { description: Dada de baja }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       404: { $ref: '#/components/responses/NoEncontrado' }
  */
-router.get("/:id", estadosController.obtenerPorId);
+router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], estadosController.obtenerPorId);
 
-router.post("/", verificarToken, verificarRol(2,3), [body("descripcion").isString().trim().isLength({min:1,max:100})], estadosController.crear);
+router.put(
+  "/:id",
+  verificarToken,
+  verificarRol(...PUEDEN_GESTIONAR),
+  [param("id").isInt({ min: 1 }), body("descripcion").isString().trim().isLength({ min: 1, max: 250 })],
+  estadosController.actualizar
+);
 
-router.put("/:id", verificarToken, verificarRol(2,3), [body("descripcion").isString().trim().isLength({min:1,max:100})], estadosController.actualizar);
-
-router.delete("/:id", verificarToken, verificarRol(2,3), estadosController.eliminar);
+router.delete(
+  "/:id",
+  verificarToken,
+  verificarRol(...PUEDEN_GESTIONAR),
+  [param("id").isInt({ min: 1 })],
+  estadosController.eliminar
+);
 
 module.exports = router;

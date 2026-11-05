@@ -1,24 +1,31 @@
 const express = require("express");
-const router = express.Router();
 const verificarToken = require("../middlewares/verificarToken");
 const meController = require("../controllers/me.controller");
+
+const router = express.Router();
 
 /**
  * @swagger
  * tags:
- *   name: Me
- *   description: Perfil del usuario autenticado
+ *   name: Perfil
+ *   description: Datos del usuario autenticado
  */
 
 /**
  * @swagger
- * /api/v1/me:
+ * /me:
  *   get:
- *     summary: Perfil del usuario autenticado (usa el id del JWT)
- *     tags: [Me]
+ *     summary: Devuelve el perfil del usuario del token
+ *     tags: [Perfil]
  *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Perfil del usuario
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Usuario' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
-// GET /api/v1/me -> Devuelve el perfil del usuario autenticado (usa el id del JWT)
 router.get("/", verificarToken, meController.obtenerPerfil);
 
 module.exports = router;
