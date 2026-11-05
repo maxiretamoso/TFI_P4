@@ -86,7 +86,6 @@ function barraDeFiltros() {
           </label>`
         : ""
     }
-    <button class="btn btn-gim" type="submit">Buscar</button>
   </form>`;
 }
 
@@ -100,10 +99,15 @@ function aplicarFiltros(evento) {
   FILTROS_DEL_DASHBOARD.forEach((clave) => {
     if (filtros.get(clave)) nuevos.set(clave, filtros.get(clave));
   });
-  if (etiqueta && FILTROS_DEL_DASHBOARD.some((clave) => nuevos.get(clave))) nuevos.set("etiqueta", etiqueta);
+  if (!FILTROS_DEL_DASHBOARD.some((clave) => nuevos.get(clave))) etiqueta = "";
 
-  const consulta = nuevos.toString();
-  window.location.hash = consulta ? `#/?${consulta}` : "#/";
+  // Se actualiza solo la lista (no toda la pantalla) para no perder el foco del buscador.
+  filtros = nuevos;
+  const enUrl = new URLSearchParams(nuevos);
+  if (etiqueta) enUrl.set("etiqueta", etiqueta);
+  history.replaceState(null, "", enUrl.toString() ? `#/?${enUrl}` : "#/");
+  contenedor.querySelector(".zona-aviso-filtro").innerHTML = avisoDeFiltro();
+  recargar(1);
 }
 
 function avisoDeFiltro() {
@@ -135,7 +139,7 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
         ${puedeCrearIncidencias(usuario) ? '<a class="btn btn-gim" href="#/nueva">+ Nueva incidencia</a>' : ""}
       </div>
       ${barraDeFiltros()}
-      ${avisoDeFiltro()}
+      <div class="zona-aviso-filtro">${avisoDeFiltro()}</div>
       <div class="zona-error"></div>
       <div class="tabla-scroll zona-lista">${cargando("Cargando incidencias...")}</div>
       <div class="zona-paginacion"></div>
@@ -146,6 +150,11 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
   formulario.querySelectorAll("select, input[type=date], input[type=checkbox]").forEach((campo) =>
     campo.addEventListener("change", () => aplicarFiltros())
   );
+  let espera = null;
+  formulario.querySelector("[name=buscar]").addEventListener("input", () => {
+    clearTimeout(espera);
+    espera = setTimeout(aplicarFiltros, 300);
+  });
   contenedor.querySelector(".zona-lista").addEventListener("click", manejarAccion);
   contenedor.querySelector(".zona-paginacion").addEventListener("click", cambiarPagina);
 
