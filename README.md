@@ -1,8 +1,31 @@
-# GIM — Gestión de Incidencias Municipales
+# Gestión de Incidencias Municipales
 
 Trabajo Final Integrador — Programación IV · UNER · Facultad de Ciencias de la Administración · Licenciatura en Sistemas · 2026
 
-Aplicación web para que el área de Sistemas de un municipio registre, asigne, resuelva y reporte incidencias sobre artículos. Un empleado municipal informa un problema, el Director lo asigna a un responsable de Sistemas, y éste lo finaliza describiendo la solución. Cada cambio de estado queda registrado en un historial.
+Aplicación web para que el área de Sistemas de un municipio registre, asigne, resuelva y reporte incidencias sobre artículos. Un empleado municipal informa un problema, el Director lo asigna a un responsable de Sistemas, y éste lo finaliza describiendo la solución. Cada cambio de estado queda registrado en un historial y, al finalizar o cancelar una incidencia, se envía un correo de aviso.
+
+## Funcionalidades
+
+**Todos los roles**
+- Inicio de sesión con token JWT.
+- Mi perfil: datos del usuario, elección de un avatar predefinido o subida de una foto propia (que se puede ampliar), y cambio de contraseña.
+- Modo claro y oscuro, con la preferencia guardada en el navegador.
+- Diseño responsivo: en el celular el menú lateral se pliega.
+
+**Empleado Municipal**
+- Listar los artículos, con buscador.
+- Crear una incidencia sobre un artículo.
+- Listar sus incidencias y cancelar las que siguen pendientes.
+
+**Empleado del área de Sistemas**
+- Listar las incidencias asignadas y finalizarlas con una descripción de la resolución.
+- BREAD de categorías y artículos.
+
+**Director del área de Sistemas**
+- Dashboard con totales por estado, por fecha, por prioridad, por área y por categoría; indicadores generales; incidencias prioritarias abiertas; y carga de trabajo de cada empleado de Sistemas.
+- Reporte estadístico de incidencias en PDF.
+- Asignar incidencias a empleados de Sistemas y cancelar las pendientes.
+- BREAD de usuarios, áreas, categorías y artículos.
 
 ## Stack
 
@@ -10,101 +33,54 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 |---|---|
 | Base de datos | PostgreSQL |
 | Servidor | Node.js + Express 5 |
-| Autenticación | JSON Web Token |
+| Autenticación | JSON Web Token + bcryptjs |
 | Validación | express-validator |
 | Registro de solicitudes | Morgan |
 | Carga de archivos | Multer |
 | Documentación | Swagger (swagger-jsdoc + swagger-ui-express) |
 | Reportes PDF | pdfkit |
 | Correo | nodemailer |
+| Seguridad | helmet + express-rate-limit |
 | Cliente | HTML + CSS + JavaScript + Bootstrap 5 (servido con Vite) |
 
 ## Roles
 
 Los valores salen de la tabla `usuarios` del script de la cátedra:
 
-| rol | Quién es | Qué puede hacer |
-|---|---|---|
-| 1 | Director del área de Sistemas | Dashboard, reportes en PDF, asignar incidencias, cancelar pendientes, gestionar usuarios y áreas |
-| 2 | Empleado del área de Sistemas | Ver las incidencias asignadas, finalizarlas, BREAD de categorías y artículos |
-| 3 | Empleado Municipal | Listar artículos, crear incidencias, ver las propias y cancelar las pendientes |
-
-## Puesta en marcha
-
-Requisitos: Node.js 20 o superior y PostgreSQL instalado localmente (con pgAdmin 4 o DBeaver como cliente).
-
-### 1. Crear e importar la base
-
-1. En pgAdmin 4, crear una base llamada **`incidencias_db`**.
-2. Abrir el *Query Tool* sobre esa base y ejecutar [`database/incidencias_db.sql`](database/incidencias_db.sql).
-
-El script crea las siete tablas del diagrama de la consigna y carga los datos de prueba.
-
-### 2. Levantar el servidor
-
-```bash
-cd server
-npm install
-cp .env.example .env
-```
-
-Completar `server/.env` con los datos de la instalación local de PostgreSQL y una clave para firmar los tokens:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
-```
-
-```bash
-npm run dev
-```
-
-La API queda en `http://localhost:3000/api/v1` y la documentación en `http://localhost:3000/api-docs`.
-
-### 3. Levantar el cliente
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-El cliente abre en `http://localhost:5173`. Si se cambia ese puerto, hay que actualizar `CLIENT_URL` en `server/.env`, porque es el origen que la API habilita por CORS.
-
-### 4. Usuarios de prueba
-
-La contraseña de cada uno son las 3 primeras letras del nombre más las 3 del apellido:
-
-| Usuario | Contraseña | Rol |
-|---|---|---|
-| pamalm@correo.com | pamalm | Director |
-| carper@correo.com | carper | Empleado de Sistemas |
-| cargom@correo.com | cargom | Empleado de Sistemas |
-| estren@correo.com | estren | Empleado Municipal |
+| rol | Quién es |
+|---|---|
+| 1 | Director del área de Sistemas |
+| 2 | Empleado del área de Sistemas |
+| 3 | Empleado Municipal |
 
 ## Estructura
 
 ```
 server/
   index.js            arranque, middlewares globales y montaje de rutas
-  config/             roles, estados y definición de Swagger
+  config/             roles, estados, avatares predefinidos y definición de Swagger
   routes/             definición de endpoints y validaciones de entrada
   controllers/        traducen HTTP a llamadas al servicio
   services/           reglas de negocio (permisos, transiciones de estado, correo)
   datos/              acceso a la base: único lugar donde hay SQL
   middlewares/        verificación de token y de rol
   utils/              helpers de errores, transacciones y carga de archivos
-  publico/avatares/   fotos de perfil subidas por los usuarios
+  publico/avatares/   fotos subidas por los usuarios y avatares predefinidos
 client/
   index.html
+  public/             logo de la Municipalidad
   src/
     api.js            cliente HTTP contra la API
-    router.js         navegación y armado del menú según el rol
+    router.js         navegación, menú lateral y barra superior según el rol
     permisos.js       qué puede hacer cada rol en la interfaz
     session.js        token y datos del usuario en localStorage
+    tema.js           interruptor de modo claro y oscuro
+    avisos.js         avisos flotantes que se cierran solos
     ui.js             constantes y helpers de presentación
+    styles.css        estilos propios sobre Bootstrap
     pages/            una pantalla por archivo
 database/
-  incidencias_db.sql  estructura y datos de prueba
+  incidencias_db.sql  estructura y datos de prueba de la cátedra
 ```
 
 ## Decisiones de diseño
@@ -113,7 +89,9 @@ database/
 
 **Versionado del API.** Todos los endpoints cuelgan de `/api/v1`. No hay rutas sin versionar.
 
-**Autorización en el servidor, no en la interfaz.** El cliente esconde los botones que el usuario no puede usar, pero quien decide es el middleware `verificarRol` de cada ruta. Pedir un endpoint prohibido con el token de otro rol devuelve 403 aunque el botón no estuviera en pantalla.
+**Acciones como recursos.** Asignar, finalizar y cancelar una incidencia son `PATCH` sobre `/incidencias/{id}/asignacion`, `/resolucion` y `/cancelacion`, en lugar de verbos en la ruta.
+
+**Autorización en el servidor, no en la interfaz.** El cliente esconde los botones que el usuario no puede usar, pero quien decide es el middleware `verificarRol` de cada ruta y las reglas de cada servicio. Pedir un endpoint prohibido con el token de otro rol devuelve 403 aunque el botón no estuviera en pantalla.
 
 **Soft deletes.** Ninguna baja borra filas: se marca `activo = 0` y los listados filtran por `activo = 1`. Así las incidencias viejas siguen mostrando el artículo o la categoría con la que se crearon.
 
@@ -121,13 +99,19 @@ database/
 
 **Flujo de una incidencia.** Nace en estado Pendiente y a cargo del Director, porque `asignado_a` es `NOT NULL` en el diagrama de la cátedra y es el Director quien reparte el trabajo. Al asignarla a un empleado de Sistemas pasa a En Proceso; al finalizarla, a Resuelta; y una Pendiente se puede cancelar.
 
-**Contraseñas.** Los usuarios que trae el script de la cátedra tienen la contraseña en SHA-256, así que el login acepta ese formato. Toda contraseña que se cree o se cambie desde la aplicación se guarda con bcrypt, que agrega salt y es mucho más caro de atacar por fuerza bruta. Los dos formatos conviven sin tocar los datos originales.
+**Correo en segundo plano.** El aviso por correo al finalizar o cancelar se envía sin esperar la respuesta del servidor de correo, para no demorar la operación. Un fallo de envío queda registrado en la consola y no afecta a la incidencia. Los estilos del correo van escritos en cada etiqueta, porque los clientes de correo descartan los CSS externos.
 
-**Cliente de una sola página.** El cliente es HTML, CSS, JavaScript y Bootstrap, sin framework ni dependencias de interfaz. La navegación entre pantallas la resuelve `router.js` leyendo el `hash` de la URL y montando la pantalla correspondiente. Se eligió así para no repetir el encabezado, el menú y el manejo de sesión en cada documento: el menú se arma en un solo lugar a partir del rol, y la lógica de token y de errores vive en `api.js` y `session.js`. Cada pantalla es un módulo independiente en `src/pages/`.
+**Contraseñas.** Los usuarios que trae el script de la cátedra tienen la contraseña en SHA-256, así que el login acepta ese formato. Toda contraseña que se cree o se cambie desde la aplicación se guarda con bcrypt. La contraseña solo se cambia desde `PATCH /auth/contrasenia`, que exige la actual; editar un usuario no la modifica.
 
-**Correo con estilos en línea.** Los estilos del correo van escritos en cada etiqueta, no en una hoja aparte: los clientes de correo descartan los CSS externos y buena parte de lo que venga en un `<style>`.
+**Avatares.** Cada usuario puede elegir uno de los avatares predefinidos (SVG con una animación suave hecha con CSS) o subir una foto propia con Multer. Al cambiar de avatar se borra la foto subida anterior, pero nunca un predefinido.
 
-**Middlewares de seguridad.** Además de lo que pide la consigna, el servidor usa `helmet` para las cabeceras HTTP y `express-rate-limit` para limitar los intentos de login. Son middlewares del mismo Express, no tecnologías adicionales.
+**Cliente de una sola página.** El cliente es HTML, CSS, JavaScript y Bootstrap, sin framework. La navegación la resuelve `router.js` leyendo el `hash` de la URL y montando la pantalla correspondiente, así el menú, la barra superior y el manejo de sesión viven en un solo lugar. Cada pantalla es un módulo independiente en `src/pages/`.
+
+**Modo oscuro.** Usa el atributo `data-bs-theme` de Bootstrap 5.3 y variables CSS propias para los colores de la app. La elección se aplica antes de pintar la página para que no parpadee.
+
+**Gráficos sin librerías.** Los gráficos del dashboard están hechos con SVG y CSS a partir de los datos de la API, sin dependencias externas, y usan los mismos colores de estado que el resto de la app: pendiente en ámbar, en proceso en azul, resuelta en verde y cancelada en rojo.
+
+**Middlewares de seguridad.** Además de lo que pide la consigna, el servidor usa `helmet` para las cabeceras HTTP y `express-rate-limit` para limitar los intentos de login.
 
 ## Endpoints
 
@@ -141,21 +125,22 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | GET | `/health` | público |
 | GET | `/incidencias` | autenticado (filtra según el rol) |
 | POST | `/incidencias` | Municipal |
-| GET | `/incidencias/{id}` | autenticado |
-| GET | `/incidencias/{id}/estados` | autenticado |
+| GET | `/incidencias/{id}` | autenticado (solo las que puede ver) |
+| GET | `/incidencias/{id}/estados` | autenticado (solo las que puede ver) |
 | PATCH | `/incidencias/{id}/asignacion` | Director |
 | PATCH | `/incidencias/{id}/resolucion` | Sistemas |
 | PATCH | `/incidencias/{id}/cancelacion` | Director y Municipal |
 | GET | `/incidencias-estados` | Director |
 | GET | `/dashboard` | Director |
 | GET | `/reportes/incidencias` | Director |
-| BREAD | `/categorias`, `/articulos` | Sistemas y Director |
-| BREAD | `/areas`, `/estados` | Director |
-| BREAD | `/usuarios` | Director (cada uno edita su perfil) |
+| GET | `/categorias`, `/articulos`, `/areas`, `/estados` | autenticado |
+| POST, PUT, DELETE | `/categorias`, `/articulos` | Sistemas y Director |
+| POST, PUT, DELETE | `/areas`, `/estados` | Director |
+| BREAD | `/usuarios` | Director (cada uno puede ver y editar su propio perfil) |
 | PATCH | `/usuarios/{id}/avatar` | el propio usuario o el Director |
+| GET | `/avatares` | autenticado |
 
-## Notas
+## Notas sobre la base
 
-- Si en el `.env` no hay servidor de correo configurado, las notificaciones se imprimen en la consola del servidor en vez de enviarse. La aplicación funciona igual.
-- `MAIL_TO_TEST` redirige todos los correos a una sola casilla, para probar sin molestar a nadie.
-- La columna `incidencias_estados.fecha_hora_estado` es de tipo `time with time zone` en el diagrama de la cátedra, así que el historial guarda la hora del cambio pero no la fecha.
+- La columna `incidencias_estados.fecha_hora_estado` es de tipo `time with time zone` en el diagrama de la cátedra, así que el historial guarda la hora de cada cambio pero no la fecha.
+- En el script de la cátedra el estado 3 figura como "Resuela"; en la base de trabajo se corrigió a "Resuelta".
