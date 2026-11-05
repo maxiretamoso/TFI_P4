@@ -1,32 +1,36 @@
-const pool = require("../db");
+const categoriasDatos = require("../datos/categorias.datos");
 const { crearError } = require("../utils/httpError");
 
-async function listarCategorias() {
-  const r = await pool.query("SELECT * FROM categorias WHERE activo=1 ORDER BY descripcion");
-  return r.rows;
+function listarCategorias() {
+  return categoriasDatos.listar();
 }
 
 async function obtenerCategoriaPorId(id) {
-  const r = await pool.query("SELECT * FROM categorias WHERE id_categoria=$1", [id]);
-  if (r.rows.length === 0) throw crearError(404, "Categoría no encontrada");
-  return r.rows[0];
+  const categoria = await categoriasDatos.buscarPorId(id);
+  if (!categoria) throw crearError(404, "Categoría no encontrada");
+  return categoria;
 }
 
-async function crearCategoria(descripcion) {
-  const r = await pool.query(`INSERT INTO categorias (descripcion, activo) VALUES ($1,1) RETURNING *`, [descripcion]);
-  return r.rows[0];
+function crearCategoria(descripcion) {
+  return categoriasDatos.insertar(descripcion);
 }
 
 async function actualizarCategoria(id, descripcion) {
-  const r = await pool.query(`UPDATE categorias SET descripcion=$1 WHERE id_categoria=$2 RETURNING *`, [descripcion, id]);
-  if (r.rows.length === 0) throw crearError(404, "Categoría no encontrada");
-  return r.rows[0];
+  const categoria = await categoriasDatos.actualizar(id, descripcion);
+  if (!categoria) throw crearError(404, "Categoría no encontrada");
+  return categoria;
 }
 
 async function desactivarCategoria(id) {
-  const r = await pool.query(`UPDATE categorias SET activo=0 WHERE id_categoria=$1 RETURNING *`, [id]);
-  if (r.rows.length === 0) throw crearError(404, "Categoría no encontrada");
-  return r.rows[0];
+  const categoria = await categoriasDatos.desactivar(id);
+  if (!categoria) throw crearError(404, "Categoría no encontrada");
+  return categoria;
 }
 
-module.exports = { listarCategorias, obtenerCategoriaPorId, crearCategoria, actualizarCategoria, desactivarCategoria };
+module.exports = {
+  listarCategorias,
+  obtenerCategoriaPorId,
+  crearCategoria,
+  actualizarCategoria,
+  desactivarCategoria,
+};

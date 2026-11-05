@@ -1,32 +1,36 @@
-const pool = require("../db");
+const estadosDatos = require("../datos/estados.datos");
 const { crearError } = require("../utils/httpError");
 
-async function listarEstados() {
-  const r = await pool.query("SELECT * FROM estados WHERE activo=1 ORDER BY descripcion");
-  return r.rows;
+function listarEstados() {
+  return estadosDatos.listar();
 }
 
 async function obtenerEstadoPorId(id) {
-  const r = await pool.query("SELECT * FROM estados WHERE id_estado=$1", [id]);
-  if (r.rows.length === 0) throw crearError(404, "Estado no encontrado");
-  return r.rows[0];
+  const estado = await estadosDatos.buscarPorId(id);
+  if (!estado) throw crearError(404, "Estado no encontrado");
+  return estado;
 }
 
-async function crearEstado(descripcion) {
-  const r = await pool.query(`INSERT INTO estados (descripcion, activo) VALUES ($1,1) RETURNING *`, [descripcion]);
-  return r.rows[0];
+function crearEstado(descripcion) {
+  return estadosDatos.insertar(descripcion);
 }
 
 async function actualizarEstado(id, descripcion) {
-  const r = await pool.query(`UPDATE estados SET descripcion=$1 WHERE id_estado=$2 RETURNING *`, [descripcion, id]);
-  if (r.rows.length === 0) throw crearError(404, "Estado no encontrado");
-  return r.rows[0];
+  const estado = await estadosDatos.actualizar(id, descripcion);
+  if (!estado) throw crearError(404, "Estado no encontrado");
+  return estado;
 }
 
 async function desactivarEstado(id) {
-  const r = await pool.query(`UPDATE estados SET activo=0 WHERE id_estado=$1 RETURNING *`, [id]);
-  if (r.rows.length === 0) throw crearError(404, "Estado no encontrado");
-  return r.rows[0];
+  const estado = await estadosDatos.desactivar(id);
+  if (!estado) throw crearError(404, "Estado no encontrado");
+  return estado;
 }
 
-module.exports = { listarEstados, obtenerEstadoPorId, crearEstado, actualizarEstado, desactivarEstado };
+module.exports = {
+  listarEstados,
+  obtenerEstadoPorId,
+  crearEstado,
+  actualizarEstado,
+  desactivarEstado,
+};

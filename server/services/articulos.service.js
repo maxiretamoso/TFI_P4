@@ -1,47 +1,48 @@
-const pool = require("../db");
+const articulosDatos = require("../datos/articulos.datos");
+const areasDatos = require("../datos/areas.datos");
+const categoriasDatos = require("../datos/categorias.datos");
 const { crearError } = require("../utils/httpError");
 
-async function listarArticulos() {
-  const r = await pool.query(`
-      SELECT articulos.id_articulo, articulos.descripcion, articulos.activo,
-             areas.descripcion AS area, categorias.descripcion AS categoria,
-             articulos.id_area, articulos.id_categoria
-      FROM articulos
-      JOIN areas ON articulos.id_area = areas.id_area
-      JOIN categorias ON articulos.id_categoria = categorias.id_categoria
-      WHERE articulos.activo=1 ORDER BY articulos.descripcion`);
-  return r.rows;
+async function validarReferencias(id_area, id_categoria) {
+  const [area, categoria] = await Promise.all([
+    areasDatos.buscarPorId(id_area),
+    categoriasDatos.buscarPorId(id_categoria),
+  ]);
+  if (!area) throw crearError(400, "El área indicada no existe");
+  if (!categoria) throw crearError(400, "La categoría indicada no existe");
+}
+
+function listarArticulos() {
+  return articulosDatos.listar();
 }
 
 async function obtenerArticuloPorId(id) {
-  const r = await pool.query(`SELECT * FROM articulos WHERE id_articulo=$1`, [id]);
-  if (r.rows.length === 0) throw crearError(404, "Artículo no encontrado");
-  return r.rows[0];
+  const articulo = await articulosDatos.buscarPorId(id);
+  if (!articulo) throw crearError(404, "Artículo no encontrado");
+  return articulo;
 }
 
 async function crearArticulo({ id_area, id_categoria, descripcion }) {
-  const r = await pool.query(
-    `INSERT INTO articulos (id_area, descripcion, id_categoria, activo) VALUES ($1,$2,$3,1) RETURNING *`,
-    [id_area, descripcion, id_categoria],
-  );
-  return r.rows[0];
+  await validarReferencias(id_area, id_categoria);
+  return articulosDatos.insertar({ id_area, id_categoria, descripcion });
 }
 
-async function actualizarArticulo(id, { id_area, id_categoria, descripcion }) {
-  const actual = await pool.query(`SELECT * FROM articulos WHERE id_articulo=$1`, [id]);
-  if (actual.rows.length === 0) throw crearError(404, "Artículo no encontrado");
-  const a = actual.rows[0];
-  const r = await pool.query(
-    `UPDATE articulos SET id_area=$1, id_categoria=$2, descripcion=$3 WHERE id_articulo=$4 RETURNING *`,
-    [id_area ?? a.id_area, id_categoria ?? a.id_categoria, descripcion ?? a.descripcion, id],
-  );
-  return r.rows[0];
+async function actualizarArticulo(id, datos) {
+  const actual = await articulosDatos.buscarPorId(id);
+  if (!actual) throw crearError(404, "Artículo no encontrado");
+
+  const id_area = datos.id_area ?? actual.id_area;
+  const id_categoria = datos.id_categoria ?? actual.id_categoria;
+  const descripcion = datos.descripcion ?? actual.descripcion;
+
+  await validarReferencias(id_area, id_categoria);
+  return articulosDatos.actualizar(id, { id_area, id_categoria, descripcion });
 }
 
 async function desactivarArticulo(id) {
-  const r = await pool.query(`UPDATE articulos SET activo=0 WHERE id_articulo=$1 RETURNING *`, [id]);
-  if (r.rows.length === 0) throw crearError(404, "Artículo no encontrado");
-  return r.rows[0];
+  const articulo = await articulosDatos.desactivar(id);
+  if (!articulo) throw crearError(404, "Artículo no encontrado");
+  return articulo;
 }
 
 module.exports = {

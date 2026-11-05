@@ -1,7 +1,7 @@
-const pool = require("../db");
+const healthDatos = require("../datos/health.datos");
 
-async function verificarConexion() {
-  await pool.query("SELECT 1");
+function verificarConexion() {
+  return healthDatos.verificarConexion();
 }
 
 module.exports = { verificarConexion };

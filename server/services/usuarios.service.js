@@ -1,77 +1,116 @@
-const pool = require("../db");
-const bcrypt = require("bcryptjs");
+const usuariosDatos = require("../datos/usuarios.datos");
+const areasDatos = require("../datos/areas.datos");
 const { crearError } = require("../utils/httpError");
+const { ROLES } = require("../config/roles");
+const { hashearContrasenia } = require("./auth.service");
 
-async function listarUsuarios() {
-  const r = await pool.query(`
-    SELECT usuarios.id_usuario, usuarios.nombres, usuarios.apellidos, usuarios.usuario, usuarios.rol, usuarios.activo, usuarios.avatar,
-           areas.descripcion AS area
-    FROM usuarios JOIN areas ON usuarios.id_area=areas.id_area
-    WHERE usuarios.activo=1 ORDER BY apellidos`);
-  return r.rows;
+const CODIGO_CLAVE_DUPLICADA = "23505";
+
+function esDirector(solicitante) {
+  return solicitante && solicitante.rol === ROLES.DIRECTOR;
+}
+
+function esElMismo(id, solicitante) {
+  return solicitante && Number(id) === solicitante.id_usuario;
+}
+
+function listarUsuarios() {
+  return usuariosDatos.listar();
+}
+
+function listarEmpleadosDeSistemas() {
+  return usuariosDatos.listarEmpleadosDeSistemas();
 }
 
 async function obtenerUsuarioPorId(id) {
-  const r = await pool.query(
-    `SELECT id_usuario, nombres, apellidos, usuario, rol, activo, avatar, id_area FROM usuarios WHERE id_usuario=$1`,
-    [id]
-  );
-  if (r.rows.length === 0) throw crearError(404, "Usuario no encontrado");
-  return r.rows[0];
+  const usuario = await usuariosDatos.buscarPorId(id);
+  if (!usuario) throw crearError(404, "Usuario no encontrado");
+  return usuario;
 }
 
 async function crearUsuario(datos) {
-  const { id_area, nombres, apellidos, usuario, contrasenia, rol, avatar } = datos;
-  const hash = await bcrypt.hash(contrasenia, 10);
+  const area = await areasDatos.buscarPorId(datos.id_area);
+  if (!area) throw crearError(400, "El área indicada no existe");
+
   try {
-    const r = await pool.query(
-      `INSERT INTO usuarios (id_area, nombres, apellidos, usuario, contrasenia, avatar, rol, activo) VALUES ($1,$2,$3,$4,$5,$6,$7,1) RETURNING id_usuario, usuario, rol`,
-      [id_area, nombres, apellidos, usuario, hash, avatar || '', rol]
-    );
-    return r.rows[0];
-  } catch (e) {
-    // 23505 = clave duplicada (UNIQUE de usuario): conflicto, no error de servidor
-    if (e.code === "23505") throw crearError(409, "Usuario ya existe");
-    throw e;
+    return await usuariosDatos.insertar({
+      ...datos,
+      hash: await hashearContrasenia(datos.contrasenia),
+    });
+  } catch (error) {
+    if (error.code === CODIGO_CLAVE_DUPLICADA) {
+      throw crearError(409, "Ya existe un usuario con ese correo");
+    }
+    throw error;
   }
 }
 
 async function actualizarUsuario(id, datos, solicitante) {
-  if (!solicitante || (solicitante.rol !== 3 && parseInt(id, 10) !== solicitante.id_usuario)) {
-    throw crearError(403, "No autorizado");
+  if (!esDirector(solicitante) && !esElMismo(id, solicitante)) {
+    throw crearError(403, "Solo podés editar tu propio perfil");
   }
-  const cur = await pool.query(`SELECT * FROM usuarios WHERE id_usuario=$1`, [id]);
-  if (cur.rows.length === 0) throw crearError(404, "Usuario no encontrado");
-  const u = cur.rows[0];
 
-  if (solicitante.rol !== 3) {                      
-    const cambiaRol = datos.rol !== undefined && datos.rol !== u.rol;   
-    const cambiaArea = datos.id_area !== undefined && datos.id_area !== u.id_area; 
+  const actual = await usuariosDatos.buscarCredencialesPorId(id);
+  if (!actual) throw crearError(404, "Usuario no encontrado");
 
+  if (!esDirector(solicitante)) {
+    const cambiaRol = datos.rol !== undefined && Number(datos.rol) !== actual.rol;
+    const cambiaArea = datos.id_area !== undefined && Number(datos.id_area) !== actual.id_area;
     if (cambiaRol || cambiaArea) {
       throw crearError(403, "Solo el Director puede cambiar el rol o el área");
     }
   }
 
-  let hash = u.contrasenia;
-  if (datos.contrasenia) hash = await bcrypt.hash(datos.contrasenia, 10);
-  const r = await pool.query(
-    `UPDATE usuarios SET id_area=$1, nombres=$2, apellidos=$3, usuario=$4, contrasenia=$5, rol=$6 WHERE id_usuario=$7 RETURNING id_usuario, nombres, apellidos, usuario, rol`,
-    [datos.id_area ?? u.id_area, datos.nombres ?? u.nombres, datos.apellidos ?? u.apellidos, datos.usuario ?? u.usuario, hash, datos.rol ?? u.rol, id]
-  );
-  return r.rows[0];
+  const id_area = datos.id_area ?? actual.id_area;
+  if (id_area !== actual.id_area && !(await areasDatos.buscarPorId(id_area))) {
+    throw crearError(400, "El área indicada no existe");
+  }
+
+  const hash = datos.contrasenia
+    ? await hashearContrasenia(datos.contrasenia)
+    : actual.contrasenia;
+
+  try {
+    return await usuariosDatos.actualizar(id, {
+      id_area,
+      nombres: datos.nombres ?? actual.nombres,
+      apellidos: datos.apellidos ?? actual.apellidos,
+      usuario: datos.usuario ?? actual.usuario,
+      hash,
+      rol: datos.rol ?? actual.rol,
+    });
+  } catch (error) {
+    if (error.code === CODIGO_CLAVE_DUPLICADA) {
+      throw crearError(409, "Ya existe un usuario con ese correo");
+    }
+    throw error;
+  }
 }
 
-async function desactivarUsuario(id) {
-  const r = await pool.query(`UPDATE usuarios SET activo=0 WHERE id_usuario=$1 RETURNING id_usuario`, [id]);
-  if (r.rows.length === 0) throw crearError(404, "Usuario no encontrado");
-  return r.rows[0];
+async function desactivarUsuario(id, solicitante) {
+  if (esElMismo(id, solicitante)) {
+    throw crearError(400, "No podés darte de baja a vos mismo");
+  }
+  const usuario = await usuariosDatos.desactivar(id);
+  if (!usuario) throw crearError(404, "Usuario no encontrado");
+  return usuario;
 }
 
-async function actualizarAvatar(id, relPath) {
-  const r = await pool.query(`UPDATE usuarios SET avatar=$1 WHERE id_usuario=$2 RETURNING id_usuario, avatar`, [relPath, id]);
-  if (r.rows.length === 0) throw crearError(404, "Usuario no encontrado");
-  return r.rows[0];
+async function actualizarAvatar(id, nombreArchivo, solicitante) {
+  if (!esDirector(solicitante) && !esElMismo(id, solicitante)) {
+    throw crearError(403, "Solo podés cambiar tu propio avatar");
+  }
+  const usuario = await usuariosDatos.actualizarAvatar(id, nombreArchivo);
+  if (!usuario) throw crearError(404, "Usuario no encontrado");
+  return usuario;
 }
 
-module.exports = { listarUsuarios, obtenerUsuarioPorId, crearUsuario, actualizarUsuario, desactivarUsuario, actualizarAvatar };
+module.exports = {
+  listarUsuarios,
+  listarEmpleadosDeSistemas,
+  obtenerUsuarioPorId,
+  crearUsuario,
+  actualizarUsuario,
+  desactivarUsuario,
+  actualizarAvatar,
+};
