@@ -18,7 +18,7 @@ export function botonTema() {
   const oscuro = temaOscuro();
   const texto = oscuro ? "Cambiar a modo claro" : "Cambiar a modo oscuro";
   return `<button type="button" class="boton-tema" id="boton-tema" aria-label="${texto}" title="${texto}">
-    <span aria-hidden="true">${oscuro ? "☀" : "☾"}</span>
+    <span aria-hidden="true">${oscuro ? "☀︎" : "☾"}</span>
   </button>`;
 }
 

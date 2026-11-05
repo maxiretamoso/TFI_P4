@@ -226,6 +226,86 @@ h3 {
     }
 }
 
+/* Login */
+
+.pantalla-login {
+    display: flex;
+    min-height: 100vh;
+}
+
+.login-marca {
+    flex: 0 0 42%;
+    background-color: var(--gim-lateral);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 32px;
+    text-align: center;
+}
+
+[data-bs-theme="dark"] .login-marca {
+    border-right: 3px solid var(--gim-verde);
+}
+
+.login-marca img {
+    width: min(260px, 70%);
+    height: auto;
+}
+
+.login-marca h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.login-formulario {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    background-color: var(--gim-tarjeta);
+}
+
+.login-formulario form {
+    width: 100%;
+    max-width: 360px;
+}
+
+.login-tema {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+@media (max-width: 768px) {
+    .pantalla-login {
+        flex-direction: column;
+    }
+
+    .login-marca {
+        flex: none;
+        padding: 24px 16px;
+        gap: 10px;
+    }
+
+    .login-marca img {
+        width: 170px;
+    }
+
+    .login-marca h1 {
+        font-size: 1.1rem;
+    }
+
+    .login-formulario {
+        align-items: flex-start;
+    }
+}
+
 /* Tarjetas de contenido */
 
 .tarjeta-lista,

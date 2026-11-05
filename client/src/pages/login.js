@@ -1,6 +1,7 @@
 import { api } from "../api.js";
 import { guardarSesion } from "../session.js";
 import { mensajeError } from "../ui.js";
+import { botonTema, activarBotonTema } from "../tema.js";
 
 let contenedor = null;
 
@@ -8,24 +9,34 @@ export async function pintar(zona) {
   contenedor = zona;
 
   contenedor.innerHTML = `
-    <main class="login-container card border-0 shadow-sm p-4">
-      <form novalidate>
-        <div class="mb-3">
-          <label class="form-label" for="usuario">Usuario:</label>
-          <input class="form-control" type="text" id="usuario" name="usuario" placeholder="usuario@correo.com" autocomplete="username">
-        </div>
+    <main class="pantalla-login">
+      <section class="login-marca">
+        <img src="/logo-muni.png" alt="Municipalidad de Concordia">
+        <h1>Gestión de Incidencias Municipales</h1>
+      </section>
 
-        <div class="mb-3">
-          <label class="form-label" for="contrasenia">Contraseña:</label>
-          <input class="form-control" type="password" id="contrasenia" name="contrasenia" placeholder="Contraseña" autocomplete="current-password">
-        </div>
+      <section class="login-formulario">
+        <div class="login-tema">${botonTema()}</div>
+        <form novalidate>
+          <h2>Ingresá a tu cuenta</h2>
 
-        <button class="btn btn-gim w-100" type="submit" id="boton-ingresar">Ingresar</button>
-      </form>
+          <div class="mb-3">
+            <label class="form-label" for="usuario">Usuario</label>
+            <input class="form-control" type="text" id="usuario" name="usuario" placeholder="usuario@correo.com" autocomplete="username">
+          </div>
 
-      <div class="zona-error login-error"></div>
+          <div class="mb-3">
+            <label class="form-label" for="contrasenia">Contraseña</label>
+            <input class="form-control" type="password" id="contrasenia" name="contrasenia" placeholder="Contraseña" autocomplete="current-password">
+          </div>
+
+          <button class="btn btn-gim w-100" type="submit" id="boton-ingresar">Ingresar</button>
+          <div class="zona-error"></div>
+        </form>
+      </section>
     </main>`;
 
+  activarBotonTema(contenedor);
   contenedor.querySelector("form").addEventListener("submit", manejarEnvio);
   contenedor.querySelector("#usuario").focus();
 }
