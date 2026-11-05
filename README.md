@@ -147,4 +147,4 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 ## Notas sobre la base
 
 - La columna `incidencias_estados.fecha_hora_estado` es de tipo `time with time zone` en el diagrama de la cátedra, así que el historial guarda la hora de cada cambio pero no la fecha.
-- En el script de la cátedra el estado 3 figura como "Resuela"; en la base de trabajo se corrigió a "Resuelta".
+- En el script original de la cátedra el estado 3 figuraba como "Resuela"; en `database/incidencias_db.sql` se corrigió a "Resuelta".
