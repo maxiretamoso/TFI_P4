@@ -22,6 +22,16 @@ const COLOR_ESTADO = {
 };
 
 const PRIORIDADES = { 1: "Baja", 2: "Media", 3: "Alta" };
+
+// Hora de Argentina en 24 h, sin segundos, sin depender de la zona del servidor.
+const FORMATO_FECHA = { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit", year: "numeric" };
+const formatoFecha = new Intl.DateTimeFormat("es-AR", FORMATO_FECHA);
+const formatoFechaHora = new Intl.DateTimeFormat("es-AR", {
+  ...FORMATO_FECHA,
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
 const MARGEN = 45;
 const ALTO_FILA = 22;
 
@@ -42,7 +52,7 @@ function encabezado(doc) {
     .text("Reporte de incidencias", 0, 30, { width: ancho - MARGEN, align: "right" });
   doc.font("Helvetica").fontSize(9.5)
     .text("Gestión de Incidencias Municipales", 0, 56, { width: ancho - MARGEN, align: "right" })
-    .text(`Generado el ${new Date().toLocaleString("es-AR")}`, 0, 70, { width: ancho - MARGEN, align: "right" });
+    .text(`Generado el ${formatoFechaHora.format(new Date())}`, 0, 70, { width: ancho - MARGEN, align: "right" });
 
   doc.y = 122;
 }
@@ -169,9 +179,9 @@ function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) 
     doc,
     [
       { titulo: "#", ancho: 0.05, campo: "id_incidencia" },
-      { titulo: "Fecha", ancho: 0.11, campo: "fecha" },
+      { titulo: "Fecha", ancho: 0.13, campo: "fecha" },
       { titulo: "Artículo", ancho: 0.16, campo: "articulo" },
-      { titulo: "Pedido", ancho: 0.24, campo: "descripcion_pedido" },
+      { titulo: "Pedido", ancho: 0.22, campo: "descripcion_pedido" },
       { titulo: "Prioridad", ancho: 0.11, campo: "prioridad_texto" },
       {
         titulo: "Estado",
@@ -182,7 +192,7 @@ function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) 
     ],
     detalle.map((inc) => ({
       ...inc,
-      fecha: new Date(inc.creado).toLocaleDateString("es-AR"),
+      fecha: formatoFecha.format(new Date(inc.creado)),
       prioridad_texto: PRIORIDADES[inc.prioridad] ?? inc.prioridad,
       asignado: `${inc.asignado_nombres} ${inc.asignado_apellidos}`,
     }))
