@@ -119,19 +119,18 @@ function tarjetasDeIndicadores(resumen) {
   const resueltas = resumen.porEstado.find((f) => f.id_estado === ESTADOS.RESUELTA)?.total ?? 0;
   const { abiertas, altas_abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
   const indicadores = [
-    ["Total", resumen.total, "incidencias registradas", ""],
-    ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
-    ["Alta sin resolver", altas_abiertas, "abiertas de prioridad Alta", `estado=${ABIERTAS}&prioridad=${PRIORIDAD_ALTA}`],
-    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
-    ["Sin asignar", sin_asignar, "pendientes a cargo del Director", "sin_asignar=true"],
-    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
+    ["Total", resumen.total, "Incidencias registradas", ""],
+    ["Abiertas", abiertas, "Sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
+    ["Alta sin resolver", altas_abiertas, "Abiertas de prioridad Alta", `estado=${ABIERTAS}&prioridad=${PRIORIDAD_ALTA}`],
+    ["Últimos 7 días", ultimos_7_dias, "Incidencias creadas en la última semana", `desde=${fechaHaceDias(6)}`],
+    ["Sin asignar", sin_asignar, "Pendientes que siguen a cargo del Director", "sin_asignar=true"],
+    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "Porcentaje de resueltas sobre el total", `estado=${ESTADOS.RESUELTA}`],
   ];
   return `<div class="indicadores">${indicadores
     .map(
-      ([titulo, valor, detalle, filtro]) => `<a class="indicador" href="#/${filtro ? `?${filtro}` : ""}" title="Ver estas incidencias">
+      ([titulo, valor, detalle, filtro]) => `<a class="indicador" href="#/${filtro ? `?${filtro}` : ""}" title="${detalle}. Tocá para ver la lista.">
         <span class="indicador-valor">${valor}</span>
         <span class="indicador-titulo">${titulo}</span>
-        <span class="indicador-detalle">${detalle}</span>
       </a>`
     )
     .join("")}</div>`;
