@@ -65,7 +65,10 @@ function estructuraHtml(rutaActual, usuario) {
       <nav>
         <ul class="lista-menu">${enlacesDelMenu(rutaActual, usuario)}</ul>
       </nav>
-      <button type="button" class="enlace-menu boton-salir" id="salir">Salir</button>
+      <button type="button" class="enlace-menu boton-salir" id="salir">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h4.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H14M10 16l-4-4 4-4M6 12h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Cerrar sesión
+      </button>
     </aside>
 
     <div class="area-principal">

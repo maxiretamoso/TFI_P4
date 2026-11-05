@@ -133,6 +133,18 @@ h3 {
 
 .boton-salir {
     margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0 0 8px 8px;
+    padding-top: 14px;
+}
+
+.boton-salir svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .area-principal {
