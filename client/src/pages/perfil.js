@@ -132,6 +132,9 @@ export async function pintar(zona) {
         <div class="modal-content modal-foto">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           <img class="foto-ampliada" src="${urlDelAvatar(perfil.avatar)}" alt="Foto de perfil de ${esc(perfil.nombres)} ${esc(perfil.apellidos)}">
+          <button type="button" class="btn btn-gim boton-cambiar-desde-foto" data-bs-toggle="modal" data-bs-target="#modal-cambiar-foto">
+            <span class="icono-boton">${ICONO_CAMARA}</span> Cambiar foto
+          </button>
         </div>
       </div>
     </div>

@@ -1260,6 +1260,15 @@ a.indicador:focus-visible {
     z-index: 1;
 }
 
+.boton-cambiar-desde-foto {
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 20px;
+}
+
 .foto-ampliada {
     width: min(440px, 85vw);
     aspect-ratio: 1;
