@@ -95,3 +95,23 @@ export function paginacion({ pagina, paginas, total, limite }) {
     </nav>
   </div>`;
 }
+
+const URL_SERVIDOR = (import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1").replace(
+  /\/api\/v1\/?$/,
+  ""
+);
+
+export function urlDelAvatar(archivo) {
+  return archivo ? `${URL_SERVIDOR}/publico/avatares/${archivo}` : "";
+}
+
+function iniciales(usuario) {
+  return `${usuario.nombres?.[0] ?? ""}${usuario.apellidos?.[0] ?? ""}`.toUpperCase();
+}
+
+export function avatarHtml(usuario, clase = "") {
+  const url = urlDelAvatar(usuario.avatar);
+  return url
+    ? `<img class="avatar ${clase}" src="${url}" alt="">`
+    : `<span class="avatar avatar-iniciales ${clase}" aria-hidden="true">${esc(iniciales(usuario))}</span>`;
+}

@@ -7,7 +7,7 @@ import * as dashboard from "./pages/dashboard.js";
 import * as reportes from "./pages/reportes.js";
 import * as nueva from "./pages/nueva.js";
 import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
-import { esc, ROLES, NOMBRES_ROL } from "./ui.js";
+import { esc, ROLES, NOMBRES_ROL, avatarHtml } from "./ui.js";
 import { botonTema, activarBotonTema } from "./tema.js";
 import { rutaDeInicio } from "./permisos.js";
 
@@ -72,6 +72,7 @@ function estructuraHtml(rutaActual, usuario) {
         <h1 class="titulo-app">${TITULO}</h1>
         <div class="barra-derecha">
           ${botonTema()}
+          ${avatarHtml(usuario, "avatar-barra")}
           <span class="usuario-actual">
             <span class="usuario-nombre">${esc(usuario.nombres)} ${esc(usuario.apellidos)}</span>
             <span class="usuario-rol">${esc(NOMBRES_ROL[usuario.rol] ?? "")}</span>
