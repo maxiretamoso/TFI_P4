@@ -1,7 +1,9 @@
 const usuariosDatos = require("../datos/usuarios.datos");
 const areasDatos = require("../datos/areas.datos");
+const incidenciasDatos = require("../datos/incidencias.datos");
 const { crearError } = require("../utils/httpError");
 const { ROLES } = require("../config/roles");
+const { ESTADOS } = require("../config/estados");
 const { hashearContrasenia } = require("./auth.service");
 
 const CODIGO_CLAVE_DUPLICADA = "23505";
@@ -12,6 +14,21 @@ function esDirector(solicitante) {
 
 function esElMismo(id, solicitante) {
   return solicitante && Number(id) === solicitante.id_usuario;
+}
+
+// Un empleado de Sistemas con incidencias abiertas no puede dejar de serlo: quedarían sin responsable.
+async function exigirSinIncidenciasAbiertas(usuario, accion) {
+  if (usuario.rol !== ROLES.EMPLEADO_SISTEMAS) return;
+  const abiertas = await incidenciasDatos.contarAsignadasEnEstados(usuario.id_usuario, [
+    ESTADOS.PENDIENTE,
+    ESTADOS.EN_PROCESO,
+  ]);
+  if (abiertas > 0) {
+    throw crearError(
+      409,
+      `No se puede ${accion}: tiene ${abiertas} incidencia${abiertas === 1 ? "" : "s"} abierta${abiertas === 1 ? "" : "s"} asignada${abiertas === 1 ? "" : "s"}. Reasignalas primero.`
+    );
+  }
 }
 
 function listarUsuarios() {
@@ -64,6 +81,12 @@ async function actualizarUsuario(id, datos, solicitante) {
     }
   }
 
+  const cambiaRol = datos.rol !== undefined && Number(datos.rol) !== actual.rol;
+  if (cambiaRol && esElMismo(id, solicitante)) {
+    throw crearError(400, "No podés cambiar tu propio rol");
+  }
+  if (cambiaRol) await exigirSinIncidenciasAbiertas(actual, "cambiarle el rol");
+
   const id_area = datos.id_area ?? actual.id_area;
   if (id_area !== actual.id_area && !(await areasDatos.buscarPorId(id_area))) {
     throw crearError(400, "El área indicada no existe");
@@ -89,9 +112,11 @@ async function desactivarUsuario(id, solicitante) {
   if (esElMismo(id, solicitante)) {
     throw crearError(400, "No podés darte de baja a vos mismo");
   }
-  const usuario = await usuariosDatos.desactivar(id);
-  if (!usuario) throw crearError(404, "Usuario no encontrado");
-  return usuario;
+  const actual = await usuariosDatos.buscarCredencialesPorId(id);
+  if (!actual) throw crearError(404, "Usuario no encontrado");
+  await exigirSinIncidenciasAbiertas(actual, "darlo de baja");
+
+  return usuariosDatos.desactivar(id);
 }
 
 async function actualizarAvatar(id, nombreArchivo, solicitante) {

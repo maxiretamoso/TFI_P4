@@ -189,4 +189,12 @@ function asignar(id, asignadoA, idEstado) {
   });
 }
 
-module.exports = { listar, buscarPorId, insertar, cambiarEstado, asignar };
+function contarAsignadasEnEstados(idUsuario, estados) {
+  return pool
+    .query(`SELECT COUNT(*)::int AS total
+            FROM incidencias
+            WHERE asignado_a = $1 AND id_estado = ANY($2)`, [idUsuario, estados])
+    .then((r) => r.rows[0].total);
+}
+
+module.exports = { listar, buscarPorId, insertar, cambiarEstado, asignar, contarAsignadasEnEstados };

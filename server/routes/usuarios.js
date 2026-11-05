@@ -120,7 +120,8 @@ router.post(
  *       200: { description: Usuario modificado }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
- *       409: { description: Ya existe un usuario con ese correo }
+ *       400: { description: Datos inválidos o intento de cambiar el propio rol }
+ *       409: { description: Ya existe un usuario con ese correo, o es empleado de Sistemas con incidencias abiertas y se le cambia el rol }
  *   delete:
  *     summary: Da de baja un usuario (soft delete, activo = 0)
  *     tags: [Usuarios]
@@ -132,6 +133,7 @@ router.post(
  *       400: { description: No podés darte de baja a vos mismo }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       409: { description: Es empleado de Sistemas y tiene incidencias abiertas asignadas }
  */
 router.get("/:id", [param("id").isInt({ min: 1 })], usuariosController.obtenerPorId);
 
