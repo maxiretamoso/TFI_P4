@@ -115,6 +115,7 @@ export async function enrutar() {
   const config = RUTAS[rutaPedida];
   const permitida = config && config.roles.includes(usuario.rol);
   const ruta = permitida ? rutaPedida : rutaDeInicio(usuario);
+  if (!permitida) history.replaceState(null, "", `#${ruta}`);
 
   app.innerHTML = estructuraHtml(ruta, usuario);
   activarBotonTema(app);
