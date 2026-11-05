@@ -65,7 +65,10 @@ async function manejarEnvio(evento) {
       contrasenia: campoContrasenia.value,
     });
     guardarSesion(datos);
-    window.location.hash = `#${rutaDeInicio(datos.usuario)}`;
+    contenedor.querySelector(".pantalla-login").classList.add("saliendo");
+    setTimeout(() => {
+      window.location.hash = `#${rutaDeInicio(datos.usuario)}`;
+    }, 350);
   } catch (e) {
     zona.innerHTML = mensajeError(e.message);
     boton.disabled = false;

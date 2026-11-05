@@ -88,20 +88,62 @@ function estructuraHtml(rutaActual, usuario) {
   </div>`;
 }
 
-// Al navegar se repinta todo; si el menú del celular o un modal estaban abiertos, su fondo queda colgado.
-function limpiarMenuAbierto() {
-  document.querySelectorAll(".offcanvas-backdrop, .modal-backdrop").forEach((fondo) => fondo.remove());
+const DURACION_SALIDA_MS = 350;
+
+// Id del usuario cuya estructura (menú y barra superior) está en pantalla.
+let usuarioEnPantalla = null;
+
+function leerHash() {
+  const [ruta, consulta = ""] = window.location.hash.slice(1).split("?");
+  return { rutaPedida: ruta || "/", parametros: new URLSearchParams(consulta) };
+}
+
+function cerrarMenuDelCelular() {
+  const abierto = document.querySelector("#menu-lateral.show");
+  abierto?.querySelector('[data-bs-dismiss="offcanvas"]').click();
+}
+
+// Si un modal quedó abierto al cambiar de pantalla, su fondo oscuro queda colgado.
+function limpiarFondos() {
+  document.querySelectorAll(".modal-backdrop").forEach((fondo) => fondo.remove());
   document.body.classList.remove("modal-open");
   document.body.style.removeProperty("overflow");
   document.body.style.removeProperty("padding-right");
 }
 
+function marcarEnlaceActivo(ruta) {
+  document.querySelectorAll(".lista-menu .enlace-menu").forEach((enlace) => {
+    const activo = enlace.getAttribute("href") === `#${ruta}`;
+    enlace.classList.toggle("activo", activo);
+    if (activo) enlace.setAttribute("aria-current", "page");
+    else enlace.removeAttribute("aria-current");
+  });
+}
+
+function salirDeLaCuenta() {
+  document.querySelector(".app-con-menu")?.classList.add("saliendo");
+  setTimeout(() => {
+    cerrarSesion();
+    window.location.hash = "#/login";
+  }, DURACION_SALIDA_MS);
+}
+
+function pintarEstructura(app, ruta, usuario) {
+  app.innerHTML = estructuraHtml(ruta, usuario);
+  app.firstElementChild.classList.add("entrada-app");
+  activarBotonTema(app);
+  document.getElementById("salir").addEventListener("click", salirDeLaCuenta);
+  usuarioEnPantalla = usuario.id_usuario;
+}
+
 export async function enrutar() {
-  const rutaPedida = window.location.hash.slice(1) || "/";
+  const { rutaPedida, parametros } = leerHash();
   const app = document.getElementById("app");
-  limpiarMenuAbierto();
+  cerrarMenuDelCelular();
+  limpiarFondos();
 
   if (!haySesion()) {
+    usuarioEnPantalla = null;
     app.innerHTML = "";
     if (rutaPedida !== "/login") {
       window.location.hash = "#/login";
@@ -123,13 +165,17 @@ export async function enrutar() {
   const ruta = permitida ? rutaPedida : rutaDeInicio(usuario);
   if (!permitida) history.replaceState(null, "", `#${ruta}`);
 
-  app.innerHTML = estructuraHtml(ruta, usuario);
-  activarBotonTema(app);
+  if (usuarioEnPantalla !== usuario.id_usuario || !document.getElementById("contenido-principal")) {
+    pintarEstructura(app, ruta, usuario);
+  } else {
+    marcarEnlaceActivo(ruta);
+  }
 
-  document.getElementById("salir").addEventListener("click", () => {
-    cerrarSesion();
-    window.location.hash = "#/login";
-  });
+  // Un <main> nuevo por pantalla: no arrastra eventos de la anterior y anima su entrada.
+  const contenido = document.createElement("main");
+  contenido.id = "contenido-principal";
+  contenido.className = "contenido-entrando";
+  document.getElementById("contenido-principal").replaceWith(contenido);
 
-  await RUTAS[ruta].pagina.pintar(document.getElementById("contenido-principal"));
+  await RUTAS[ruta].pagina.pintar(contenido, permitida ? parametros : new URLSearchParams());
 }
