@@ -8,7 +8,7 @@ import * as reportes from "./pages/reportes.js";
 import * as nueva from "./pages/nueva.js";
 import * as articulos from "./pages/articulos.js";
 import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
-import { esc, ROLES, NOMBRES_ROL, avatarHtml } from "./ui.js";
+import { esc, ROLES, avatarHtml } from "./ui.js";
 import { botonTema, activarBotonTema } from "./tema.js";
 import { rutaDeInicio } from "./permisos.js";
 
@@ -76,10 +76,7 @@ function estructuraHtml(rutaActual, usuario) {
           ${botonTema()}
           <a class="enlace-usuario" href="#/perfil" title="Ir a Mi perfil">
             ${avatarHtml(usuario, "avatar-barra")}
-            <span class="usuario-actual">
-              <span class="usuario-nombre">${esc(usuario.nombres)} ${esc(usuario.apellidos)}</span>
-              <span class="usuario-rol">${esc(NOMBRES_ROL[usuario.rol] ?? "")}</span>
-            </span>
+            <span class="usuario-nombre">${esc(usuario.nombres)} ${esc(usuario.apellidos)}</span>
           </a>
         </div>
       </header>

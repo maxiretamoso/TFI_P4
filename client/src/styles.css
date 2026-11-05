@@ -288,20 +288,8 @@ h3 {
     color: inherit;
 }
 
-.usuario-actual {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
-    text-align: right;
-}
-
 .usuario-nombre {
     font-weight: 600;
-}
-
-.usuario-rol {
-    font-size: 0.8rem;
-    color: var(--gim-texto-suave);
 }
 
 @media (min-width: 992px) {
@@ -325,7 +313,7 @@ h3 {
         padding: 12px 12px 24px;
     }
 
-    .usuario-actual {
+    .usuario-nombre {
         display: none;
     }
 }
