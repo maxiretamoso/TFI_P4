@@ -18,30 +18,9 @@ function totalesPorFecha(dias) {
     .query(`SELECT to_char(creado::date, 'YYYY-MM-DD') AS fecha,
                    COUNT(*)::int AS total
             FROM incidencias
+            WHERE creado::date > current_date - $1::int
             GROUP BY creado::date
-            ORDER BY creado::date DESC
-            LIMIT $1`, [dias])
-    .then((r) => r.rows);
-}
-
-function prioritarias(prioridad, limite) {
-  return pool
-    .query(`SELECT incidencias.id_incidencia,
-                   incidencias.descripcion_pedido,
-                   incidencias.prioridad,
-                   incidencias.creado,
-                   incidencias.id_estado,
-                   estados.descripcion   AS estado,
-                   articulos.descripcion AS articulo_descripcion,
-                   asignado.nombres      AS asignado_a_nombre,
-                   asignado.apellidos    AS asignado_a_apellido
-            FROM incidencias
-            JOIN estados   ON incidencias.id_estado = estados.id_estado
-            JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
-            JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
-            WHERE incidencias.prioridad = $1
-            ORDER BY incidencias.creado DESC
-            LIMIT $2`, [prioridad, limite])
+            ORDER BY creado::date`, [dias])
     .then((r) => r.rows);
 }
 
@@ -51,4 +30,4 @@ function total() {
     .then((r) => r.rows[0].total);
 }
 
-module.exports = { totalesPorEstado, totalesPorFecha, prioritarias, total };
+module.exports = { totalesPorEstado, totalesPorFecha, total };

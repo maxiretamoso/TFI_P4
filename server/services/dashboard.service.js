@@ -1,18 +1,18 @@
 const dashboardDatos = require("../datos/dashboard.datos");
+const reportesDatos = require("../datos/reportes.datos");
 
-const DIAS_DEL_GRAFICO = 30;
-const PRIORIDAD_ALTA = 3;
-const MAXIMO_PRIORITARIAS = 20;
+const DIAS_DEL_GRAFICO = 14;
 
 async function obtenerResumen() {
-  const [total, porEstado, porFecha, prioritarias] = await Promise.all([
+  const [total, porEstado, porFecha, porPrioridad, porArea] = await Promise.all([
     dashboardDatos.total(),
     dashboardDatos.totalesPorEstado(),
     dashboardDatos.totalesPorFecha(DIAS_DEL_GRAFICO),
-    dashboardDatos.prioritarias(PRIORIDAD_ALTA, MAXIMO_PRIORITARIAS),
+    reportesDatos.totalesPorPrioridad(),
+    reportesDatos.totalesPorArea(),
   ]);
 
-  return { total, porEstado, porFecha, prioritarias };
+  return { total, porEstado, porFecha, porPrioridad, porArea, dias: DIAS_DEL_GRAFICO };
 }
 
 module.exports = { obtenerResumen };
