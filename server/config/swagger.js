@@ -59,6 +59,12 @@ const definicion = {
           prioridad: { type: "integer", enum: [1, 2, 3] },
           descripcion_pedido: { type: "string" },
           descripcion_resolucion: { type: "string", nullable: true },
+          fecha_estado: {
+            type: "string",
+            format: "date-time",
+            nullable: true,
+            description: "Fecha y hora en que pasó al estado actual (en una resuelta o cancelada, la fecha de cierre)",
+          },
         },
       },
     },

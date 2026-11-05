@@ -24,7 +24,11 @@ const SELECCION = `
          creador.nombres       AS creado_por_nombre,
          creador.apellidos     AS creado_por_apellido,
          asignado.nombres      AS asignado_a_nombre,
-         asignado.apellidos    AS asignado_a_apellido
+         asignado.apellidos    AS asignado_a_apellido,
+         (SELECT max(incidencias_estados.fecha_hora_estado)
+          FROM incidencias_estados
+          WHERE incidencias_estados.id_incidencia = incidencias.id_incidencia
+            AND incidencias_estados.id_estado = incidencias.id_estado) AS fecha_estado
   ${DESDE}
 `;
 

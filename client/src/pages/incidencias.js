@@ -15,6 +15,7 @@ const POR_PAGINA = 10;
 const FILTROS_ADMITIDOS = ["buscar", "estado", "prioridad", "desde", "fecha", "sin_asignar", "area", "categoria", "asignado"];
 // Estos vienen solo desde el dashboard; la barra de filtros los conserva al cambiar los demás.
 const FILTROS_DEL_DASHBOARD = ["area", "categoria", "asignado", "fecha"];
+const CERRADAS = [ESTADOS.RESUELTA, ESTADOS.CANCELADA];
 const NOMBRES_ESTADO_PLURAL = {
   [ESTADOS.PENDIENTE]: "Pendientes",
   [ESTADOS.EN_PROCESO]: "En proceso",
@@ -255,7 +256,11 @@ function filaIncidencia(inc) {
     <td>${esc(inc.articulo_descripcion)}</td>
     <td class="celda-pedido" data-ayuda-si-cortado>${esc(inc.descripcion_pedido)}</td>
     <td>${esc(PRIORIDADES[inc.prioridad] ?? inc.prioridad)}</td>
-    <td>${badgeEstado(inc)}</td>
+    <td>${badgeEstado(inc)}${
+      CERRADAS.includes(inc.id_estado) && inc.fecha_estado
+        ? `<span class="fecha-cierre">el ${fechaHora(inc.fecha_estado)}</span>`
+        : ""
+    }</td>
     <td>${asignado}</td>
     <td>${fechaHora(inc.creado)}</td>
     <td class="celda-acciones">${acciones}</td>

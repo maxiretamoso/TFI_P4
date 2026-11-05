@@ -22,6 +22,7 @@ const COLOR_ESTADO = {
 };
 
 const PRIORIDADES = { 1: "Baja", 2: "Media", 3: "Alta" };
+const CERRADAS = [ESTADOS.RESUELTA, ESTADOS.CANCELADA];
 
 // Hora de Argentina en 24 h, sin segundos, sin depender de la zona del servidor.
 const FORMATO_FECHA = { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit", year: "numeric" };
@@ -190,21 +191,24 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
   tabla(
     doc,
     [
-      { titulo: "#", ancho: 0.05, campo: "id_incidencia" },
-      { titulo: "Fecha", ancho: 0.13, campo: "fecha" },
-      { titulo: "Artículo", ancho: 0.16, campo: "articulo" },
-      { titulo: "Pedido", ancho: 0.2, campo: "descripcion_pedido" },
+      { titulo: "#", ancho: 0.04, campo: "id_incidencia" },
+      { titulo: "Creada", ancho: 0.13, campo: "fecha" },
+      { titulo: "Cerrada", ancho: 0.13, campo: "cierre" },
+      { titulo: "Artículo", ancho: 0.14, campo: "articulo" },
+      { titulo: "Pedido", ancho: 0.15, campo: "descripcion_pedido" },
       { titulo: "Prioridad", ancho: 0.11, campo: "prioridad_texto" },
       {
         titulo: "Estado",
-        ancho: 0.16,
+        ancho: 0.14,
         dibujar: celdaConPunto((f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde, (f) => f.estado),
       },
-      { titulo: "Asignada a", ancho: 0.19, campo: "asignado" },
+      { titulo: "Asignada a", ancho: 0.16, campo: "asignado" },
     ],
     detalle.map((inc) => ({
       ...inc,
       fecha: formatoFecha.format(new Date(inc.creado)),
+      cierre:
+        CERRADAS.includes(inc.id_estado) && inc.fecha_estado ? formatoFecha.format(new Date(inc.fecha_estado)) : "-",
       prioridad_texto: PRIORIDADES[inc.prioridad] ?? inc.prioridad,
       asignado: `${inc.asignado_nombres} ${inc.asignado_apellidos}`,
     }))

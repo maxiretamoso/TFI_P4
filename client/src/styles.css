@@ -672,6 +672,14 @@ h3 {
     white-space: nowrap;
 }
 
+.fecha-cierre {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--bs-secondary-color);
+    white-space: nowrap;
+}
+
 .estado-1 {
     background-color: var(--gim-pendiente-fondo);
     color: var(--gim-pendiente-texto);

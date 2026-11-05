@@ -54,7 +54,11 @@ function detalle(estados) {
                    articulos.descripcion AS articulo,
                    estados.descripcion   AS estado,
                    asignado.apellidos    AS asignado_apellidos,
-                   asignado.nombres      AS asignado_nombres
+                   asignado.nombres      AS asignado_nombres,
+                   (SELECT max(incidencias_estados.fecha_hora_estado)
+                    FROM incidencias_estados
+                    WHERE incidencias_estados.id_incidencia = incidencias.id_incidencia
+                      AND incidencias_estados.id_estado = incidencias.id_estado) AS fecha_estado
             FROM incidencias
             JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
             JOIN estados   ON incidencias.id_estado = estados.id_estado

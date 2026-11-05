@@ -148,7 +148,19 @@ router.get("/:id", [param("id").isInt({ min: 1 })], incidenciasController.obtene
  *     parameters:
  *       - { in: path, name: id, required: true, schema: { type: integer } }
  *     responses:
- *       200: { description: Lista de cambios de estado }
+ *       200:
+ *         description: Cambios de estado, del más viejo al más nuevo
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_pedidos_estados: { type: integer, example: 7 }
+ *                   id_estado:          { type: integer, example: 3 }
+ *                   estado:             { type: string, example: Resuelta }
+ *                   fecha_hora_estado:  { type: string, format: date-time, example: "2026-11-05T18:30:00-03:00" }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  */
