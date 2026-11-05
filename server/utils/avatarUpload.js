@@ -1,6 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const { crearError } = require("./httpError");
 
 const uploadDir = path.join(__dirname, "..", "publico", "avatares");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
@@ -21,7 +22,7 @@ const uploadAvatar = multer({
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (!file.mimetype.startsWith("image/") || !EXTENSIONES.includes(ext)) {
-      return cb(new Error("Solo se permiten imágenes jpg, png o webp"));
+      return cb(crearError(400, "Solo se permiten imágenes jpg, png o webp"));
     }
     cb(null, true);
   },
