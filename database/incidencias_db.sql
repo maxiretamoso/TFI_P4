@@ -100,7 +100,7 @@ CREATE TABLE public.incidencias_estados (
     id_pedidos_estados integer NOT NULL,
     id_incidencia integer NOT NULL,
     id_estado integer NOT NULL,
-    fecha_hora_estado time with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+    fecha_hora_estado timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE SEQUENCE public.incidencias_estados_id_pedidos_estados_seq

@@ -156,5 +156,5 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 
 ## Notas sobre la base
 
-- La columna `incidencias_estados.fecha_hora_estado` es de tipo `time with time zone` en el diagrama de la cátedra, así que el historial guarda la hora de cada cambio pero no la fecha. Por eso no se muestra la fecha de cierre de una incidencia ni se calcula cuánto tardó en resolverse. Se respetó el diagrama; cambiar la columna a `timestamp with time zone` permitiría guardar la fecha completa.
+- En el diagrama de la cátedra la columna `incidencias_estados.fecha_hora_estado` es `time with time zone`, que guarda la hora de cada cambio pero no el día. En `database/incidencias_db.sql` se cambió a `timestamp with time zone` para que el historial tenga fecha y hora, y así poder mostrar cuándo se resolvió o canceló cada incidencia (en la lista y en el reporte PDF). Es el único cambio de tipo respecto del diagrama.
 - En el script original de la cátedra el estado 3 figuraba como "Resuela"; en `database/incidencias_db.sql` se corrigió a "Resuelta".
