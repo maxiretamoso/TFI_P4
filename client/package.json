@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Frontend de GIM sin framework: Vite + Bootstrap + JavaScript puro",
   "scripts": {
-    "dev": "vite --port 5174",
+    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 4174"
+    "preview": "vite preview"
   },
   "license": "ISC",
   "type": "module",

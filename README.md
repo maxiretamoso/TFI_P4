@@ -68,7 +68,7 @@ npm install
 npm run dev
 ```
 
-El cliente abre en `http://localhost:5174`. Si se cambia ese puerto, hay que actualizar `CLIENT_URL` en `server/.env`, porque es el origen que la API habilita por CORS.
+El cliente abre en `http://localhost:5173`. Si se cambia ese puerto, hay que actualizar `CLIENT_URL` en `server/.env`, porque es el origen que la API habilita por CORS.
 
 ### 4. Usuarios de prueba
 
