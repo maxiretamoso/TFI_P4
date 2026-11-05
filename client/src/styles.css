@@ -331,6 +331,72 @@ h3 {
     }
 }
 
+/* Transiciones */
+
+.enlace-menu {
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.contenido-entrando {
+    animation: entrar-contenido 0.25s ease-out;
+}
+
+.entrada-app {
+    animation: entrar-app 0.45s ease-out;
+}
+
+.pantalla-login {
+    animation: entrar-app 0.45s ease-out;
+}
+
+.pantalla-login .login-marca {
+    animation: deslizar-marca 0.55s ease-out;
+}
+
+.app-con-menu.saliendo,
+.pantalla-login.saliendo {
+    animation: salir-app 0.35s ease-in forwards;
+}
+
+@keyframes entrar-contenido {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+@keyframes entrar-app {
+    from {
+        opacity: 0;
+        transform: scale(0.985);
+    }
+}
+
+@keyframes deslizar-marca {
+    from {
+        transform: translateX(-24px);
+        opacity: 0.6;
+    }
+}
+
+@keyframes salir-app {
+    to {
+        opacity: 0;
+        transform: scale(0.985);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contenido-entrando,
+    .entrada-app,
+    .pantalla-login,
+    .pantalla-login .login-marca,
+    .app-con-menu.saliendo,
+    .pantalla-login.saliendo {
+        animation-duration: 0.01s;
+    }
+}
+
 /* Login */
 
 .pantalla-login {
@@ -843,6 +909,57 @@ h3 {
     display: flex;
     flex-direction: column;
     line-height: 1.3;
+}
+
+a.indicador {
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+a.indicador:hover,
+a.indicador:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    border-color: var(--gim-verde);
+    color: inherit;
+}
+
+a.indicador:focus-visible {
+    outline: 3px solid var(--gim-verde);
+    outline-offset: 2px;
+}
+
+.referencia-enlace {
+    color: inherit;
+    text-decoration: none;
+    padding: 2px 6px;
+    margin-left: -6px;
+    border-radius: 6px;
+}
+
+.referencia-enlace:hover,
+.referencia-enlace:focus-visible {
+    background-color: var(--gim-verde-suave);
+    color: inherit;
+}
+
+.filtro-activo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    border-radius: 10px;
+    background-color: var(--gim-verde-suave);
+    color: var(--gim-verde-texto);
+}
+
+.filtro-activo a {
+    color: var(--gim-verde-texto);
+    font-weight: 600;
 }
 
 .indicador-valor {

@@ -34,7 +34,7 @@ function indicadores({ abiertos, prioridadAlta, pendiente, rolDirector }) {
   return pool
     .query(`SELECT COUNT(*) FILTER (WHERE id_estado = ANY($1))::int AS abiertas,
                    COUNT(*) FILTER (WHERE id_estado = ANY($1) AND prioridad = $2)::int AS altas_abiertas,
-                   COUNT(*) FILTER (WHERE creado >= now() - interval '7 days')::int AS ultimos_7_dias,
+                   COUNT(*) FILTER (WHERE creado >= current_date - 6)::int AS ultimos_7_dias,
                    COUNT(*) FILTER (
                      WHERE id_estado = $3
                        AND asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $4)

@@ -8,6 +8,16 @@ const COLOR_ESTADO = {
   [ESTADOS.CANCELADA]: "var(--gim-cancelada)",
 };
 
+const ABIERTAS = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
+const PRIORIDAD_ALTA = 3;
+
+function fechaHaceDias(dias) {
+  const dia = new Date();
+  dia.setDate(dia.getDate() - dias);
+  const mes = String(dia.getMonth() + 1).padStart(2, "0");
+  return `${dia.getFullYear()}-${mes}-${String(dia.getDate()).padStart(2, "0")}`;
+}
+
 function porcentaje(parte, total) {
   return total > 0 ? Math.round((parte / total) * 100) : 0;
 }
@@ -29,9 +39,11 @@ function graficoPorEstado(resumen) {
   const referencias = resumen.porEstado
     .map(
       (f) => `<li>
-        <span class="punto" style="background: ${COLOR_ESTADO[f.id_estado]}"></span>
-        ${esc(f.estado)} <strong>${f.total}</strong>
-        <span class="porcentaje">${porcentaje(f.total, resumen.total)}%</span>
+        <a class="referencia-enlace" href="#/?estado=${f.id_estado}" title="Ver las incidencias en este estado">
+          <span class="punto" style="background: ${COLOR_ESTADO[f.id_estado]}"></span>
+          ${esc(f.estado)} <strong>${f.total}</strong>
+          <span class="porcentaje">${porcentaje(f.total, resumen.total)}%</span>
+        </a>
       </li>`
     )
     .join("");
@@ -89,20 +101,20 @@ function tarjetasDeIndicadores(resumen) {
   const resueltas = resumen.porEstado.find((f) => f.id_estado === ESTADOS.RESUELTA)?.total ?? 0;
   const { abiertas, altas_abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
   const indicadores = [
-    ["Total", resumen.total, "incidencias registradas"],
-    ["Abiertas", abiertas, "sin terminar: pendientes o en proceso"],
-    ["Alta sin resolver", altas_abiertas, "abiertas de prioridad Alta"],
-    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas"],
-    ["Sin asignar", sin_asignar, "pendientes a cargo del Director"],
-    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "del total"],
+    ["Total", resumen.total, "incidencias registradas", ""],
+    ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
+    ["Alta sin resolver", altas_abiertas, "abiertas de prioridad Alta", `estado=${ABIERTAS}&prioridad=${PRIORIDAD_ALTA}`],
+    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
+    ["Sin asignar", sin_asignar, "pendientes a cargo del Director", "sin_asignar=true"],
+    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
   ];
   return `<div class="indicadores">${indicadores
     .map(
-      ([titulo, valor, detalle]) => `<div class="indicador">
+      ([titulo, valor, detalle, filtro]) => `<a class="indicador" href="#/${filtro ? `?${filtro}` : ""}" title="Ver estas incidencias">
         <span class="indicador-valor">${valor}</span>
         <span class="indicador-titulo">${titulo}</span>
         <span class="indicador-detalle">${detalle}</span>
-      </div>`
+      </a>`
     )
     .join("")}</div>`;
 }

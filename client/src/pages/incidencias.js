@@ -1,6 +1,6 @@
 import { api } from "../api.js";
 import { leerUsuario } from "../session.js";
-import { PRIORIDADES, esc, fechaHora, cargando, mensajeError, badgeEstado, paginacion } from "../ui.js";
+import { PRIORIDADES, ESTADOS, esc, fecha, fechaHora, cargando, mensajeError, badgeEstado, paginacion } from "../ui.js";
 import {
   puedeCrearIncidencias,
   puedeCancelar,
@@ -11,6 +11,13 @@ import {
 } from "../permisos.js";
 
 const POR_PAGINA = 10;
+const FILTROS_ADMITIDOS = ["estado", "prioridad", "desde", "sin_asignar"];
+const NOMBRES_ESTADO_PLURAL = {
+  [ESTADOS.PENDIENTE]: "Pendientes",
+  [ESTADOS.EN_PROCESO]: "En proceso",
+  [ESTADOS.RESUELTA]: "Resueltas",
+  [ESTADOS.CANCELADA]: "Canceladas",
+};
 
 let contenedor = null;
 let usuario = null;
@@ -20,6 +27,7 @@ let empleadosDeSistemas = [];
 let error = "";
 let finalizandoId = null;
 let asignandoId = null;
+let filtros = new URLSearchParams();
 
 function tituloDeLista() {
   if (esDirector(usuario)) return "Todas las incidencias";
@@ -27,8 +35,33 @@ function tituloDeLista() {
   return "Mis incidencias";
 }
 
-export async function pintar(zona) {
+function descripcionDelFiltro() {
+  const partes = [];
+  const estados = filtros.get("estado");
+  if (estados === `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`) {
+    partes.push("Abiertas (pendientes o en proceso)");
+  } else if (estados) {
+    partes.push(estados.split(",").map((id) => NOMBRES_ESTADO_PLURAL[id] ?? id).join(" y "));
+  }
+  if (filtros.get("prioridad")) partes.push(`prioridad ${PRIORIDADES[filtros.get("prioridad")] ?? ""}`);
+  if (filtros.get("sin_asignar")) partes.push("sin asignar");
+  if (filtros.get("desde")) partes.push(`creadas desde el ${fecha(filtros.get("desde"))}`);
+  return partes.join(" · ");
+}
+
+function avisoDeFiltro() {
+  if ([...filtros.keys()].length === 0) return "";
+  return `<div class="filtro-activo">
+    <span>Filtrando: <strong>${esc(descripcionDelFiltro())}</strong></span>
+    <a href="#/">Quitar filtro</a>
+  </div>`;
+}
+
+export async function pintar(zona, parametros = new URLSearchParams()) {
   contenedor = zona;
+  filtros = new URLSearchParams(
+    [...parametros].filter(([clave]) => FILTROS_ADMITIDOS.includes(clave))
+  );
   usuario = leerUsuario();
   incidencias = [];
   paginado = { pagina: 1, paginas: 1, total: 0, limite: POR_PAGINA };
@@ -43,6 +76,7 @@ export async function pintar(zona) {
         <h2>${tituloDeLista()}</h2>
         ${puedeCrearIncidencias(usuario) ? '<a class="btn btn-gim" href="#/nueva">+ Nueva incidencia</a>' : ""}
       </div>
+      ${avisoDeFiltro()}
       <div class="zona-error"></div>
       <div class="tabla-scroll zona-lista">${cargando("Cargando incidencias...")}</div>
       <div class="zona-paginacion"></div>
@@ -57,7 +91,10 @@ export async function pintar(zona) {
 }
 
 function pedirIncidencias(pagina) {
-  return api.get(`/incidencias?pagina=${pagina}&limite=${POR_PAGINA}`);
+  const consulta = new URLSearchParams(filtros);
+  consulta.set("pagina", pagina);
+  consulta.set("limite", POR_PAGINA);
+  return api.get(`/incidencias?${consulta}`);
 }
 
 function guardarPagina(respuesta) {
@@ -154,7 +191,9 @@ function pintarLista() {
   const cuerpo =
     incidencias.length > 0
       ? incidencias.map(filaIncidencia).join("")
-      : `<tr><td colspan="8">No hay incidencias para mostrar.</td></tr>`;
+      : `<tr><td colspan="8">${
+          [...filtros.keys()].length ? "No hay incidencias con este filtro." : "No hay incidencias para mostrar."
+        }</td></tr>`;
 
   contenedor.querySelector(".zona-lista").innerHTML = `
     <table>
