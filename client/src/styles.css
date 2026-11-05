@@ -2,11 +2,11 @@
     --gim-verde: #5e8c3a;
     --gim-verde-hover: #4f7a30;
     --gim-verde-texto: #4a7030;
-    --gim-verde-suave: #e8efe1;
+    --gim-verde-suave: #e3eada;
     --gim-lateral: #5e8c3a;
-    --gim-fondo: #f3f5f1;
-    --gim-tarjeta: #ffffff;
-    --gim-borde: #dde3d7;
+    --gim-fondo: #e8e9e1;
+    --gim-tarjeta: #f6f6f0;
+    --gim-borde: #d6d7cc;
     --gim-texto-suave: #5f665a;
 
     --gim-pendiente: #d98e04;
@@ -23,16 +23,17 @@
     --gim-cancelada-texto: #a12a22;
 
     --bs-body-bg: var(--gim-fondo);
+    --bs-body-color: #26261f;
     --bs-border-color: var(--gim-borde);
 }
 
 [data-bs-theme="dark"] {
     --gim-verde-texto: #9dcb78;
-    --gim-verde-suave: #25301e;
-    --gim-lateral: #0d0f0c;
-    --gim-fondo: #111310;
-    --gim-tarjeta: #1b1e19;
-    --gim-borde: #2c3228;
+    --gim-verde-suave: #2f3b28;
+    --gim-lateral: #161a16;
+    --gim-fondo: #1c211c;
+    --gim-tarjeta: #262c25;
+    --gim-borde: #384136;
     --gim-texto-suave: #a3ab9c;
 
     --gim-pendiente-fondo: #3a2c10;
