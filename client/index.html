@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="GIM (Gestión de Incidencias Municipales) - Municipalidad de Concordia. Consulta, seguimiento y gestión de incidencias.">
-    <title>GIM - Gestión de Incidencias Municipales</title>
+    <meta name="description" content="Gestión de Incidencias Municipales - Municipalidad de Concordia. Consulta, seguimiento y gestión de incidencias.">
+    <title>Gestión de Incidencias Municipales</title>
+    <script>
+        try {
+            if (localStorage.getItem("tema") === "dark") {
+                document.documentElement.setAttribute("data-bs-theme", "dark");
+            }
+        } catch {}
+    </script>
 </head>
 
 <body>
-
-    <div class="container-princ">
-        <div class="titulo-container">
-            <img class="logo-municipalidad" src="/logo-muni.png" alt="Logo Municipalidad de Concordia">
-            <h1>GIM - Gestión de Incidencias Municipales</h1>
-        </div>
-
-        <div id="app"></div>
-    </div>
+    <div id="app"></div>
 
     <script type="module" src="/src/main.js"></script>
-
 </body>
 </html>

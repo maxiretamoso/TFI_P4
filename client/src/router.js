@@ -7,55 +7,80 @@ import * as dashboard from "./pages/dashboard.js";
 import * as reportes from "./pages/reportes.js";
 import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
 import { esc, ROLES, NOMBRES_ROL } from "./ui.js";
+import { botonTema, activarBotonTema } from "./tema.js";
 
 const TODOS = [ROLES.DIRECTOR, ROLES.EMPLEADO_SISTEMAS, ROLES.EMPLEADO_MUNICIPAL];
 
 const RUTAS = {
+  "/dashboard": { pagina: dashboard, texto: "Dashboard", roles: [ROLES.DIRECTOR] },
   "/": { pagina: incidencias, texto: "Incidencias", roles: TODOS },
   "/catalogos": {
     pagina: catalogos,
     texto: "Catálogos",
     roles: [ROLES.DIRECTOR, ROLES.EMPLEADO_SISTEMAS],
   },
-  "/dashboard": { pagina: dashboard, texto: "Dashboard", roles: [ROLES.DIRECTOR] },
   "/reportes": { pagina: reportes, texto: "Reportes", roles: [ROLES.DIRECTOR] },
   "/usuarios": { pagina: usuarios, texto: "Usuarios", roles: [ROLES.DIRECTOR] },
   "/perfil": { pagina: perfil, texto: "Mi perfil", roles: TODOS },
 };
 
-function menuHtml(rutaActual, usuario) {
-  const items = Object.entries(RUTAS)
+const TITULO = "Gestión de Incidencias Municipales";
+
+function enlacesDelMenu(rutaActual, usuario) {
+  return Object.entries(RUTAS)
     .filter(([, config]) => config.roles.includes(usuario.rol))
-    .map(
-      ([ruta, config]) => `<li class="nav-item">
-        <a class="nav-link${ruta === rutaActual ? " active" : ""}" href="#${ruta}">${config.texto}</a>
-      </li>`
-    )
+    .map(([ruta, config]) => {
+      const activa = ruta === rutaActual;
+      return `<li>
+        <a class="enlace-menu${activa ? " activo" : ""}" href="#${ruta}"${activa ? ' aria-current="page"' : ""}>${config.texto}</a>
+      </li>`;
+    })
     .join("");
+}
 
-  return `<nav class="navbar navbar-expand-lg navbar-gim" id="menu-principal">
-    <div class="container-fluid px-0">
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu-colapsable" aria-controls="menu-colapsable" aria-expanded="false" aria-label="Abrir o cerrar el menú">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="menu-colapsable">
-        <ul class="navbar-nav me-auto">${items}</ul>
-        <span class="navbar-text">
-          ${esc(usuario.nombres)} ${esc(usuario.apellidos)} — ${esc(NOMBRES_ROL[usuario.rol] ?? "")}
-        </span>
-        <button type="button" class="btn btn-salir btn-sm ms-lg-3 mt-2 mt-lg-0" id="salir">Salir</button>
+function estructuraHtml(rutaActual, usuario) {
+  return `<div class="app-con-menu">
+    <aside class="lateral offcanvas-lg offcanvas-start" tabindex="-1" id="menu-lateral" aria-label="Menú principal">
+      <div class="lateral-logo">
+        <img src="/logo-muni.png" alt="Municipalidad de Concordia">
+        <button type="button" class="btn-close btn-close-white d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#menu-lateral" aria-label="Cerrar el menú"></button>
       </div>
+      <nav>
+        <ul class="lista-menu">${enlacesDelMenu(rutaActual, usuario)}</ul>
+      </nav>
+      <button type="button" class="enlace-menu boton-salir" id="salir">Salir</button>
+    </aside>
+
+    <div class="area-principal">
+      <header class="barra-superior">
+        <button type="button" class="boton-menu d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#menu-lateral" aria-controls="menu-lateral" aria-label="Abrir el menú">☰</button>
+        <h1 class="titulo-app">${TITULO}</h1>
+        <div class="barra-derecha">
+          ${botonTema()}
+          <span class="usuario-actual">
+            <span class="usuario-nombre">${esc(usuario.nombres)} ${esc(usuario.apellidos)}</span>
+            <span class="usuario-rol">${esc(NOMBRES_ROL[usuario.rol] ?? "")}</span>
+          </span>
+        </div>
+      </header>
+      <main id="contenido-principal"></main>
     </div>
-  </nav>`;
+  </div>`;
+}
+
+// Al navegar se repinta todo; si el menú del celular estaba abierto, su fondo queda colgado.
+function limpiarMenuAbierto() {
+  document.querySelectorAll(".offcanvas-backdrop").forEach((fondo) => fondo.remove());
+  document.body.style.removeProperty("overflow");
+  document.body.style.removeProperty("padding-right");
 }
 
 export async function enrutar() {
   const rutaPedida = window.location.hash.slice(1) || "/";
-  const conSesion = haySesion();
+  const app = document.getElementById("app");
+  limpiarMenuAbierto();
 
-  if (!conSesion) {
-    const app = document.getElementById("app");
+  if (!haySesion()) {
     app.innerHTML = "";
     if (rutaPedida !== "/login") {
       window.location.hash = "#/login";
@@ -75,8 +100,8 @@ export async function enrutar() {
   const permitida = config && config.roles.includes(usuario.rol);
   const ruta = permitida ? rutaPedida : "/";
 
-  const app = document.getElementById("app");
-  app.innerHTML = menuHtml(ruta, usuario) + `<main id="contenido-principal"></main>`;
+  app.innerHTML = estructuraHtml(ruta, usuario);
+  activarBotonTema(app);
 
   document.getElementById("salir").addEventListener("click", () => {
     cerrarSesion();
