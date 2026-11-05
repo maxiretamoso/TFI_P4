@@ -63,23 +63,6 @@ function asegurarEspacio(doc, alto) {
   }
 }
 
-function tarjetas(doc, datos) {
-  const separacion = 10;
-  const ancho = (anchoUtil(doc) - separacion * (datos.length - 1)) / datos.length;
-  const y = doc.y;
-
-  datos.forEach(({ etiqueta, valor, color }, i) => {
-    const x = MARGEN + i * (ancho + separacion);
-    doc.roundedRect(x, y, ancho, 58, 6).fillAndStroke("#ffffff", COLOR.borde);
-    doc.rect(x, y + 6, 4, 46).fill(color);
-    doc.fillColor(color).font("Helvetica-Bold").fontSize(20).text(String(valor), x + 14, y + 10, { width: ancho - 20 });
-    doc.fillColor(COLOR.textoSuave).font("Helvetica").fontSize(9).text(etiqueta, x + 14, y + 37, { width: ancho - 20 });
-  });
-
-  doc.y = y + 70;
-  doc.x = MARGEN;
-}
-
 // Dibuja una tabla con encabezado verde y filas alternadas; si no entra, sigue en otra página
 // repitiendo el encabezado. Cada columna puede dibujar su celda a mano con "dibujar".
 function tabla(doc, columnas, filas) {
@@ -144,23 +127,13 @@ function celdaConPunto(color, texto) {
   };
 }
 
-function celdaConBarra(total, color) {
-  return (doc, fila, x, y, ancho) => {
-    const largo = ancho - 16;
-    doc.roundedRect(x + 8, y + 8, largo, 6, 3).fill("#ececE4");
-    const relleno = total > 0 ? (fila.total / total) * largo : 0;
-    if (relleno > 0) doc.roundedRect(x + 8, y + 8, Math.max(relleno, 6), 6, 3).fill(color(fila));
-  };
-}
-
 function tablaDeTotales(doc, nombreColumna, filas, total, color) {
   tabla(
     doc,
     [
-      { titulo: nombreColumna, ancho: 0.38, dibujar: celdaConPunto(color, (f) => f.nombre) },
-      { titulo: "Cantidad", ancho: 0.14, campo: "total", alinear: "right" },
-      { titulo: "%", ancho: 0.12, campo: "porcentaje", alinear: "right" },
-      { titulo: "", ancho: 0.36, dibujar: celdaConBarra(total, color) },
+      { titulo: nombreColumna, ancho: 0.6, dibujar: celdaConPunto(color, (f) => f.nombre) },
+      { titulo: "Cantidad", ancho: 0.2, campo: "total", alinear: "right" },
+      { titulo: "%", ancho: 0.2, campo: "porcentaje", alinear: "right" },
     ],
     filas.map((f) => ({ ...f, porcentaje: `${porcentaje(f.total, total)}%` }))
   );
@@ -188,39 +161,8 @@ function pieDePagina(doc) {
 function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) {
   const doc = new PDFDocument({ margin: MARGEN, size: "A4", bufferPages: true });
   const total = detalle.length;
-  const contar = (id) => porEstado.find((f) => f.id_estado === id)?.total ?? 0;
 
   encabezado(doc);
-
-  tarjetas(doc, [
-    { etiqueta: "Total", valor: total, color: COLOR.verdeOscuro },
-    { etiqueta: "Pendientes", valor: contar(ESTADOS.PENDIENTE), color: COLOR_ESTADO[ESTADOS.PENDIENTE] },
-    { etiqueta: "En proceso", valor: contar(ESTADOS.EN_PROCESO), color: COLOR_ESTADO[ESTADOS.EN_PROCESO] },
-    { etiqueta: "Resueltas", valor: contar(ESTADOS.RESUELTA), color: COLOR_ESTADO[ESTADOS.RESUELTA] },
-    { etiqueta: "Canceladas", valor: contar(ESTADOS.CANCELADA), color: COLOR_ESTADO[ESTADOS.CANCELADA] },
-  ]);
-
-  titulo(doc, "Totales por estado");
-  tablaDeTotales(
-    doc,
-    "Estado",
-    porEstado.map((f) => ({ nombre: f.estado, total: f.total, id_estado: f.id_estado })),
-    total,
-    (f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde
-  );
-
-  titulo(doc, "Totales por prioridad");
-  const porId = new Map(porPrioridad.map((f) => [f.prioridad, f.total]));
-  tablaDeTotales(
-    doc,
-    "Prioridad",
-    [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })),
-    total,
-    () => COLOR.verde
-  );
-
-  titulo(doc, "Totales por área del artículo");
-  tablaDeTotales(doc, "Área", porArea.map((f) => ({ nombre: f.area, total: f.total })), total, () => COLOR.verde);
 
   titulo(doc, "Detalle de incidencias");
   tabla(
@@ -245,6 +187,28 @@ function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) 
       asignado: `${inc.asignado_nombres} ${inc.asignado_apellidos}`,
     }))
   );
+
+  titulo(doc, "Totales por estado");
+  tablaDeTotales(
+    doc,
+    "Estado",
+    porEstado.map((f) => ({ nombre: f.estado, total: f.total, id_estado: f.id_estado })),
+    total,
+    (f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde
+  );
+
+  titulo(doc, "Totales por prioridad");
+  const porId = new Map(porPrioridad.map((f) => [f.prioridad, f.total]));
+  tablaDeTotales(
+    doc,
+    "Prioridad",
+    [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })),
+    total,
+    () => COLOR.verde
+  );
+
+  titulo(doc, "Totales por área del artículo");
+  tablaDeTotales(doc, "Área", porArea.map((f) => ({ nombre: f.area, total: f.total })), total, () => COLOR.verde);
 
   pieDePagina(doc);
   return doc;
