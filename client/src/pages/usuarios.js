@@ -1,6 +1,7 @@
 import { api } from "../api.js";
 import { puedeGestionarUsuarios } from "../permisos.js";
 import { leerUsuario } from "../session.js";
+import { confirmar } from "../confirmar.js";
 import { NOMBRES_ROL, esc, cargando, mensajeError } from "../ui.js";
 
 let contenedor = null;
@@ -279,9 +280,11 @@ async function guardar(evento) {
 }
 
 async function eliminar(item) {
-  const seguro = window.confirm(
-    `¿Eliminar a ${item.nombres} ${item.apellidos}?`
-  );
+  const seguro = await confirmar({
+    titulo: "Dar de baja al usuario",
+    mensaje: `${item.nombres} ${item.apellidos} no va a poder iniciar sesión. Sus incidencias se conservan.`,
+    textoBoton: "Dar de baja",
+  });
   if (!seguro) return;
 
   error = "";

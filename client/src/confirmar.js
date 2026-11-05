@@ -16,7 +16,7 @@ function asegurarVentana() {
             <p class="mb-0 texto-confirmar"></p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-outline-secondary boton-volver" data-bs-dismiss="modal"></button>
             <button type="button" class="btn btn-danger boton-confirmar"></button>
           </div>
         </div>
@@ -41,11 +41,12 @@ function asegurarVentana() {
 }
 
 // Reemplaza a window.confirm con una ventana de Bootstrap; resuelve true si se confirma.
-export function confirmar({ titulo, mensaje, textoBoton = "Eliminar" }) {
+export function confirmar({ titulo, mensaje, textoBoton = "Eliminar", textoVolver = "Cancelar" }) {
   const ventana = asegurarVentana();
   ventana.querySelector("#titulo-confirmar").textContent = titulo;
   ventana.querySelector(".texto-confirmar").innerHTML = esc(mensaje);
   ventana.querySelector(".boton-confirmar").textContent = textoBoton;
+  ventana.querySelector(".boton-volver").textContent = textoVolver;
   document.getElementById("abrir-confirmar").click();
   return new Promise((resolve) => {
     resolver = resolve;

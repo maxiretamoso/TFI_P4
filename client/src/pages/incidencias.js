@@ -1,5 +1,6 @@
 import { api } from "../api.js";
 import { leerUsuario } from "../session.js";
+import { confirmar } from "../confirmar.js";
 import { PRIORIDADES, ESTADOS, esc, fecha, fechaHora, cargando, mensajeError, badgeEstado, paginacion } from "../ui.js";
 import {
   puedeCrearIncidencias,
@@ -352,7 +353,13 @@ async function recargar(pagina = paginado.pagina) {
 }
 
 async function cancelar(inc) {
-  if (!window.confirm(`¿Cancelar la incidencia #${inc.id_incidencia}?`)) return;
+  const seguro = await confirmar({
+    titulo: `Cancelar la incidencia #${inc.id_incidencia}`,
+    mensaje: `"${inc.descripcion_pedido}" va a quedar cancelada y se le avisa por correo a quien la creó.`,
+    textoBoton: "Cancelar incidencia",
+    textoVolver: "Volver",
+  });
+  if (!seguro) return;
 
   try {
     await api.patch(`/incidencias/${inc.id_incidencia}/cancelacion`);
