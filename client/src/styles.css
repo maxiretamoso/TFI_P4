@@ -1129,12 +1129,6 @@ h3 {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
-.grilla-perfil {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-}
-
 .tarjeta-perfil {
     background-color: var(--gim-tarjeta);
     border: 1px solid var(--gim-borde);
@@ -1150,8 +1144,7 @@ h3 {
 }
 
 .tarjeta-contrasenia {
-    grid-column: 1 / -1;
-    max-width: 520px;
+    max-width: 560px;
 }
 
 .icono-titulo {
@@ -1182,19 +1175,6 @@ h3 {
     background-color: var(--gim-verde-suave);
 }
 
-.zona-carga-vacia,
-.zona-carga-vista {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-}
-
-.zona-carga-vacia[hidden],
-.zona-carga-vista[hidden] {
-    display: none;
-}
-
 .icono-grande {
     width: 44px;
     height: 44px;
@@ -1203,14 +1183,6 @@ h3 {
     background-color: var(--gim-verde-suave);
     color: var(--gim-verde-texto);
     display: inline-flex;
-}
-
-.zona-carga-vista img {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--gim-verde);
 }
 
 .nombre-archivo {
@@ -1247,9 +1219,63 @@ h3 {
     background-color: var(--gim-verde-suave);
 }
 
-@media (max-width: 991.98px) {
-    .grilla-perfil {
-        grid-template-columns: minmax(0, 1fr);
+.boton-cambiar-foto {
+    margin-left: auto;
+    margin-bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.icono-boton {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+}
+
+.modal {
+    --bs-modal-bg: var(--gim-tarjeta);
+}
+
+.cambiar-foto {
+    display: flex;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+.vista-previa {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.cambiar-foto-opciones {
+    flex: 1;
+    min-width: 0;
+}
+
+.cambiar-foto .nav-pills {
+    --bs-nav-pills-link-active-bg: var(--gim-verde);
+    --bs-nav-link-color: var(--gim-verde-texto);
+    --bs-nav-link-hover-color: var(--gim-verde-hover);
+    gap: 6px;
+}
+
+.cambiar-foto .zona-carga {
+    flex-direction: column;
+    gap: 6px;
+}
+
+@media (max-width: 767.98px) {
+    .cambiar-foto {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cambiar-foto-opciones {
+        width: 100%;
     }
 
     .tarjeta-contrasenia {

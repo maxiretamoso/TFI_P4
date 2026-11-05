@@ -85,9 +85,10 @@ function estructuraHtml(rutaActual, usuario) {
   </div>`;
 }
 
-// Al navegar se repinta todo; si el menú del celular estaba abierto, su fondo queda colgado.
+// Al navegar se repinta todo; si el menú del celular o un modal estaban abiertos, su fondo queda colgado.
 function limpiarMenuAbierto() {
-  document.querySelectorAll(".offcanvas-backdrop").forEach((fondo) => fondo.remove());
+  document.querySelectorAll(".offcanvas-backdrop, .modal-backdrop").forEach((fondo) => fondo.remove());
+  document.body.classList.remove("modal-open");
   document.body.style.removeProperty("overflow");
   document.body.style.removeProperty("padding-right");
 }
