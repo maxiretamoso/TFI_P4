@@ -11,14 +11,14 @@ export async function pintar(zona) {
       <h2>Reportes</h2>
 
       <p>
-        Reporte estadístico de incidencias en PDF: totales por estado, por
-        prioridad y por área del artículo. Solo el director puede generarlo.
+        Descargá un PDF con el listado de todas las incidencias y un resumen
+        por estado, por prioridad y por área.
       </p>
 
       <div class="zona-error"></div>
 
       <button class="btn btn-gim" type="button" id="boton-descargar">
-        Descargar reporte de incidencias (PDF)
+        Descargar reporte
       </button>
     </div>`;
 
@@ -49,6 +49,6 @@ async function descargar() {
     zona.innerHTML = mensajeError(e.message);
   } finally {
     boton.disabled = false;
-    boton.textContent = "Descargar reporte de incidencias (PDF)";
+    boton.textContent = "Descargar reporte";
   }
 }
