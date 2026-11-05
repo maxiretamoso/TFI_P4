@@ -6,6 +6,7 @@ import * as perfil from "./pages/perfil.js";
 import * as dashboard from "./pages/dashboard.js";
 import * as reportes from "./pages/reportes.js";
 import * as nueva from "./pages/nueva.js";
+import * as articulos from "./pages/articulos.js";
 import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
 import { esc, ROLES, NOMBRES_ROL, avatarHtml } from "./ui.js";
 import { botonTema, activarBotonTema } from "./tema.js";
@@ -25,6 +26,7 @@ const RUTAS = {
     roles: TODOS,
   },
   "/nueva": { pagina: nueva, texto: "Nueva incidencia", roles: [ROLES.EMPLEADO_MUNICIPAL] },
+  "/articulos": { pagina: articulos, texto: "Artículos", roles: [ROLES.EMPLEADO_MUNICIPAL] },
   "/catalogos": {
     pagina: catalogos,
     texto: "Catálogos",
