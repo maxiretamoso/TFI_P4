@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { esc, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fechaHora } from "../ui.js";
+import { esc, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fecha, fechaHora } from "../ui.js";
 
 const COLOR_ESTADO = {
   [ESTADOS.PENDIENTE]: "var(--gim-pendiente)",
@@ -81,6 +81,16 @@ function barrasHorizontales(filas) {
       </li>`
     )
     .join("")}</ul>`;
+}
+
+function graficoPorFecha(resumen) {
+  return barrasHorizontales(
+    resumen.porFecha.map((f) => ({
+      nombre: fecha(f.fecha),
+      total: f.total,
+      enlace: enlaceALista({ fecha: f.fecha }),
+    }))
+  );
 }
 
 function graficoPorPrioridad(resumen) {
@@ -225,25 +235,30 @@ export async function pintar(zona) {
 
     <div class="grilla-dos">
       <section class="tarjeta-grafico">
-        <h3>Por prioridad</h3>
-        ${graficoPorPrioridad(resumen)}
+        <h3>Por fecha</h3>
+        ${graficoPorFecha(resumen)}
       </section>
       <section class="tarjeta-grafico">
-        <h3>Por área</h3>
-        ${graficoPorArea(resumen)}
+        <h3>Por prioridad</h3>
+        ${graficoPorPrioridad(resumen)}
       </section>
     </div>
 
     <div class="grilla-dos">
       <section class="tarjeta-grafico">
+        <h3>Por área</h3>
+        ${graficoPorArea(resumen)}
+      </section>
+      <section class="tarjeta-grafico">
         <h3>Por categoría</h3>
         ${graficoPorCategoria(resumen)}
       </section>
-      <section class="tarjeta-grafico">
-        <h3>Carga de trabajo del equipo de Sistemas</h3>
-        ${cargaDeEmpleados(resumen)}
-      </section>
-    </div>`;
+    </div>
+
+    <section class="tarjeta-grafico tarjeta-completa">
+      <h3>Carga de trabajo del equipo de Sistemas</h3>
+      ${cargaDeEmpleados(resumen)}
+    </section>`;
 
   zona.querySelector(".tabla-dashboard")?.addEventListener("click", (evento) => {
     const fila = evento.target.closest("tr[data-enlace]");

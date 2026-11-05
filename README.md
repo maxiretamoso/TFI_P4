@@ -23,7 +23,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 - BREAD de categorías y artículos.
 
 **Director del área de Sistemas**
-- Dashboard con totales por estado, por prioridad, por área y por categoría; indicadores generales; incidencias prioritarias abiertas; y carga de trabajo de cada empleado de Sistemas. Cada dato lleva a la lista de incidencias ya filtrada.
+- Dashboard con totales por estado, por fecha, por prioridad, por área y por categoría; indicadores generales; incidencias prioritarias abiertas; y carga de trabajo de cada empleado de Sistemas. Cada dato lleva a la lista de incidencias ya filtrada.
 - Reporte de incidencias en PDF, completo o filtrado por pendientes, en proceso, resueltas o canceladas.
 - Asignar incidencias a empleados de Sistemas y cancelar las pendientes.
 - BREAD de usuarios, áreas, categorías y artículos.
@@ -135,7 +135,7 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | PATCH | `/auth/contrasenia` | autenticado |
 | GET | `/me` | autenticado |
 | GET | `/health` | público |
-| GET | `/incidencias` | autenticado (según el rol; filtros: buscar, estado, prioridad, desde, sin_asignar, area, categoria, asignado) |
+| GET | `/incidencias` | autenticado (según el rol; filtros: buscar, estado, prioridad, desde, fecha, sin_asignar, area, categoria, asignado) |
 | POST | `/incidencias` | Municipal |
 | GET | `/incidencias/{id}` | autenticado (solo las que puede ver) |
 | GET | `/incidencias/{id}/estados` | autenticado (solo las que puede ver) |
