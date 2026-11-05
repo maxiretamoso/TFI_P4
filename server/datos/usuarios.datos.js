@@ -81,13 +81,13 @@ function insertar({ id_area, nombres, apellidos, usuario, hash, avatar, rol }) {
     .then((r) => r.rows[0]);
 }
 
-function actualizar(id, { id_area, nombres, apellidos, usuario, hash, rol }) {
+function actualizar(id, { id_area, nombres, apellidos, usuario, rol }) {
   return pool
     .query(`UPDATE usuarios
-            SET id_area = $1, nombres = $2, apellidos = $3, usuario = $4, contrasenia = $5, rol = $6
-            WHERE id_usuario = $7
+            SET id_area = $1, nombres = $2, apellidos = $3, usuario = $4, rol = $5
+            WHERE id_usuario = $6
             RETURNING id_usuario, id_area, nombres, apellidos, usuario, avatar, rol, activo`,
-      [id_area, nombres, apellidos, usuario, hash, rol, id])
+      [id_area, nombres, apellidos, usuario, rol, id])
     .then((r) => r.rows[0] || null);
 }
 

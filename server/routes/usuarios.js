@@ -114,7 +114,6 @@ router.post(
  *               nombres:     { type: string }
  *               apellidos:   { type: string }
  *               usuario:     { type: string, format: email }
- *               contrasenia: { type: string, minLength: 6 }
  *               rol:         { type: integer, enum: [1, 2, 3] }
  *     responses:
  *       200: { description: Usuario modificado }
@@ -143,7 +142,6 @@ router.put(
     body("nombres").optional().isString().trim().isLength({ min: 1, max: 250 }),
     body("apellidos").optional().isString().trim().isLength({ min: 1, max: 250 }),
     body("usuario").optional().isEmail().normalizeEmail(),
-    body("contrasenia").optional().isString().isLength({ min: 6, max: 100 }),
     body("rol").optional().isInt({ min: 1, max: 3 }),
   ],
   usuariosController.actualizar

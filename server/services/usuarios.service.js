@@ -69,17 +69,12 @@ async function actualizarUsuario(id, datos, solicitante) {
     throw crearError(400, "El área indicada no existe");
   }
 
-  const hash = datos.contrasenia
-    ? await hashearContrasenia(datos.contrasenia)
-    : actual.contrasenia;
-
   try {
     return await usuariosDatos.actualizar(id, {
       id_area,
       nombres: datos.nombres ?? actual.nombres,
       apellidos: datos.apellidos ?? actual.apellidos,
       usuario: datos.usuario ?? actual.usuario,
-      hash,
       rol: datos.rol ?? actual.rol,
     });
   } catch (error) {
