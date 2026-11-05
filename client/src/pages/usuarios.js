@@ -1,6 +1,7 @@
 import { api } from "../api.js";
+import { puedeGestionarUsuarios } from "../permisos.js";
 import { leerUsuario } from "../session.js";
-import { ROLES, esc, cargando, mensajeError } from "../ui.js";
+import { NOMBRES_ROL, esc, cargando, mensajeError } from "../ui.js";
 
 let contenedor = null;
 let esDirector = false;
@@ -13,12 +14,12 @@ let apellidos = "";
 let nombreUsuario = "";
 let contrasenia = "";
 let idArea = "";
-let rol = "1";
+let rol = "3";
 let busqueda = "";
 
 export async function pintar(zona) {
   contenedor = zona;
-  esDirector = leerUsuario().rol === 3;
+  esDirector = puedeGestionarUsuarios(leerUsuario());
   usuarios = [];
   areas = [];
   error = "";
@@ -28,10 +29,10 @@ export async function pintar(zona) {
   nombreUsuario = "";
   contrasenia = "";
   idArea = "";
-  rol = "1";
+  rol = "3";
   busqueda = "";
 
-  const opcionesRol = Object.entries(ROLES)
+  const opcionesRol = Object.entries(NOMBRES_ROL)
     .map(([valor, etiqueta]) => `<option value="${valor}">${etiqueta}</option>`)
     .join("");
 
@@ -151,7 +152,7 @@ function pintarTabla() {
           <td>${esc(item.nombres)} ${esc(item.apellidos)}</td>
           <td>${esc(item.usuario)}</td>
           <td>${esc(item.area)}</td>
-          <td>${esc(ROLES[item.rol] ?? item.rol)}</td>
+          <td>${esc(NOMBRES_ROL[item.rol] ?? item.rol)}</td>
           ${
             esDirector
               ? `<td class="celda-acciones">
@@ -236,7 +237,7 @@ function cancelarEdicion() {
   nombreUsuario = "";
   contrasenia = "";
   idArea = "";
-  rol = "1";
+  rol = "3";
   error = "";
   pintarError();
   refrescarForm();

@@ -1,39 +1,34 @@
 import * as login from "./pages/login.js";
 import * as incidencias from "./pages/incidencias.js";
-import * as asignadas from "./pages/asignadas.js";
 import * as catalogos from "./pages/catalogos.js";
 import * as usuarios from "./pages/usuarios.js";
+import * as perfil from "./pages/perfil.js";
 import * as dashboard from "./pages/dashboard.js";
 import * as reportes from "./pages/reportes.js";
 import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
-import { esc } from "./ui.js";
+import { esc, ROLES, NOMBRES_ROL } from "./ui.js";
+
+const TODOS = [ROLES.DIRECTOR, ROLES.EMPLEADO_SISTEMAS, ROLES.EMPLEADO_MUNICIPAL];
 
 const RUTAS = {
-  "/": incidencias,
-  "/asignadas": asignadas,
-  "/catalogos": catalogos,
-  "/usuarios": usuarios,
-  "/dashboard": dashboard,
-  "/reportes": reportes,
-  "/login": login,
+  "/": { pagina: incidencias, texto: "Incidencias", roles: TODOS },
+  "/catalogos": {
+    pagina: catalogos,
+    texto: "Catálogos",
+    roles: [ROLES.DIRECTOR, ROLES.EMPLEADO_SISTEMAS],
+  },
+  "/dashboard": { pagina: dashboard, texto: "Dashboard", roles: [ROLES.DIRECTOR] },
+  "/reportes": { pagina: reportes, texto: "Reportes", roles: [ROLES.DIRECTOR] },
+  "/usuarios": { pagina: usuarios, texto: "Usuarios", roles: [ROLES.DIRECTOR] },
+  "/perfil": { pagina: perfil, texto: "Mi perfil", roles: TODOS },
 };
 
-function menuHtml(ruta) {
-  const usuario = leerUsuario();
-
-  const enlaces = [
-    { ruta: "/", texto: "Mis incidencias" },
-    { ruta: "/asignadas", texto: "Mis asignadas", rolMinimo: 2 },
-    { ruta: "/catalogos", texto: "Catálogos" },
-    { ruta: "/usuarios", texto: "Usuarios" },
-    { ruta: "/dashboard", texto: "Dashboard", rolMinimo: 3 },
-    { ruta: "/reportes", texto: "Reportes", rolMinimo: 3 },
-  ].filter((enlace) => !enlace.rolMinimo || usuario.rol >= enlace.rolMinimo);
-
-  const items = enlaces
+function menuHtml(rutaActual, usuario) {
+  const items = Object.entries(RUTAS)
+    .filter(([, config]) => config.roles.includes(usuario.rol))
     .map(
-      (enlace) => `<li class="nav-item">
-        <a class="nav-link${enlace.ruta === ruta ? " active" : ""}" href="#${enlace.ruta}">${enlace.texto}</a>
+      ([ruta, config]) => `<li class="nav-item">
+        <a class="nav-link${ruta === rutaActual ? " active" : ""}" href="#${ruta}">${config.texto}</a>
       </li>`
     )
     .join("");
@@ -46,7 +41,9 @@ function menuHtml(ruta) {
 
       <div class="collapse navbar-collapse" id="menu-colapsable">
         <ul class="navbar-nav me-auto">${items}</ul>
-        <span class="navbar-text">Hola, ${esc(usuario.nombres)} ${esc(usuario.apellidos)} (rol ${usuario.rol})</span>
+        <span class="navbar-text">
+          ${esc(usuario.nombres)} ${esc(usuario.apellidos)} — ${esc(NOMBRES_ROL[usuario.rol] ?? "")}
+        </span>
         <button type="button" class="btn btn-salir btn-sm ms-lg-3 mt-2 mt-lg-0" id="salir">Salir</button>
       </div>
     </div>
@@ -54,37 +51,37 @@ function menuHtml(ruta) {
 }
 
 export async function enrutar() {
-  const rutaActual = window.location.hash.slice(1) || "/";
+  const rutaPedida = window.location.hash.slice(1) || "/";
   const conSesion = haySesion();
 
-  if (!conSesion && rutaActual !== "/login") {
-    window.location.hash = "#/login";
-    return;
-  }
-
-  if (conSesion && rutaActual === "/login") {
-    window.location.hash = "#/";
-    return;
-  }
-
-  const app = document.getElementById("app");
-
   if (!conSesion) {
+    const app = document.getElementById("app");
     app.innerHTML = "";
+    if (rutaPedida !== "/login") {
+      window.location.hash = "#/login";
+      return;
+    }
     await login.pintar(app);
     return;
   }
 
-  const rutaValida = rutaActual in RUTAS ? rutaActual : "/";
-  const pagina = RUTAS[rutaValida];
+  if (rutaPedida === "/login") {
+    window.location.hash = "#/";
+    return;
+  }
 
-  app.innerHTML =
-    menuHtml(rutaValida) + `<main id="contenido-principal"></main>`;
+  const usuario = leerUsuario();
+  const config = RUTAS[rutaPedida];
+  const permitida = config && config.roles.includes(usuario.rol);
+  const ruta = permitida ? rutaPedida : "/";
+
+  const app = document.getElementById("app");
+  app.innerHTML = menuHtml(ruta, usuario) + `<main id="contenido-principal"></main>`;
 
   document.getElementById("salir").addEventListener("click", () => {
     cerrarSesion();
     window.location.hash = "#/login";
   });
 
-  await pagina.pintar(document.getElementById("contenido-principal"));
+  await RUTAS[ruta].pagina.pintar(document.getElementById("contenido-principal"));
 }

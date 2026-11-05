@@ -405,3 +405,44 @@ body {
         animation: none;
     }
 }
+
+.mensaje-ok {
+  color: #0f6b3c;
+  background: #e8f6ee;
+  border: 1px solid #b7e0c8;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 8px 0 0;
+}
+
+.perfil-datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.perfil-avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #d9e3ea;
+}
+
+.perfil-datos dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin: 0;
+}
+
+.perfil-datos dt {
+  font-weight: 600;
+  color: #5a6b78;
+}
+
+.perfil-datos dd {
+  margin: 0;
+}

@@ -1,6 +1,7 @@
 node_modules/
 .env
 .vscode/
-uploads/
-*.log
 dist/
+*.log
+server/publico/avatares/*
+!server/publico/avatares/.gitkeep

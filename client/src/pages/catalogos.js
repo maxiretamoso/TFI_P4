@@ -1,10 +1,11 @@
 import { api } from "../api.js";
+import { puedeGestionarCatalogos } from "../permisos.js";
 import { leerUsuario } from "../session.js";
 import { esc, cargando, mensajeError } from "../ui.js";
 
 export async function pintar(zona) {
   const usuario = leerUsuario();
-  const puedeEscribir = usuario.rol >= 2;
+  const puedeEscribir = puedeGestionarCatalogos(usuario);
 
   zona.innerHTML = `
     <div class="zona-bloque">${cargando("Cargando artículos...")}</div>

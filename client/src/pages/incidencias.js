@@ -1,113 +1,114 @@
 import { api } from "../api.js";
 import { leerUsuario } from "../session.js";
+import { PRIORIDADES, esc, fechaHora, cargando, mensajeError, badgeEstado } from "../ui.js";
 import {
-  PRIORIDADES,
-  esc,
-  fechaHora,
-  cargando,
-  mensajeError,
-  badgeEstado,
-} from "../ui.js";
+  puedeCrearIncidencias,
+  puedeCancelar,
+  puedeFinalizar,
+  puedeAsignar,
+  esDirector,
+  esDeSistemas,
+} from "../permisos.js";
 
 let contenedor = null;
 let usuario = null;
 let incidencias = [];
 let articulos = [];
+let empleadosDeSistemas = [];
 let error = "";
 let finalizandoId = null;
 let asignandoId = null;
-let usuariosSistemas = [];
+
+function tituloDeLista() {
+  if (esDirector(usuario)) return "Todas las incidencias";
+  if (esDeSistemas(usuario)) return "Incidencias asignadas a mí";
+  return "Mis incidencias";
+}
+
+function formularioDeAlta() {
+  if (!puedeCrearIncidencias(usuario)) return "";
+
+  const opcionesPrioridad = Object.entries(PRIORIDADES)
+    .map(([valor, etiqueta]) => `<option value="${valor}">${etiqueta}</option>`)
+    .join("");
+
+  return `<h2>Nueva incidencia</h2>
+    <form class="form-alta row g-2 align-items-end" id="form-alta">
+      <div class="col-12 col-md-4">
+        <label class="form-label" for="articulo">Artículo:</label>
+        <select class="form-select" id="articulo" required>
+          <option value="">Elegir artículo...</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label" for="prioridad">Prioridad:</label>
+        <select class="form-select" id="prioridad">${opcionesPrioridad}</select>
+      </div>
+      <div class="col-12 col-md-3">
+        <label class="form-label" for="pedido">Pedido:</label>
+        <input class="form-control" type="text" id="pedido" placeholder="Describí el problema" required maxlength="250">
+      </div>
+      <div class="col-12 col-md-2">
+        <button class="btn btn-gim w-100" type="submit" id="boton-crear">Crear</button>
+      </div>
+    </form>`;
+}
 
 export async function pintar(zona) {
   contenedor = zona;
   usuario = leerUsuario();
   incidencias = [];
   articulos = [];
+  empleadosDeSistemas = [];
   error = "";
   finalizandoId = null;
   asignandoId = null;
-  usuariosSistemas = [];
-
-  const opcionesPrioridad = Object.entries(PRIORIDADES)
-    .map(([valor, etiqueta]) => `<option value="${valor}">${etiqueta}</option>`)
-    .join("");
 
   contenedor.innerHTML = `
     <div class="tarjeta-lista">
-      <h2>Nueva incidencia</h2>
-
-      <form class="form-alta row g-2 align-items-end" id="form-alta">
-        <div class="col-12 col-md-4">
-          <label class="form-label" for="articulo">Artículo:</label>
-          <select class="form-select" id="articulo" name="articulo" required>
-            <option value="">Elegir artículo...</option>
-          </select>
-        </div>
-
-        <div class="col-12 col-md-3">
-          <label class="form-label" for="prioridad">Prioridad:</label>
-          <select class="form-select" id="prioridad" name="prioridad">
-            ${opcionesPrioridad}
-          </select>
-        </div>
-
-        <div class="col-12 col-md-3">
-          <label class="form-label" for="pedido">Pedido:</label>
-          <input class="form-control" type="text" id="pedido" name="pedido" placeholder="Describí el problema" required maxlength="255">
-        </div>
-
-        <div class="col-12 col-md-2">
-          <button class="btn btn-gim w-100" type="submit" id="boton-crear">Crear</button>
-        </div>
-      </form>
-
-      <h2>Mis incidencias</h2>
-
+      ${formularioDeAlta()}
+      <h2>${tituloDeLista()}</h2>
       <div class="zona-error"></div>
       <div class="tabla-scroll zona-lista">${cargando("Cargando incidencias...")}</div>
     </div>`;
 
-  contenedor.querySelector("#form-alta").addEventListener("submit", crear);
+  contenedor.querySelector("#form-alta")?.addEventListener("submit", crear);
   contenedor.querySelector(".zona-lista").addEventListener("click", manejarAccion);
 
-  try {
-    const [listaIncidencias, listaArticulos] = await Promise.all([
-      api.get("/incidencias/mias"),
-      api.get("/articulos"),
-    ]);
-    incidencias = listaIncidencias;
-    articulos = listaArticulos;
-    contenedor.querySelector("#articulo").innerHTML =
-      `<option value="">Elegir artículo...</option>` +
-      articulos
-        .map(
-          (articulo) =>
-            `<option value="${articulo.id_articulo}">${esc(articulo.descripcion)}</option>`
-        )
-        .join("");
-  } catch (e) {
-    error = e.message;
-  }
-
+  await cargarDatos();
   pintarError();
   pintarLista();
 }
 
-function pintarError() {
-  contenedor.querySelector(".zona-error").innerHTML = mensajeError(error);
+async function cargarDatos() {
+  try {
+    const pedidos = [api.get("/incidencias?limite=100")];
+    if (puedeCrearIncidencias(usuario)) pedidos.push(api.get("/articulos"));
+    if (esDirector(usuario)) pedidos.push(api.get("/usuarios?rol=sistemas"));
+
+    const respuestas = await Promise.all(pedidos);
+    incidencias = respuestas[0].items;
+
+    if (puedeCrearIncidencias(usuario)) {
+      articulos = respuestas[1];
+      contenedor.querySelector("#articulo").innerHTML =
+        `<option value="">Elegir artículo...</option>` +
+        articulos
+          .map((a) => `<option value="${a.id_articulo}">${esc(a.descripcion)}</option>`)
+          .join("");
+    }
+
+    if (esDirector(usuario)) {
+      empleadosDeSistemas = respuestas[respuestas.length - 1];
+    }
+    error = "";
+  } catch (e) {
+    error = e.message;
+  }
 }
 
-function encabezado() {
-  return `<tr>
-    <th>#</th>
-    <th>Artículo</th>
-    <th>Pedido</th>
-    <th>Prioridad</th>
-    <th>Estado</th>
-    <th>Asignado a</th>
-    <th>Creado</th>
-    <th>Acciones</th>
-  </tr>`;
+function pintarError() {
+  contenedor.querySelector(".zona-error").innerHTML = mensajeError(error);
 }
 
 function filaIncidencia(inc) {
@@ -116,16 +117,13 @@ function filaIncidencia(inc) {
     : "—";
 
   let acciones = "";
-
-  if (puedeCancelar(inc)) {
+  if (puedeCancelar(usuario, inc)) {
     acciones += `<button type="button" class="btn btn-eliminar btn-sm" data-accion="cancelar" data-id="${inc.id_incidencia}">Cancelar</button>`;
   }
-
-  if (puedeFinalizar(inc)) {
+  if (puedeFinalizar(usuario, inc)) {
     acciones += `<button type="button" class="btn btn-editar btn-sm" data-accion="abrir-finalizar" data-id="${inc.id_incidencia}">Finalizar</button>`;
   }
-
-  if (puedeAsignar(inc)) {
+  if (puedeAsignar(usuario, inc)) {
     acciones += `<button type="button" class="btn btn-asignar btn-sm" data-accion="abrir-asignar" data-id="${inc.id_incidencia}">Asignar</button>`;
   }
 
@@ -136,19 +134,17 @@ function filaIncidencia(inc) {
       <td colspan="8">
         <div class="accion-inline">
           <label for="campo-resolucion">Resolución:</label>
-          <input class="form-control" type="text" id="campo-resolucion" maxlength="255" placeholder="Contá qué se hizo">
+          <input class="form-control" type="text" id="campo-resolucion" maxlength="250" placeholder="Contá qué se hizo">
           <button type="button" class="btn btn-gim btn-sm" data-accion="aceptar-finalizar" data-id="${inc.id_incidencia}">Aceptar</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-accion="cerrar-finalizar">Cerrar</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-accion="cerrar">Cerrar</button>
         </div>
       </td>
     </tr>`;
   }
 
   if (asignandoId === inc.id_incidencia) {
-    const opciones = usuariosSistemas
-      .map(
-        (u) => `<option value="${u.id_usuario}">${esc(u.apellidos)}, ${esc(u.nombres)}</option>`
-      )
+    const opciones = empleadosDeSistemas
+      .map((u) => `<option value="${u.id_usuario}">${esc(u.apellidos)}, ${esc(u.nombres)}</option>`)
       .join("");
 
     extra += `<tr class="fila-accion">
@@ -160,7 +156,7 @@ function filaIncidencia(inc) {
             ${opciones}
           </select>
           <button type="button" class="btn btn-gim btn-sm" data-accion="aceptar-asignar" data-id="${inc.id_incidencia}">Aceptar</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm" data-accion="cerrar-asignar">Cerrar</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-accion="cerrar">Cerrar</button>
         </div>
       </td>
     </tr>`;
@@ -179,34 +175,21 @@ function filaIncidencia(inc) {
 }
 
 function pintarLista() {
-  let cuerpo = `<tr><td colspan="8">No tenés incidencias cargadas.</td></tr>`;
-
-  if (incidencias.length > 0) {
-    cuerpo = incidencias.map(filaIncidencia).join("");
-  }
+  const cuerpo =
+    incidencias.length > 0
+      ? incidencias.map(filaIncidencia).join("")
+      : `<tr><td colspan="8">No hay incidencias para mostrar.</td></tr>`;
 
   contenedor.querySelector(".zona-lista").innerHTML = `
     <table>
-      <thead>${encabezado()}</thead>
+      <thead>
+        <tr>
+          <th>#</th><th>Artículo</th><th>Pedido</th><th>Prioridad</th>
+          <th>Estado</th><th>Asignado a</th><th>Creado</th><th>Acciones</th>
+        </tr>
+      </thead>
       <tbody>${cuerpo}</tbody>
     </table>`;
-}
-
-function puedeCancelar(inc) {
-  return inc.id_estado === 1 && usuario.rol !== 2;
-}
-
-function puedeFinalizar(inc) {
-  return (
-    inc.id_estado !== 3 &&
-    inc.id_estado !== 4 &&
-    (usuario.rol === 3 ||
-      (usuario.rol === 2 && inc.asignado_a === usuario.id_usuario))
-  );
-}
-
-function puedeAsignar(inc) {
-  return inc.id_estado !== 3 && inc.id_estado !== 4 && usuario.rol === 3;
 }
 
 function manejarAccion(evento) {
@@ -214,17 +197,40 @@ function manejarAccion(evento) {
   if (!boton) return;
 
   const accion = boton.dataset.accion;
-  const inc = incidencias.find(
-    (i) => i.id_incidencia === Number(boton.dataset.id)
-  );
+  const inc = incidencias.find((i) => i.id_incidencia === Number(boton.dataset.id));
 
   if (accion === "cancelar") cancelar(inc);
-  if (accion === "abrir-finalizar") abrirFinalizar(inc);
-  if (accion === "cerrar-finalizar") cerrarAcciones();
+  if (accion === "abrir-finalizar") abrirPanel("finalizar", inc);
+  if (accion === "abrir-asignar") abrirPanel("asignar", inc);
   if (accion === "aceptar-finalizar") finalizar(inc);
-  if (accion === "abrir-asignar") abrirAsignar(inc);
-  if (accion === "cerrar-asignar") cerrarAcciones();
   if (accion === "aceptar-asignar") asignar(inc);
+  if (accion === "cerrar") cerrarPaneles();
+}
+
+function abrirPanel(cual, inc) {
+  error = "";
+  pintarError();
+  finalizandoId = cual === "finalizar" ? inc.id_incidencia : null;
+  asignandoId = cual === "asignar" ? inc.id_incidencia : null;
+  pintarLista();
+  contenedor.querySelector(cual === "finalizar" ? "#campo-resolucion" : "#campo-destino")?.focus();
+}
+
+function cerrarPaneles() {
+  finalizandoId = null;
+  asignandoId = null;
+  pintarLista();
+}
+
+async function recargar() {
+  try {
+    incidencias = (await api.get("/incidencias?limite=100")).items;
+    error = "";
+  } catch (e) {
+    error = e.message;
+  }
+  pintarError();
+  pintarLista();
 }
 
 async function crear(evento) {
@@ -255,46 +261,16 @@ async function crear(evento) {
   }
 }
 
-async function recargar() {
-  try {
-    incidencias = await api.get("/incidencias/mias");
-    error = "";
-  } catch (e) {
-    error = e.message;
-  }
-  pintarError();
-  pintarLista();
-}
-
-function cerrarAcciones() {
-  finalizandoId = null;
-  asignandoId = null;
-  pintarLista();
-}
-
 async function cancelar(inc) {
-  const seguro = window.confirm(
-    `¿Cancelar la incidencia #${inc.id_incidencia}?`
-  );
-  if (!seguro) return;
+  if (!window.confirm(`¿Cancelar la incidencia #${inc.id_incidencia}?`)) return;
 
-  error = "";
   try {
-    await api.patch(`/incidencias/${inc.id_incidencia}/cancelar`);
+    await api.patch(`/incidencias/${inc.id_incidencia}/cancelacion`);
     await recargar();
   } catch (e) {
     error = e.message;
     pintarError();
   }
-}
-
-function abrirFinalizar(inc) {
-  error = "";
-  pintarError();
-  asignandoId = null;
-  finalizandoId = inc.id_incidencia;
-  pintarLista();
-  contenedor.querySelector("#campo-resolucion")?.focus();
 }
 
 async function finalizar(inc) {
@@ -306,9 +282,8 @@ async function finalizar(inc) {
     return;
   }
 
-  error = "";
   try {
-    await api.patch(`/incidencias/${inc.id_incidencia}/finalizar`, {
+    await api.patch(`/incidencias/${inc.id_incidencia}/resolucion`, {
       descripcion_resolucion: resolucion,
     });
     finalizandoId = null;
@@ -317,26 +292,6 @@ async function finalizar(inc) {
     error = e.message;
     pintarError();
   }
-}
-
-async function abrirAsignar(inc) {
-  error = "";
-  pintarError();
-  finalizandoId = null;
-  asignandoId = inc.id_incidencia;
-
-  if (usuariosSistemas.length === 0) {
-    try {
-      const todos = await api.get("/usuarios");
-      usuariosSistemas = todos.filter((u) => u.rol === 2);
-    } catch (e) {
-      error = e.message;
-      pintarError();
-    }
-  }
-
-  pintarLista();
-  contenedor.querySelector("#campo-destino")?.focus();
 }
 
 async function asignar(inc) {
@@ -348,9 +303,8 @@ async function asignar(inc) {
     return;
   }
 
-  error = "";
   try {
-    await api.patch(`/incidencias/${inc.id_incidencia}/asignar`, {
+    await api.patch(`/incidencias/${inc.id_incidencia}/asignacion`, {
       asignado_a: Number(destino),
     });
     asignandoId = null;

@@ -1,69 +1,73 @@
-const URL_BASE =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const URL_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+
+function cerrarSesionPorTokenVencido() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("usuario");
+  window.location.hash = "#/login";
+}
+
+async function leerError(respuesta) {
+  const datos = await respuesta.json().catch(() => ({}));
+  return (
+    datos.error ||
+    (Array.isArray(datos.errors) && datos.errors[0]?.msg) ||
+    `Error ${respuesta.status} del servidor`
+  );
+}
 
 async function pedir(metodo, ruta, cuerpo) {
   const token = localStorage.getItem("token");
+  const opciones = { method: metodo, headers: {} };
 
-  const opciones = {
-    method: metodo,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
+  if (token) opciones.headers.Authorization = `Bearer ${token}`;
 
-  if (token) {
-    opciones.headers.Authorization = `Bearer ${token}`;
-  }
-
-  if (cuerpo !== undefined) {
+  if (cuerpo instanceof FormData) {
+    opciones.body = cuerpo;
+  } else if (cuerpo !== undefined) {
+    opciones.headers["Content-Type"] = "application/json";
     opciones.body = JSON.stringify(cuerpo);
   }
 
-  const respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
+  let respuesta;
+  try {
+    respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
+  } catch {
+    throw new Error("No se pudo conectar con el servidor. ¿Está levantada la API?");
+  }
 
   if (respuesta.status === 401 && token && ruta !== "/auth/login") {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    window.location.hash = "#/login";
-    throw new Error("Sesión vencida. Iniciá sesión otra vez.");
+    cerrarSesionPorTokenVencido();
+    throw new Error("La sesión venció. Iniciá sesión otra vez.");
   }
 
-  const datos = await respuesta.json();
+  if (!respuesta.ok) throw new Error(await leerError(respuesta));
 
-  if (!respuesta.ok) {
-    const mensaje =
-      datos.error ||
-      (Array.isArray(datos.errors) && datos.errors[0]?.msg) ||
-      "Error inesperado del servidor";
-    throw new Error(mensaje);
-  }
+  // 204 No Content: las bajas no devuelven cuerpo.
+  if (respuesta.status === 204) return null;
 
-  return datos;
+  return respuesta.json();
 }
 
 async function descargar(ruta) {
   const token = localStorage.getItem("token");
+  const opciones = { method: "GET", headers: {} };
+  if (token) opciones.headers.Authorization = `Bearer ${token}`;
 
-  const opciones = { method: "GET" };
-  if (token) {
-    opciones.headers = { Authorization: `Bearer ${token}` };
+  let respuesta;
+  try {
+    respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
+  } catch {
+    throw new Error("No se pudo conectar con el servidor. ¿Está levantada la API?");
   }
-
-  const respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
 
   if (respuesta.status === 401 && token) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-    window.location.hash = "#/login";
-    throw new Error("Sesión vencida. Iniciá sesión otra vez.");
+    cerrarSesionPorTokenVencido();
+    throw new Error("La sesión venció. Iniciá sesión otra vez.");
   }
 
-  if (!respuesta.ok) {
-    const datos = await respuesta.json().catch(() => ({}));
-    throw new Error(datos.error || "No se pudo generar el archivo");
-  }
+  if (!respuesta.ok) throw new Error(await leerError(respuesta));
 
-  return await respuesta.blob();
+  return respuesta.blob();
 }
 
 export const api = {

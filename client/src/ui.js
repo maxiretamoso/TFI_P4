@@ -1,13 +1,26 @@
+export const ROLES = {
+  DIRECTOR: 1,
+  EMPLEADO_SISTEMAS: 2,
+  EMPLEADO_MUNICIPAL: 3,
+};
+
+export const NOMBRES_ROL = {
+  [ROLES.DIRECTOR]: "Director",
+  [ROLES.EMPLEADO_SISTEMAS]: "Sistemas",
+  [ROLES.EMPLEADO_MUNICIPAL]: "Municipal",
+};
+
+export const ESTADOS = {
+  PENDIENTE: 1,
+  EN_PROCESO: 2,
+  RESUELTA: 3,
+  CANCELADA: 4,
+};
+
 export const PRIORIDADES = {
   1: "Baja",
   2: "Media",
   3: "Alta",
-};
-
-export const ROLES = {
-  1: "Municipal",
-  2: "Sistemas",
-  3: "Director",
 };
 
 export function esc(texto) {
