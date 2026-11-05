@@ -11,7 +11,9 @@ import {
 } from "../permisos.js";
 
 const POR_PAGINA = 10;
-const FILTROS_ADMITIDOS = ["estado", "prioridad", "desde", "sin_asignar", "area", "categoria", "asignado"];
+const FILTROS_ADMITIDOS = ["buscar", "estado", "prioridad", "desde", "sin_asignar", "area", "categoria", "asignado"];
+// Estos vienen solo desde el dashboard; la barra de filtros los conserva al cambiar los demás.
+const FILTROS_DEL_DASHBOARD = ["area", "categoria", "asignado"];
 const NOMBRES_ESTADO_PLURAL = {
   [ESTADOS.PENDIENTE]: "Pendientes",
   [ESTADOS.EN_PROCESO]: "En proceso",
@@ -39,6 +41,7 @@ function tituloDeLista() {
 
 function descripcionDelFiltro() {
   const partes = [];
+  if (filtros.get("buscar")) partes.push(`"${filtros.get("buscar")}"`);
   const estados = filtros.get("estado");
   if (estados === `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`) {
     partes.push("Abiertas (pendientes o en proceso)");
@@ -50,6 +53,57 @@ function descripcionDelFiltro() {
   if (filtros.get("desde")) partes.push(`creadas desde el ${fecha(filtros.get("desde"))}`);
   if (etiqueta) partes.push(etiqueta);
   return partes.join(" · ");
+}
+
+function opcion(valor, texto, actual) {
+  return `<option value="${valor}"${String(actual ?? "") === String(valor) ? " selected" : ""}>${texto}</option>`;
+}
+
+function barraDeFiltros() {
+  const abiertas = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
+  const estado = filtros.get("estado");
+  const prioridad = filtros.get("prioridad");
+  return `<form class="barra-filtros" id="form-filtros" role="search">
+    <input class="form-control" type="search" name="buscar" placeholder="Buscar por pedido o artículo" aria-label="Buscar por pedido o artículo" value="${esc(filtros.get("buscar") ?? "")}">
+    <select class="form-select" name="estado" aria-label="Filtrar por estado">
+      ${opcion("", "Todos los estados", estado)}
+      ${opcion(abiertas, "Abiertas", estado)}
+      ${Object.entries(NOMBRES_ESTADO_PLURAL).map(([id, nombre]) => opcion(id, nombre, estado)).join("")}
+    </select>
+    <select class="form-select" name="prioridad" aria-label="Filtrar por prioridad">
+      ${opcion("", "Todas las prioridades", prioridad)}
+      ${[3, 2, 1].map((p) => opcion(p, PRIORIDADES[p], prioridad)).join("")}
+    </select>
+    <label class="filtro-fecha">
+      <span>Desde</span>
+      <input class="form-control" type="date" name="desde" value="${esc(filtros.get("desde") ?? "")}">
+    </label>
+    ${
+      esDirector(usuario)
+        ? `<label class="form-check filtro-check">
+            <input class="form-check-input" type="checkbox" name="sin_asignar" value="true"${filtros.get("sin_asignar") ? " checked" : ""}>
+            <span class="form-check-label">Sin asignar</span>
+          </label>`
+        : ""
+    }
+    <button class="btn btn-gim" type="submit">Buscar</button>
+  </form>`;
+}
+
+function aplicarFiltros(evento) {
+  evento?.preventDefault();
+  const formulario = contenedor.querySelector("#form-filtros");
+  const nuevos = new URLSearchParams();
+  for (const [clave, valor] of new FormData(formulario)) {
+    if (valor.trim()) nuevos.set(clave, valor.trim());
+  }
+  FILTROS_DEL_DASHBOARD.forEach((clave) => {
+    if (filtros.get(clave)) nuevos.set(clave, filtros.get(clave));
+  });
+  if (etiqueta && FILTROS_DEL_DASHBOARD.some((clave) => nuevos.get(clave))) nuevos.set("etiqueta", etiqueta);
+
+  const consulta = nuevos.toString();
+  window.location.hash = consulta ? `#/?${consulta}` : "#/";
 }
 
 function avisoDeFiltro() {
@@ -80,12 +134,18 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
         <h2>${tituloDeLista()}</h2>
         ${puedeCrearIncidencias(usuario) ? '<a class="btn btn-gim" href="#/nueva">+ Nueva incidencia</a>' : ""}
       </div>
+      ${barraDeFiltros()}
       ${avisoDeFiltro()}
       <div class="zona-error"></div>
       <div class="tabla-scroll zona-lista">${cargando("Cargando incidencias...")}</div>
       <div class="zona-paginacion"></div>
     </div>`;
 
+  const formulario = contenedor.querySelector("#form-filtros");
+  formulario.addEventListener("submit", aplicarFiltros);
+  formulario.querySelectorAll("select, input[type=date], input[type=checkbox]").forEach((campo) =>
+    campo.addEventListener("change", () => aplicarFiltros())
+  );
   contenedor.querySelector(".zona-lista").addEventListener("click", manejarAccion);
   contenedor.querySelector(".zona-paginacion").addEventListener("click", cambiarPagina);
 

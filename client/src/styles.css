@@ -1000,6 +1000,47 @@ a.indicador:focus-visible {
     background-color: var(--gim-verde-suave);
 }
 
+.barra-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.barra-filtros input[type="search"] {
+    flex: 1 1 220px;
+}
+
+.barra-filtros .form-select {
+    width: auto;
+    flex: 0 1 190px;
+}
+
+.filtro-fecha {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    color: var(--gim-texto-suave);
+}
+
+.filtro-fecha .form-control {
+    width: auto;
+}
+
+.filtro-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+}
+
+.filtro-check .form-check-input:checked {
+    background-color: var(--gim-verde);
+    border-color: var(--gim-verde);
+}
+
 .filtro-activo {
     display: flex;
     flex-wrap: wrap;
