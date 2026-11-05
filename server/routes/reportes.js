@@ -26,7 +26,7 @@ const router = express.Router();
  *     parameters:
  *       - in: query
  *         name: filtro
- *         schema: { type: string, enum: [abiertas, resueltas, canceladas] }
+ *         schema: { type: string, enum: [pendientes, en_proceso, resueltas, canceladas] }
  *         description: Sin filtro incluye todas las incidencias
  *     responses:
  *       200:

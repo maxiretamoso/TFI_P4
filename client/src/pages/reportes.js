@@ -3,7 +3,8 @@ import { mensajeError } from "../ui.js";
 
 const OPCIONES = [
   ["", "Todas"],
-  ["abiertas", "Abiertas"],
+  ["pendientes", "Pendientes"],
+  ["en_proceso", "En proceso"],
   ["resueltas", "Resueltas"],
   ["canceladas", "Canceladas"],
 ];

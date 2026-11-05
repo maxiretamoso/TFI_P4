@@ -2,7 +2,8 @@ const reportesDatos = require("../datos/reportes.datos");
 const { ESTADOS } = require("../config/estados");
 
 const FILTROS = {
-  abiertas: { titulo: "Incidencias abiertas", estados: [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO] },
+  pendientes: { titulo: "Incidencias pendientes", estados: [ESTADOS.PENDIENTE] },
+  en_proceso: { titulo: "Incidencias en proceso", estados: [ESTADOS.EN_PROCESO] },
   resueltas: { titulo: "Incidencias resueltas", estados: [ESTADOS.RESUELTA] },
   canceladas: { titulo: "Incidencias canceladas", estados: [ESTADOS.CANCELADA] },
 };
