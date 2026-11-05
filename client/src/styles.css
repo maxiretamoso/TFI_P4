@@ -944,6 +944,34 @@ a.indicador:focus-visible {
     color: inherit;
 }
 
+.pestanias-catalogo {
+    --bs-nav-pills-link-active-bg: var(--gim-verde);
+    --bs-nav-link-color: var(--gim-verde-texto);
+    --bs-nav-link-hover-color: var(--gim-verde-hover);
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pestanias-catalogo .nav-link:not(.active):hover {
+    background-color: var(--gim-verde-suave);
+}
+
+.barra-herramientas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.buscador-catalogo {
+    max-width: 360px;
+}
+
+.columna-acciones {
+    width: 1%;
+}
+
 .filtro-activo {
     display: flex;
     flex-wrap: wrap;
