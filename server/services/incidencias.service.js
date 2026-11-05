@@ -9,8 +9,6 @@ const { ESTADOS } = require("../config/estados");
 const LIMITE_POR_DEFECTO = 20;
 const LIMITE_MAXIMO = 100;
 
-// Cada rol ve un subconjunto distinto: el municipal las que creó, el empleado
-// de sistemas las que tiene asignadas y el director todas.
 function filtroSegunRol({ rol, id_usuario }) {
   if (rol === ROLES.EMPLEADO_MUNICIPAL) return { creadoPor: id_usuario };
   if (rol === ROLES.EMPLEADO_SISTEMAS) return { asignadoA: id_usuario };
@@ -51,8 +49,7 @@ async function obtenerPorId(id, solicitante) {
   return incidencia;
 }
 
-// La incidencia nace Pendiente y a cargo del Director, que es quien después
-// la asigna a un empleado de Sistemas. asignado_a es NOT NULL en la base.
+// asignado_a es NOT NULL: nace a cargo del Director hasta que la asigne.
 async function crear({ id_articulo, prioridad, descripcion_pedido }, solicitante) {
   const articulo = await articulosDatos.buscarPorId(id_articulo);
   if (!articulo || articulo.activo !== 1) throw crearError(400, "El artículo indicado no existe");

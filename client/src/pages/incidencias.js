@@ -252,7 +252,6 @@ function cerrarPaneles() {
 async function recargar(pagina = paginado.pagina) {
   try {
     let respuesta = await pedirIncidencias(pagina);
-    // Si la página pedida quedó fuera de rango, muestra la última.
     if (respuesta.items.length === 0 && respuesta.pagina > 1) {
       respuesta = await pedirIncidencias(respuesta.paginas);
     }

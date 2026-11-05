@@ -15,8 +15,7 @@ const app = express();
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-// CLIENT_URL admite varios orígenes separados por coma. Sin lista, se permite
-// cualquiera (sirve para probar con Swagger o Postman en desarrollo).
+// Sin CLIENT_URL se acepta cualquier origen (desarrollo).
 const origenesPermitidos = (process.env.CLIENT_URL || "")
   .split(",")
   .map((origen) => origen.trim())
@@ -34,7 +33,6 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 
-// Archivos subidos por los usuarios (avatares)
 app.use("/publico", express.static(path.join(__dirname, "publico")));
 
 const limitadorDeLogin = rateLimit({

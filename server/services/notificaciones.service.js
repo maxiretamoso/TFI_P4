@@ -1,8 +1,7 @@
 const nodemailer = require("nodemailer");
 const usuariosDatos = require("../datos/usuarios.datos");
 
-// Los estilos van escritos en cada etiqueta: los clientes de correo descartan
-// las hojas de estilo externas y buena parte de lo que venga en un <style>.
+// Estilos en línea porque los clientes de correo ignoran <style>.
 const ESTILO_CAJA = "font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;max-width:560px";
 const ESTILO_TITULO = "font-size:18px;margin:0 0 12px 0;color:#0d4d7a";
 const ESTILO_DATO = "margin:4px 0";

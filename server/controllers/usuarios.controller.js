@@ -12,8 +12,7 @@ function borrarArchivo(ruta) {
   }
 }
 
-// basename() descarta cualquier "../" guardado en la base, así el borrado
-// no puede salirse de la carpeta de avatares.
+// basename() evita que un "../" guardado en la base salga de la carpeta.
 function borrarAvatarAnterior(nombreArchivo) {
   if (!nombreArchivo) return;
   borrarArchivo(path.join(uploadDir, path.basename(nombreArchivo)));

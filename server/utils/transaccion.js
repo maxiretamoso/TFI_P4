@@ -1,7 +1,5 @@
 const pool = require("../db");
 
-// Todas las consultas del callback usan el mismo cliente del pool:
-// o se confirman todas (COMMIT) o se deshacen todas (ROLLBACK).
 async function conTransaccion(callback) {
   const cliente = await pool.connect();
   try {

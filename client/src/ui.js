@@ -69,7 +69,6 @@ function botonDePagina(numero, texto, { activa = false, deshabilitada = false, e
   </li>`;
 }
 
-// Muestra hasta 5 números alrededor de la página actual.
 export function paginacion({ pagina, paginas, total, limite }) {
   if (total === 0) return "";
 

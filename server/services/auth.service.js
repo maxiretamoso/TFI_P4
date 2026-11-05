@@ -6,8 +6,7 @@ const { crearError } = require("../utils/httpError");
 
 const HORAS_DE_SESION = "8h";
 
-// Los usuarios que trae incidencias_db.sql guardan la contraseña en SHA-256.
-// Los que se crean desde la aplicación usan bcrypt.
+// Los usuarios del script de la cátedra están en SHA-256; los creados desde la app, en bcrypt.
 function esHashBcrypt(hash) {
   return /^\$2[aby]\$/.test(hash);
 }
