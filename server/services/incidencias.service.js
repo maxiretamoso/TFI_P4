@@ -39,6 +39,7 @@ async function listar(solicitante, consulta = {}) {
     prioridad: consulta.prioridad ? aEntero(consulta.prioridad, null) : null,
     buscar: consulta.buscar || null,
     desde: consulta.desde || null,
+    fecha: consulta.fecha || null,
     area: consulta.area ? aEntero(consulta.area, null) : null,
     categoria: consulta.categoria ? aEntero(consulta.categoria, null) : null,
     asignado: consulta.asignado ? aEntero(consulta.asignado, null) : null,

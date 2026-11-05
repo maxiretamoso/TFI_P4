@@ -35,6 +35,7 @@ function armarFiltros({
   prioridad,
   buscar,
   desde,
+  fecha,
   sinAsignar,
   pendiente,
   rolDirector,
@@ -71,6 +72,10 @@ function armarFiltros({
   if (desde) {
     valores.push(desde);
     condiciones.push(`incidencias.creado >= $${valores.length}::date`);
+  }
+  if (fecha) {
+    valores.push(fecha);
+    condiciones.push(`incidencias.creado::date = $${valores.length}::date`);
   }
   if (area) {
     valores.push(area);

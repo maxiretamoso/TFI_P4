@@ -33,6 +33,7 @@ router.use(verificarToken);
  *       - { in: query, name: prioridad, schema: { type: integer, minimum: 1, maximum: 3 } }
  *       - { in: query, name: buscar,    schema: { type: string }, description: Texto en el pedido o el artículo }
  *       - { in: query, name: desde,     schema: { type: string, format: date }, description: Creadas desde esa fecha (AAAA-MM-DD) }
+ *       - { in: query, name: fecha,     schema: { type: string, format: date }, description: Creadas ese día (AAAA-MM-DD) }
  *       - { in: query, name: sin_asignar, schema: { type: boolean }, description: Solo las pendientes que siguen a cargo del Director }
  *       - { in: query, name: area,      schema: { type: integer }, description: id_area del artículo }
  *       - { in: query, name: categoria, schema: { type: integer }, description: id_categoria del artículo }
@@ -65,6 +66,7 @@ router.get(
     query("prioridad").optional().isInt({ min: 1, max: 3 }),
     query("buscar").optional().trim().isLength({ max: 255 }),
     query("desde").optional().isISO8601({ strict: true }).withMessage("desde debe ser una fecha AAAA-MM-DD"),
+    query("fecha").optional().isISO8601({ strict: true }).withMessage("fecha debe ser una fecha AAAA-MM-DD"),
     query("sin_asignar").optional().isBoolean().withMessage("sin_asignar debe ser true o false"),
     query("area").optional().isInt({ min: 1 }),
     query("categoria").optional().isInt({ min: 1 }),

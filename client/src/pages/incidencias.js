@@ -12,9 +12,9 @@ import {
 } from "../permisos.js";
 
 const POR_PAGINA = 10;
-const FILTROS_ADMITIDOS = ["buscar", "estado", "prioridad", "desde", "sin_asignar", "area", "categoria", "asignado"];
+const FILTROS_ADMITIDOS = ["buscar", "estado", "prioridad", "desde", "fecha", "sin_asignar", "area", "categoria", "asignado"];
 // Estos vienen solo desde el dashboard; la barra de filtros los conserva al cambiar los demás.
-const FILTROS_DEL_DASHBOARD = ["area", "categoria", "asignado"];
+const FILTROS_DEL_DASHBOARD = ["area", "categoria", "asignado", "fecha"];
 const NOMBRES_ESTADO_PLURAL = {
   [ESTADOS.PENDIENTE]: "Pendientes",
   [ESTADOS.EN_PROCESO]: "En proceso",
@@ -52,6 +52,7 @@ function descripcionDelFiltro() {
   if (filtros.get("prioridad")) partes.push(`prioridad ${PRIORIDADES[filtros.get("prioridad")] ?? ""}`);
   if (filtros.get("sin_asignar")) partes.push("sin asignar");
   if (filtros.get("desde")) partes.push(`creadas desde el ${fecha(filtros.get("desde"))}`);
+  if (filtros.get("fecha")) partes.push(`creadas el ${fecha(filtros.get("fecha"))}`);
   if (etiqueta) partes.push(etiqueta);
   return partes.join(" · ");
 }
