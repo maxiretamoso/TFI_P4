@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Avatar 1">
+<style>
+.cabeza{animation:balanceo 3.2s ease-in-out infinite alternate;transform-origin:60px 86px}
+.ojos{animation:parpadeo 4.5s infinite;transform-origin:60px 52px}
+@keyframes balanceo{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+@keyframes parpadeo{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@media (prefers-reduced-motion:reduce){.cabeza,.ojos{animation:none}}
+</style>
+<circle cx="60" cy="60" r="60" fill="#dcebd0"/>
+<path d="M20 120 Q22 90 60 88 Q98 90 100 120Z" fill="#5e8c3a"/>
+<rect x="53" y="72" width="14" height="18" rx="5" fill="#f5d0b5"/>
+<g class="cabeza" style="animation-delay:-0.37s">
+
+<circle cx="36" cy="55" r="5.5" fill="#f5d0b5"/><circle cx="84" cy="55" r="5.5" fill="#f5d0b5"/>
+<circle cx="60" cy="52" r="24" fill="#f5d0b5"/>
+
+<g class="ojos" style="animation-delay:-0.37s"><circle cx="51" cy="52" r="2.9" fill="#2a2420"/><circle cx="69" cy="52" r="2.9" fill="#2a2420"/></g>
+<circle cx="46" cy="61" r="3.6" fill="#f08f8f" opacity=".35"/><circle cx="74" cy="61" r="3.6" fill="#f08f8f" opacity=".35"/>
+<path d="M52 63 Q60 70 68 63" fill="none" stroke="#7a3b2e" stroke-width="2.4" stroke-linecap="round"/>
+<path d="M36 50 Q35 25 60 25 Q85 25 84 50 Q80 37 70 35 Q60 42 48 35 Q40 39 36 50Z" fill="#6b3e26"/>
+
+</g>
+</svg>

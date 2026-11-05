@@ -5,3 +5,4 @@ dist/
 *.log
 server/publico/avatares/*
 !server/publico/avatares/.gitkeep
+!server/publico/avatares/predefinidos/

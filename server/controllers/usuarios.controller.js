@@ -3,6 +3,7 @@ const path = require("path");
 const usuariosService = require("../services/usuarios.service");
 const { uploadDir } = require("../utils/avatarUpload");
 const { responderSiHayErroresDeValidacion } = require("../utils/validar");
+const { archivoDelPredefinido, esPredefinido } = require("../config/avatares");
 
 function borrarArchivo(ruta) {
   try {
@@ -14,7 +15,7 @@ function borrarArchivo(ruta) {
 
 // basename() evita que un "../" guardado en la base salga de la carpeta.
 function borrarAvatarAnterior(nombreArchivo) {
-  if (!nombreArchivo) return;
+  if (!nombreArchivo || esPredefinido(nombreArchivo)) return;
   borrarArchivo(path.join(uploadDir, path.basename(nombreArchivo)));
 }
 
@@ -76,20 +77,18 @@ async function subirAvatar(req, res, next) {
     return;
   }
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: "Falta el archivo en el campo 'avatar'" });
+    const predefinido = req.body?.predefinido;
+    if (!req.file && !predefinido) {
+      return res
+        .status(400)
+        .json({ error: "Mandá una imagen en el campo 'avatar' o un avatar en 'predefinido'" });
     }
 
-    const anterior = await usuariosService.obtenerUsuarioPorId(req.params.id);
-    const usuario = await usuariosService.actualizarAvatar(
-      req.params.id,
-      req.file.filename,
-      req.usuario
-    );
+    const nuevo = req.file ? req.file.filename : archivoDelPredefinido(predefinido);
+    const anterior = await usuariosService.obtenerUsuarioPorId(req.params.id, req.usuario);
+    const usuario = await usuariosService.actualizarAvatar(req.params.id, nuevo, req.usuario);
 
-    if (anterior.avatar && anterior.avatar !== req.file.filename) {
-      borrarAvatarAnterior(anterior.avatar);
-    }
+    if (anterior.avatar !== nuevo) borrarAvatarAnterior(anterior.avatar);
 
     res.json(usuario);
   } catch (error) {

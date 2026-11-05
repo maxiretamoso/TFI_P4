@@ -5,6 +5,7 @@ const verificarRol = require("../middlewares/verificarRol");
 const usuariosController = require("../controllers/usuarios.controller");
 const { uploadAvatar } = require("../utils/avatarUpload");
 const { ROLES } = require("../config/roles");
+const { AVATARES_PREDEFINIDOS } = require("../config/avatares");
 
 const router = express.Router();
 
@@ -158,8 +159,11 @@ router.delete(
  * @swagger
  * /usuarios/{id}/avatar:
  *   patch:
- *     summary: Sube la foto de perfil del usuario
- *     description: Cada usuario puede cambiar la propia; el Director, la de cualquiera. Máximo 2 MB, jpg/png/webp.
+ *     summary: Cambia la foto de perfil del usuario
+ *     description: >
+ *       Acepta una imagen propia (multipart, campo avatar, máximo 2 MB, jpg/png/webp)
+ *       o el id de un avatar predefinido (JSON, campo predefinido, ver GET /avatares).
+ *       Cada usuario puede cambiar la propia; el Director, la de cualquiera.
  *     tags: [Usuarios]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -173,15 +177,24 @@ router.delete(
  *             required: [avatar]
  *             properties:
  *               avatar: { type: string, format: binary }
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [predefinido]
+ *             properties:
+ *               predefinido: { type: string, example: caricatura-03 }
  *     responses:
  *       200: { description: Avatar actualizado }
- *       400: { description: Falta el archivo o supera los 2 MB }
+ *       400: { description: Falta la imagen o el predefinido, el archivo no es válido o supera los 2 MB }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  */
 router.patch(
   "/:id/avatar",
-  [param("id").isInt({ min: 1 })],
+  [
+    param("id").isInt({ min: 1 }),
+    body("predefinido").optional().isIn(AVATARES_PREDEFINIDOS).withMessage("Ese avatar no existe"),
+  ],
   uploadAvatar.single("avatar"),
   usuariosController.subirAvatar
 );

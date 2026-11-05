@@ -56,6 +56,7 @@ app.use(`${PREFIJO_API}/categorias`, require("./routes/categorias"));
 app.use(`${PREFIJO_API}/estados`, require("./routes/estados"));
 app.use(`${PREFIJO_API}/articulos`, require("./routes/articulos"));
 app.use(`${PREFIJO_API}/usuarios`, require("./routes/usuarios"));
+app.use(`${PREFIJO_API}/avatares`, require("./routes/avatares"));
 app.use(`${PREFIJO_API}/incidencias`, require("./routes/incidencias"));
 app.use(`${PREFIJO_API}/incidencias-estados`, require("./routes/incidencias_estados"));
 app.use(`${PREFIJO_API}/dashboard`, require("./routes/dashboard"));
