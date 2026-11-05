@@ -77,4 +77,4 @@ async function validarSesion(datosDelToken) {
   return { id_usuario: usuario.id_usuario, rol: usuario.rol };
 }
 
-module.exports = { login, validarSesion, cambiarContrasenia, hashearContrasenia, compararContrasenia };
+module.exports = { login, validarSesion, cambiarContrasenia, hashearContrasenia };

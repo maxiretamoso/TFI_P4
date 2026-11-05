@@ -10,7 +10,7 @@ export function esDeSistemas(usuario) {
   return usuario.rol === ROLES.EMPLEADO_SISTEMAS;
 }
 
-export function esMunicipal(usuario) {
+function esMunicipal(usuario) {
   return usuario.rol === ROLES.EMPLEADO_MUNICIPAL;
 }
 
@@ -34,10 +34,6 @@ export function puedeAsignar(usuario, incidencia) {
   const abierta =
     incidencia.id_estado !== ESTADOS.RESUELTA && incidencia.id_estado !== ESTADOS.CANCELADA;
   return abierta && esDirector(usuario);
-}
-
-export function puedeGestionarCatalogos(usuario) {
-  return esDirector(usuario) || esDeSistemas(usuario);
 }
 
 export function puedeGestionarUsuarios(usuario) {
