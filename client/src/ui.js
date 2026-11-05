@@ -58,3 +58,41 @@ export function mensajeError(texto) {
 export function badgeEstado(inc) {
   return `<span class="estado estado-${inc.id_estado}">${esc(inc.estado)}</span>`;
 }
+
+function botonDePagina(numero, texto, { activa = false, deshabilitada = false, etiqueta = "" } = {}) {
+  const clases = ["page-item", activa && "active", deshabilitada && "disabled"].filter(Boolean).join(" ");
+  const aria = etiqueta ? ` aria-label="${etiqueta}"` : "";
+  const actual = activa ? ` aria-current="page"` : "";
+  return `<li class="${clases}">
+    <button type="button" class="page-link" data-pagina="${numero}"${aria}${actual}
+      ${deshabilitada || activa ? "disabled" : ""}>${texto}</button>
+  </li>`;
+}
+
+// Muestra hasta 5 números alrededor de la página actual.
+export function paginacion({ pagina, paginas, total, limite }) {
+  if (total === 0) return "";
+
+  const desde = (pagina - 1) * limite + 1;
+  const hasta = Math.min(pagina * limite, total);
+  const resumen = `<p class="texto-paginacion">Mostrando ${desde}–${hasta} de ${total}</p>`;
+  if (paginas <= 1) return resumen;
+
+  const inicio = Math.max(1, Math.min(pagina - 2, paginas - 4));
+  const fin = Math.min(paginas, inicio + 4);
+  let numeros = "";
+  for (let n = inicio; n <= fin; n++) {
+    numeros += botonDePagina(n, n, { activa: n === pagina });
+  }
+
+  return `<div class="barra-paginacion">
+    ${resumen}
+    <nav aria-label="Paginación">
+      <ul class="pagination pagination-sm mb-0">
+        ${botonDePagina(pagina - 1, "&laquo;", { deshabilitada: pagina === 1, etiqueta: "Página anterior" })}
+        ${numeros}
+        ${botonDePagina(pagina + 1, "&raquo;", { deshabilitada: pagina === paginas, etiqueta: "Página siguiente" })}
+      </ul>
+    </nav>
+  </div>`;
+}

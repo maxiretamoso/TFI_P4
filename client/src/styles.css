@@ -446,3 +446,31 @@ body {
 .perfil-datos dd {
   margin: 0;
 }
+
+.barra-paginacion {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.texto-paginacion {
+    margin: 0.75rem 0 0;
+    color: #555;
+    font-size: 0.875rem;
+}
+
+.barra-paginacion .texto-paginacion {
+    margin: 0;
+}
+
+.pagination {
+    --bs-pagination-color: #3f6b1f;
+    --bs-pagination-hover-color: #2f5216;
+    --bs-pagination-focus-color: #2f5216;
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(139, 199, 86, 0.4);
+    --bs-pagination-active-bg: #4f7f2a;
+    --bs-pagination-active-border-color: #4f7f2a;
+}
