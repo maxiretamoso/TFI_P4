@@ -9,6 +9,9 @@ const { ESTADOS } = require("../config/estados");
 const LIMITE_POR_DEFECTO = 20;
 const LIMITE_MAXIMO = 100;
 
+const ABIERTOS = [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO];
+const CAMBIO_SIMULTANEO = "La incidencia cambió de estado mientras tanto. Recargá la lista y probá de nuevo.";
+
 function filtroSegunRol({ rol, id_usuario }) {
   if (rol === ROLES.EMPLEADO_MUNICIPAL) return { creadoPor: id_usuario };
   if (rol === ROLES.EMPLEADO_SISTEMAS) return { asignadoA: id_usuario };
@@ -90,7 +93,9 @@ async function asignar(id, asignadoA) {
     throw crearError(409, "No se puede asignar una incidencia resuelta o cancelada");
   }
 
-  return incidenciasDatos.asignar(id, asignadoA, ESTADOS.EN_PROCESO);
+  const actualizada = await incidenciasDatos.asignar(id, asignadoA, ESTADOS.EN_PROCESO, ABIERTOS);
+  if (!actualizada) throw crearError(409, CAMBIO_SIMULTANEO);
+  return actualizada;
 }
 
 async function finalizar(id, descripcionResolucion, solicitante) {
@@ -106,7 +111,9 @@ async function finalizar(id, descripcionResolucion, solicitante) {
 
   const actualizada = await incidenciasDatos.cambiarEstado(id, ESTADOS.RESUELTA, {
     descripcion_resolucion: descripcionResolucion,
+    desde: ABIERTOS,
   });
+  if (!actualizada) throw crearError(409, CAMBIO_SIMULTANEO);
 
   // El correo sale en segundo plano para no demorar la respuesta.
   enviarNotificacionDeIncidencia({
@@ -133,7 +140,10 @@ async function cancelar(id, solicitante) {
     throw crearError(403, "Solo podés cancelar las incidencias que creaste");
   }
 
-  const actualizada = await incidenciasDatos.cambiarEstado(id, ESTADOS.CANCELADA);
+  const actualizada = await incidenciasDatos.cambiarEstado(id, ESTADOS.CANCELADA, {
+    desde: [ESTADOS.PENDIENTE],
+  });
+  if (!actualizada) throw crearError(409, CAMBIO_SIMULTANEO);
 
   enviarNotificacionDeIncidencia({ incidencia, estado: "cancelada" });
 

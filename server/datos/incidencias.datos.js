@@ -144,15 +144,17 @@ function insertar({ id_articulo, id_estado, creado_por, asignado_a, prioridad, d
   });
 }
 
-function cambiarEstado(id, idEstado, { descripcion_resolucion } = {}) {
+// "desde" son los estados en los que tiene que estar la incidencia para cambiar: si otro
+// pedido la cambió antes, el UPDATE no afecta filas y se devuelve null.
+function cambiarEstado(id, idEstado, { descripcion_resolucion, desde }) {
   return conTransaccion(async (cliente) => {
     const cambio = await cliente.query(
       `UPDATE incidencias
        SET id_estado = $1,
            descripcion_resolucion = COALESCE($2, descripcion_resolucion)
-       WHERE id_incidencia = $3
+       WHERE id_incidencia = $3 AND id_estado = ANY($4)
        RETURNING *`,
-      [idEstado, descripcion_resolucion ?? null, id]
+      [idEstado, descripcion_resolucion ?? null, id, desde]
     );
 
     if (cambio.rowCount === 0) return null;
@@ -167,14 +169,14 @@ function cambiarEstado(id, idEstado, { descripcion_resolucion } = {}) {
   });
 }
 
-function asignar(id, asignadoA, idEstado) {
+function asignar(id, asignadoA, idEstado, desde) {
   return conTransaccion(async (cliente) => {
     const cambio = await cliente.query(
       `UPDATE incidencias
        SET asignado_a = $1, id_estado = $2
-       WHERE id_incidencia = $3
+       WHERE id_incidencia = $3 AND id_estado = ANY($4)
        RETURNING *`,
-      [asignadoA, idEstado, id]
+      [asignadoA, idEstado, id, desde]
     );
 
     if (cambio.rowCount === 0) return null;
