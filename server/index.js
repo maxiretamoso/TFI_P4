@@ -26,7 +26,7 @@ app.use(
     origin(origen, devolver) {
       if (!origen || origenesPermitidos.length === 0) return devolver(null, true);
       if (origenesPermitidos.includes(origen)) return devolver(null, true);
-      devolver(new Error(`Origen no permitido por CORS: ${origen}`));
+      devolver(Object.assign(new Error("Origen no permitido"), { status: 403 }));
     },
   })
 );

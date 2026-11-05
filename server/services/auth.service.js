@@ -18,7 +18,9 @@ function sha256(texto) {
 function compararContrasenia(contrasenia, hash) {
   if (!hash) return Promise.resolve(false);
   if (esHashBcrypt(hash)) return bcrypt.compare(contrasenia, hash);
-  return Promise.resolve(sha256(contrasenia) === hash);
+  const calculado = Buffer.from(sha256(contrasenia), "hex");
+  const guardado = Buffer.from(hash, "hex");
+  return Promise.resolve(calculado.length === guardado.length && crypto.timingSafeEqual(calculado, guardado));
 }
 
 function hashearContrasenia(contrasenia) {
@@ -66,4 +68,13 @@ async function cambiarContrasenia(idUsuario, actual, nueva) {
   return { mensaje: "Contraseña actualizada" };
 }
 
-module.exports = { login, cambiarContrasenia, hashearContrasenia, compararContrasenia };
+// El token puede seguir vigente después de una baja o un cambio de rol: se usa el estado actual.
+async function validarSesion(datosDelToken) {
+  const usuario = await usuariosDatos.buscarPorId(datosDelToken.id_usuario);
+  if (!usuario || usuario.activo !== 1) {
+    throw crearError(401, "Tu sesión ya no es válida. Iniciá sesión de nuevo.");
+  }
+  return { id_usuario: usuario.id_usuario, rol: usuario.rol };
+}
+
+module.exports = { login, validarSesion, cambiarContrasenia, hashearContrasenia, compararContrasenia };

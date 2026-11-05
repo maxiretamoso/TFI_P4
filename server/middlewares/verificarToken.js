@@ -1,24 +1,25 @@
 const jwt = require("jsonwebtoken");
+const authService = require("../services/auth.service");
 
-function verificarToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
+async function verificarToken(req, res, next) {
+  const [tipo, token] = (req.headers.authorization ?? "").split(" ");
 
-  if (!authHeader) {
-    return res.status(401).json({ error: "No se proporcionó un token" });
+  if (tipo !== "Bearer" || !token) {
+    return res.status(401).json({ error: "Falta el token de acceso" });
   }
 
-  const token = authHeader.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ error: "Formato de token inválido" });
+  let datosDelToken;
+  try {
+    datosDelToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch {
+    return res.status(401).json({ error: "Token inválido o expirado" });
   }
 
   try {
-    const datosUsuario = jwt.verify(token, process.env.JWT_SECRET);
-    req.usuario = datosUsuario;
+    req.usuario = await authService.validarSesion(datosDelToken);
     next();
   } catch (error) {
-    return res.status(401).json({ error: "Token inválido o expirado" });
+    next(error);
   }
 }
 
