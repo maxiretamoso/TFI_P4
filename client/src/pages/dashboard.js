@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { esc, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fechaHora } from "../ui.js";
+import { esc, fecha, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fechaHora } from "../ui.js";
 
 const COLOR_ESTADO = {
   [ESTADOS.PENDIENTE]: "var(--gim-pendiente)",
@@ -10,25 +10,6 @@ const COLOR_ESTADO = {
 
 function porcentaje(parte, total) {
   return total > 0 ? Math.round((parte / total) * 100) : 0;
-}
-
-function tarjetasDeTotales(resumen) {
-  const porEstado = resumen.porEstado
-    .map(
-      (f) => `<div class="kpi">
-        <span class="kpi-etiqueta">${esc(f.estado)}</span>
-        <span class="kpi-numero" style="color: ${COLOR_ESTADO[f.id_estado] ?? "inherit"}">${f.total}</span>
-      </div>`
-    )
-    .join("");
-
-  return `<div class="kpis">
-    <div class="kpi">
-      <span class="kpi-etiqueta">Total</span>
-      <span class="kpi-numero">${resumen.total}</span>
-    </div>
-    ${porEstado}
-  </div>`;
 }
 
 // Torta hecha con círculos SVG: cada estado es un trazo cuyo largo es su porcentaje.
@@ -49,7 +30,8 @@ function graficoPorEstado(resumen) {
     .map(
       (f) => `<li>
         <span class="punto" style="background: ${COLOR_ESTADO[f.id_estado]}"></span>
-        ${esc(f.estado)} <strong>${porcentaje(f.total, resumen.total)}%</strong>
+        ${esc(f.estado)} <strong>${f.total}</strong>
+        <span class="porcentaje">${porcentaje(f.total, resumen.total)}%</span>
       </li>`
     )
     .join("");
@@ -64,42 +46,6 @@ function graficoPorEstado(resumen) {
     </svg>
     <ul class="referencias">${referencias}</ul>
   </div>`;
-}
-
-function claveDeFecha(fecha) {
-  const mes = String(fecha.getMonth() + 1).padStart(2, "0");
-  const dia = String(fecha.getDate()).padStart(2, "0");
-  return `${fecha.getFullYear()}-${mes}-${dia}`;
-}
-
-function graficoPorDia(resumen) {
-  const totales = new Map(resumen.porFecha.map((f) => [f.fecha, f.total]));
-  const dias = [];
-  for (let atras = resumen.dias - 1; atras >= 0; atras--) {
-    const fecha = new Date();
-    fecha.setDate(fecha.getDate() - atras);
-    dias.push({ fecha, total: totales.get(claveDeFecha(fecha)) ?? 0 });
-  }
-
-  const maximo = Math.max(...dias.map((d) => d.total), 1);
-  const columnas = dias
-    .map((d, i) => {
-      const etiqueta = `${d.fecha.getDate()}/${d.fecha.getMonth() + 1}`;
-      const mostrarEtiqueta = (dias.length - 1 - i) % 2 === 0;
-      return `<div class="columna" title="${etiqueta}: ${d.total}">
-        <span class="columna-valor">${d.total || ""}</span>
-        <span class="columna-barra" style="height: ${(d.total / maximo) * 100}%"></span>
-        <span class="columna-fecha">${mostrarEtiqueta ? etiqueta : ""}</span>
-      </div>`;
-    })
-    .join("");
-
-  const suma = dias.reduce((acumulado, d) => acumulado + d.total, 0);
-
-  return `<div class="grafico-columnas" role="img" aria-label="Incidencias creadas por día en los últimos ${resumen.dias} días: ${suma} en total">
-      ${columnas}
-    </div>
-    <p class="texto-grafico">${suma === 0 ? "No se crearon incidencias en este período." : `${suma} en total en el período.`}</p>`;
 }
 
 function barrasHorizontales(filas) {
@@ -129,6 +75,10 @@ function graficoPorArea(resumen) {
   return barrasHorizontales(resumen.porArea.map((f) => ({ nombre: f.area, total: f.total })));
 }
 
+function totalesPorFecha(resumen) {
+  return barrasHorizontales(resumen.porFecha.map((f) => ({ nombre: fecha(f.fecha), total: f.total })));
+}
+
 function graficoPorCategoria(resumen) {
   return barrasHorizontales(
     resumen.porCategoria.map((f) => ({ nombre: f.categoria, total: f.total }))
@@ -139,10 +89,11 @@ function tarjetasDeIndicadores(resumen) {
   const resueltas = resumen.porEstado.find((f) => f.id_estado === ESTADOS.RESUELTA)?.total ?? 0;
   const { abiertas, altas_abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
   const indicadores = [
-    ["Abiertas", abiertas, "pendientes y en proceso"],
-    ["Alta sin resolver", altas_abiertas, "prioridad Alta abiertas"],
+    ["Total", resumen.total, "incidencias registradas"],
+    ["Abiertas", abiertas, "sin terminar: pendientes o en proceso"],
+    ["Alta sin resolver", altas_abiertas, "abiertas de prioridad Alta"],
     ["Últimos 7 días", ultimos_7_dias, "incidencias creadas"],
-    ["Sin asignar", sin_asignar, "pendientes del Director"],
+    ["Sin asignar", sin_asignar, "pendientes a cargo del Director"],
     ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "del total"],
   ];
   return `<div class="indicadores">${indicadores
@@ -208,7 +159,7 @@ function cargaDeEmpleados(resumen) {
     .join("");
   return `<ul class="barras">${filas}</ul>
     <p class="referencias-linea">
-      <span><span class="punto" style="background: var(--gim-pendiente)"></span>Abiertas</span>
+      <span><span class="punto" style="background: var(--gim-pendiente)"></span>Abiertas (sin terminar)</span>
       <span><span class="punto" style="background: var(--gim-resuelta)"></span>Resueltas</span>
     </p>`;
 }
@@ -226,18 +177,13 @@ export async function pintar(zona) {
 
   zona.innerHTML = `
     <h2>Dashboard</h2>
-    ${tarjetasDeTotales(resumen)}
-    ${tarjetasDeIndicadores(resumen)}
 
-    <div class="grilla-graficos">
+    <div class="grilla-resumen">
       <section class="tarjeta-grafico">
         <h3>Por estado</h3>
         ${graficoPorEstado(resumen)}
       </section>
-      <section class="tarjeta-grafico grafico-ancho">
-        <h3>Creadas por día (últimos ${resumen.dias} días)</h3>
-        ${graficoPorDia(resumen)}
-      </section>
+      ${tarjetasDeIndicadores(resumen)}
     </div>
 
     <section class="tarjeta-grafico tarjeta-completa">
@@ -260,8 +206,15 @@ export async function pintar(zona) {
       </section>
     </div>
 
-    <section class="tarjeta-grafico tarjeta-completa">
-      <h3>Carga de trabajo del equipo de Sistemas</h3>
-      ${cargaDeEmpleados(resumen)}
-    </section>`;
+    <div class="grilla-dos">
+      <section class="tarjeta-grafico">
+        <h3>Por fecha</h3>
+        <p class="texto-ayuda">Últimos días con incidencias creadas</p>
+        ${totalesPorFecha(resumen)}
+      </section>
+      <section class="tarjeta-grafico">
+        <h3>Carga de trabajo del equipo de Sistemas</h3>
+        ${cargaDeEmpleados(resumen)}
+      </section>
+    </div>`;
 }
