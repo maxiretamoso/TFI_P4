@@ -9,6 +9,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 **Todos los roles**
 - Inicio de sesión con token JWT.
 - Mi perfil: datos del usuario, elección de un avatar predefinido o subida de una foto propia (que se puede ampliar), y cambio de contraseña.
+- Lista de incidencias con búsqueda en vivo y filtros por estado, prioridad y fecha.
 - Modo claro y oscuro, con la preferencia guardada en el navegador.
 - Diseño responsivo: en el celular el menú lateral se pliega.
 
@@ -22,8 +23,8 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 - BREAD de categorías y artículos.
 
 **Director del área de Sistemas**
-- Dashboard con totales por estado, por fecha, por prioridad, por área y por categoría; indicadores generales; incidencias prioritarias abiertas; y carga de trabajo de cada empleado de Sistemas.
-- Reporte estadístico de incidencias en PDF.
+- Dashboard con totales por estado, por prioridad, por área y por categoría; indicadores generales; incidencias prioritarias abiertas; y carga de trabajo de cada empleado de Sistemas. Cada dato lleva a la lista de incidencias ya filtrada.
+- Reporte de incidencias en PDF, completo o filtrado por pendientes, en proceso, resueltas o canceladas.
 - Asignar incidencias a empleados de Sistemas y cancelar las pendientes.
 - BREAD de usuarios, áreas, categorías y artículos.
 
@@ -64,7 +65,8 @@ server/
   services/           reglas de negocio (permisos, transiciones de estado, correo)
   datos/              acceso a la base: único lugar donde hay SQL
   middlewares/        verificación de token y de rol
-  utils/              helpers de errores, transacciones y carga de archivos
+  utils/              errores, transacciones, carga de archivos, reporte PDF y correo
+  assets/             logo usado en el reporte PDF y en el correo
   publico/avatares/   fotos subidas por los usuarios y avatares predefinidos
 client/
   index.html
@@ -76,6 +78,8 @@ client/
     session.js        token y datos del usuario en localStorage
     tema.js           interruptor de modo claro y oscuro
     avisos.js         avisos flotantes que se cierran solos
+    ayudas.js         globos de ayuda al pasar el mouse
+    confirmar.js      ventana de confirmación reutilizable
     ui.js             constantes y helpers de presentación
     styles.css        estilos propios sobre Bootstrap
     pages/            una pantalla por archivo
@@ -96,6 +100,10 @@ database/
 **Estados de solo lectura.** Los cuatro estados (Pendiente, En Proceso, Resuelta, Cancelada) se consultan pero no se crean, editan ni eliminan: todo el flujo de una incidencia depende de ellos.
 
 **Protecciones en usuarios.** Nadie puede cambiarse su propio rol ni darse de baja a sí mismo, y un empleado de Sistemas con incidencias abiertas asignadas no puede ser dado de baja ni cambiar de rol hasta que se reasignen.
+
+**Cambios de estado sin carreras.** Asignar, finalizar y cancelar actualizan la incidencia solo si sigue en un estado que lo permite (la condición va en el mismo `UPDATE`). Si dos personas actúan a la vez sobre la misma incidencia, la segunda recibe 409 en lugar de aplicar un segundo cambio.
+
+**Sesión verificada en cada pedido.** Además de validar el token, el servidor comprueba que el usuario siga activo y toma su rol actual de la base: una baja o un cambio de rol se aplican de inmediato, sin esperar a que venza el token.
 
 **Soft deletes.** Ninguna baja borra filas: se marca `activo = 0` y los listados filtran por `activo = 1`. Así las incidencias viejas siguen mostrando el artículo o la categoría con la que se crearon.
 
@@ -127,7 +135,7 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | PATCH | `/auth/contrasenia` | autenticado |
 | GET | `/me` | autenticado |
 | GET | `/health` | público |
-| GET | `/incidencias` | autenticado (filtra según el rol) |
+| GET | `/incidencias` | autenticado (según el rol; filtros: buscar, estado, prioridad, desde, sin_asignar, area, categoria, asignado) |
 | POST | `/incidencias` | Municipal |
 | GET | `/incidencias/{id}` | autenticado (solo las que puede ver) |
 | GET | `/incidencias/{id}/estados` | autenticado (solo las que puede ver) |
@@ -135,8 +143,8 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | PATCH | `/incidencias/{id}/resolucion` | Sistemas |
 | PATCH | `/incidencias/{id}/cancelacion` | Director y Municipal |
 | GET | `/incidencias-estados` | Director |
-| GET | `/dashboard` | Director |
-| GET | `/reportes/incidencias` | Director |
+| GET | `/dashboard` | Director (incluye totales por fecha) |
+| GET | `/reportes/incidencias` | Director (filtro opcional: pendientes, en_proceso, resueltas, canceladas) |
 | GET | `/categorias`, `/articulos`, `/areas`, `/estados` | autenticado |
 | POST, PUT, DELETE | `/categorias`, `/articulos` | Sistemas y Director |
 | POST, PUT, DELETE | `/areas` | Director |
