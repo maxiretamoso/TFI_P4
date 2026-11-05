@@ -3,7 +3,7 @@ const reportesDatos = require("../datos/reportes.datos");
 const { ESTADOS } = require("../config/estados");
 const { ROLES } = require("../config/roles");
 
-const DIAS_DEL_GRAFICO = 14;
+const FECHAS_DEL_LISTADO = 7;
 const PRIORIDAD_ALTA = 3;
 const MAXIMO_PRIORITARIAS = 10;
 const ABIERTOS = [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO];
@@ -22,7 +22,7 @@ async function obtenerResumen() {
   ] = await Promise.all([
     dashboardDatos.total(),
     dashboardDatos.totalesPorEstado(),
-    dashboardDatos.totalesPorFecha(DIAS_DEL_GRAFICO),
+    dashboardDatos.totalesPorFecha(FECHAS_DEL_LISTADO),
     reportesDatos.totalesPorPrioridad(),
     reportesDatos.totalesPorArea(),
     dashboardDatos.totalesPorCategoria(),
@@ -49,7 +49,6 @@ async function obtenerResumen() {
     indicadores,
     porEstado,
     porFecha,
-    dias: DIAS_DEL_GRAFICO,
     porPrioridad,
     porArea,
     porCategoria,

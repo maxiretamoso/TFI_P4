@@ -48,7 +48,7 @@ const router = express.Router();
  *                       total:     { type: integer, example: 4 }
  *                 porFecha:
  *                   type: array
- *                   description: Días con incidencias creadas dentro del período
+ *                   description: Las últimas 7 fechas en que se crearon incidencias, la más reciente primero
  *                   items:
  *                     type: object
  *                     properties:
@@ -68,10 +68,6 @@ const router = express.Router();
  *                     properties:
  *                       area:  { type: string, example: Sistemas }
  *                       total: { type: integer, example: 9 }
- *                 dias:
- *                   type: integer
- *                   description: Cantidad de días que cubre porFecha
- *                   example: 14
  *                 porCategoria:
  *                   type: array
  *                   items:

@@ -13,14 +13,14 @@ function totalesPorEstado() {
     .then((r) => r.rows);
 }
 
-function totalesPorFecha(dias) {
+function totalesPorFecha(limite) {
   return pool
     .query(`SELECT to_char(creado::date, 'YYYY-MM-DD') AS fecha,
                    COUNT(*)::int AS total
             FROM incidencias
-            WHERE creado::date > current_date - $1::int
             GROUP BY creado::date
-            ORDER BY creado::date`, [dias])
+            ORDER BY creado::date DESC
+            LIMIT $1`, [limite])
     .then((r) => r.rows);
 }
 
