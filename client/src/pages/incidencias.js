@@ -1,6 +1,6 @@
 import { api } from "../api.js";
 import { leerUsuario } from "../session.js";
-import { PRIORIDADES, esc, fechaHora, cargando, mensajeError, badgeEstado } from "../ui.js";
+import { PRIORIDADES, esc, fechaHora, cargando, mensajeError, badgeEstado, paginacion } from "../ui.js";
 import {
   puedeCrearIncidencias,
   puedeCancelar,
@@ -10,9 +10,12 @@ import {
   esDeSistemas,
 } from "../permisos.js";
 
+const POR_PAGINA = 10;
+
 let contenedor = null;
 let usuario = null;
 let incidencias = [];
+let paginado = { pagina: 1, paginas: 1, total: 0, limite: POR_PAGINA };
 let articulos = [];
 let empleadosDeSistemas = [];
 let error = "";
@@ -58,6 +61,7 @@ export async function pintar(zona) {
   contenedor = zona;
   usuario = leerUsuario();
   incidencias = [];
+  paginado = { pagina: 1, paginas: 1, total: 0, limite: POR_PAGINA };
   articulos = [];
   empleadosDeSistemas = [];
   error = "";
@@ -70,24 +74,36 @@ export async function pintar(zona) {
       <h2>${tituloDeLista()}</h2>
       <div class="zona-error"></div>
       <div class="tabla-scroll zona-lista">${cargando("Cargando incidencias...")}</div>
+      <div class="zona-paginacion"></div>
     </div>`;
 
   contenedor.querySelector("#form-alta")?.addEventListener("submit", crear);
   contenedor.querySelector(".zona-lista").addEventListener("click", manejarAccion);
+  contenedor.querySelector(".zona-paginacion").addEventListener("click", cambiarPagina);
 
   await cargarDatos();
   pintarError();
   pintarLista();
 }
 
+function pedirIncidencias(pagina) {
+  return api.get(`/incidencias?pagina=${pagina}&limite=${POR_PAGINA}`);
+}
+
+function guardarPagina(respuesta) {
+  const { items, ...resto } = respuesta;
+  incidencias = items;
+  paginado = resto;
+}
+
 async function cargarDatos() {
   try {
-    const pedidos = [api.get("/incidencias?limite=100")];
+    const pedidos = [pedirIncidencias(1)];
     if (puedeCrearIncidencias(usuario)) pedidos.push(api.get("/articulos"));
     if (esDirector(usuario)) pedidos.push(api.get("/usuarios?rol=sistemas"));
 
     const respuestas = await Promise.all(pedidos);
-    incidencias = respuestas[0].items;
+    guardarPagina(respuestas[0]);
 
     if (puedeCrearIncidencias(usuario)) {
       articulos = respuestas[1];
@@ -190,6 +206,17 @@ function pintarLista() {
       </thead>
       <tbody>${cuerpo}</tbody>
     </table>`;
+  contenedor.querySelector(".zona-paginacion").innerHTML = paginacion(paginado);
+}
+
+async function cambiarPagina(evento) {
+  const boton = evento.target.closest("button[data-pagina]");
+  if (!boton || boton.disabled) return;
+
+  finalizandoId = null;
+  asignandoId = null;
+  await recargar(Number(boton.dataset.pagina));
+  contenedor.querySelector("h2:last-of-type")?.scrollIntoView({ block: "start" });
 }
 
 function manejarAccion(evento) {
@@ -222,9 +249,14 @@ function cerrarPaneles() {
   pintarLista();
 }
 
-async function recargar() {
+async function recargar(pagina = paginado.pagina) {
   try {
-    incidencias = (await api.get("/incidencias?limite=100")).items;
+    let respuesta = await pedirIncidencias(pagina);
+    // Si la página pedida quedó fuera de rango, muestra la última.
+    if (respuesta.items.length === 0 && respuesta.pagina > 1) {
+      respuesta = await pedirIncidencias(respuesta.paginas);
+    }
+    guardarPagina(respuesta);
     error = "";
   } catch (e) {
     error = e.message;
