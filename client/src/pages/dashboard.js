@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { esc, cargando, mensajeError, PRIORIDADES, ESTADOS } from "../ui.js";
+import { esc, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fechaHora } from "../ui.js";
 
 const COLOR_ESTADO = {
   [ESTADOS.PENDIENTE]: "var(--gim-pendiente)",
@@ -129,6 +129,90 @@ function graficoPorArea(resumen) {
   return barrasHorizontales(resumen.porArea.map((f) => ({ nombre: f.area, total: f.total })));
 }
 
+function graficoPorCategoria(resumen) {
+  return barrasHorizontales(
+    resumen.porCategoria.map((f) => ({ nombre: f.categoria, total: f.total }))
+  );
+}
+
+function tarjetasDeIndicadores(resumen) {
+  const resueltas = resumen.porEstado.find((f) => f.id_estado === ESTADOS.RESUELTA)?.total ?? 0;
+  const { abiertas, altas_abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
+  const indicadores = [
+    ["Abiertas", abiertas, "pendientes y en proceso"],
+    ["Alta sin resolver", altas_abiertas, "prioridad Alta abiertas"],
+    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas"],
+    ["Sin asignar", sin_asignar, "pendientes del Director"],
+    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "del total"],
+  ];
+  return `<div class="indicadores">${indicadores
+    .map(
+      ([titulo, valor, detalle]) => `<div class="indicador">
+        <span class="indicador-valor">${valor}</span>
+        <span class="indicador-titulo">${titulo}</span>
+        <span class="indicador-detalle">${detalle}</span>
+      </div>`
+    )
+    .join("")}</div>`;
+}
+
+function antiguedad(fecha) {
+  const dias = Math.floor((Date.now() - new Date(fecha)) / 86400000);
+  if (dias <= 0) return "hoy";
+  return dias === 1 ? "hace 1 día" : `hace ${dias} días`;
+}
+
+function tablaDePrioritarias(resumen) {
+  if (resumen.prioritarias.length === 0) {
+    return `<p class="texto-grafico">No hay incidencias de prioridad Alta abiertas.</p>`;
+  }
+  const filas = resumen.prioritarias
+    .map(
+      (inc) => `<tr>
+        <td>${inc.id_incidencia}</td>
+        <td>${esc(inc.articulo)}</td>
+        <td class="celda-pedido" title="${esc(inc.descripcion_pedido)}">${esc(inc.descripcion_pedido)}</td>
+        <td>${badgeEstado(inc)}</td>
+        <td>${esc(inc.asignado_nombres)} ${esc(inc.asignado_apellidos)}</td>
+        <td>${esc(inc.creador_nombres)} ${esc(inc.creador_apellidos)}</td>
+        <td title="${fechaHora(inc.creado)}">${antiguedad(inc.creado)}</td>
+      </tr>`
+    )
+    .join("");
+  return `<div class="tabla-scroll tabla-dashboard">
+    <table>
+      <thead><tr><th>#</th><th>Artículo</th><th>Pedido</th><th>Estado</th><th>Asignada a</th><th>Creada por</th><th>Antigüedad</th></tr></thead>
+      <tbody>${filas}</tbody>
+    </table>
+  </div>
+  <a class="enlace-ver-todas" href="#/">Ver todas las incidencias</a>`;
+}
+
+function cargaDeEmpleados(resumen) {
+  if (resumen.cargaPorEmpleado.length === 0) {
+    return `<p class="texto-grafico">No hay empleados de Sistemas activos.</p>`;
+  }
+
+  const maximo = Math.max(...resumen.cargaPorEmpleado.map((e) => e.abiertas + e.resueltas), 1);
+  const filas = resumen.cargaPorEmpleado
+    .map(
+      (e) => `<li>
+        <span class="barra-nombre carga-nombre">${esc(e.nombres)} ${esc(e.apellidos)}</span>
+        <span class="barra-pista carga-pista">
+          <span class="carga-abiertas" style="width: ${(e.abiertas / maximo) * 100}%"></span>
+          <span class="carga-resueltas" style="width: ${(e.resueltas / maximo) * 100}%"></span>
+        </span>
+        <span class="carga-numeros" title="abiertas / resueltas">${e.abiertas} / ${e.resueltas}</span>
+      </li>`
+    )
+    .join("");
+  return `<ul class="barras">${filas}</ul>
+    <p class="referencias-linea">
+      <span><span class="punto" style="background: var(--gim-pendiente)"></span>Abiertas</span>
+      <span><span class="punto" style="background: var(--gim-resuelta)"></span>Resueltas</span>
+    </p>`;
+}
+
 export async function pintar(zona) {
   zona.innerHTML = cargando("Cargando estadísticas...");
 
@@ -143,6 +227,7 @@ export async function pintar(zona) {
   zona.innerHTML = `
     <h2>Dashboard</h2>
     ${tarjetasDeTotales(resumen)}
+    ${tarjetasDeIndicadores(resumen)}
 
     <div class="grilla-graficos">
       <section class="tarjeta-grafico">
@@ -153,6 +238,14 @@ export async function pintar(zona) {
         <h3>Creadas por día (últimos ${resumen.dias} días)</h3>
         ${graficoPorDia(resumen)}
       </section>
+    </div>
+
+    <section class="tarjeta-grafico tarjeta-completa">
+      <h3>Incidencias prioritarias</h3>
+      ${tablaDePrioritarias(resumen)}
+    </section>
+
+    <div class="grilla-tres">
       <section class="tarjeta-grafico">
         <h3>Por prioridad</h3>
         ${graficoPorPrioridad(resumen)}
@@ -161,5 +254,14 @@ export async function pintar(zona) {
         <h3>Por área</h3>
         ${graficoPorArea(resumen)}
       </section>
-    </div>`;
+      <section class="tarjeta-grafico">
+        <h3>Por categoría</h3>
+        ${graficoPorCategoria(resumen)}
+      </section>
+    </div>
+
+    <section class="tarjeta-grafico tarjeta-completa">
+      <h3>Carga de trabajo del equipo de Sistemas</h3>
+      ${cargaDeEmpleados(resumen)}
+    </section>`;
 }
