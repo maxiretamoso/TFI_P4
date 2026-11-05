@@ -2,11 +2,11 @@ const pool = require("../db");
 
 function totalesPorEstado() {
   return pool
-    .query(`SELECT estados.descripcion AS estado, COUNT(*)::int AS total
+    .query(`SELECT estados.id_estado, estados.descripcion AS estado, COUNT(*)::int AS total
             FROM incidencias
             JOIN estados ON incidencias.id_estado = estados.id_estado
-            GROUP BY estados.descripcion
-            ORDER BY total DESC`)
+            GROUP BY estados.id_estado, estados.descripcion
+            ORDER BY estados.id_estado`)
     .then((r) => r.rows);
 }
 
@@ -35,6 +35,7 @@ function detalle() {
     .query(`SELECT incidencias.id_incidencia,
                    incidencias.creado,
                    incidencias.prioridad,
+                   incidencias.id_estado,
                    incidencias.descripcion_pedido,
                    articulos.descripcion AS articulo,
                    estados.descripcion   AS estado,
