@@ -28,7 +28,20 @@ const SELECCION = `
   ${DESDE}
 `;
 
-function armarFiltros({ creadoPor, asignadoA, estados, prioridad, buscar, desde, sinAsignar, pendiente, rolDirector }) {
+function armarFiltros({
+  creadoPor,
+  asignadoA,
+  estados,
+  prioridad,
+  buscar,
+  desde,
+  sinAsignar,
+  pendiente,
+  rolDirector,
+  area,
+  categoria,
+  asignado,
+}) {
   const condiciones = [];
   const valores = [];
 
@@ -58,6 +71,18 @@ function armarFiltros({ creadoPor, asignadoA, estados, prioridad, buscar, desde,
   if (desde) {
     valores.push(desde);
     condiciones.push(`incidencias.creado >= $${valores.length}::date`);
+  }
+  if (area) {
+    valores.push(area);
+    condiciones.push(`articulos.id_area = $${valores.length}`);
+  }
+  if (categoria) {
+    valores.push(categoria);
+    condiciones.push(`articulos.id_categoria = $${valores.length}`);
+  }
+  if (asignado) {
+    valores.push(asignado);
+    condiciones.push(`incidencias.asignado_a = $${valores.length}`);
   }
   if (sinAsignar) {
     valores.push(pendiente, rolDirector);

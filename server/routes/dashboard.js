@@ -66,6 +66,7 @@ const router = express.Router();
  *                   items:
  *                     type: object
  *                     properties:
+ *                       id_area: { type: integer, example: 3 }
  *                       area:  { type: string, example: Sistemas }
  *                       total: { type: integer, example: 9 }
  *                 porCategoria:
@@ -73,6 +74,7 @@ const router = express.Router();
  *                   items:
  *                     type: object
  *                     properties:
+ *                       id_categoria: { type: integer, example: 1 }
  *                       categoria: { type: string, example: Periféricos }
  *                       total:     { type: integer, example: 7 }
  *                 prioritarias:

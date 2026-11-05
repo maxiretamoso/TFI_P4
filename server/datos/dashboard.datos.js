@@ -83,11 +83,11 @@ function cargaPorEmpleado({ rolSistemas, abiertos, resuelta }) {
 
 function totalesPorCategoria() {
   return pool
-    .query(`SELECT categorias.descripcion AS categoria, COUNT(*)::int AS total
+    .query(`SELECT categorias.id_categoria, categorias.descripcion AS categoria, COUNT(*)::int AS total
             FROM incidencias
             JOIN articulos  ON incidencias.id_articulo = articulos.id_articulo
             JOIN categorias ON articulos.id_categoria = categorias.id_categoria
-            GROUP BY categorias.descripcion
+            GROUP BY categorias.id_categoria, categorias.descripcion
             ORDER BY total DESC`)
     .then((r) => r.rows);
 }

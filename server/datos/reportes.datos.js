@@ -21,11 +21,11 @@ function totalesPorPrioridad() {
 
 function totalesPorArea() {
   return pool
-    .query(`SELECT areas.descripcion AS area, COUNT(*)::int AS total
+    .query(`SELECT areas.id_area, areas.descripcion AS area, COUNT(*)::int AS total
             FROM incidencias
             JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
             JOIN areas     ON articulos.id_area = areas.id_area
-            GROUP BY areas.descripcion
+            GROUP BY areas.id_area, areas.descripcion
             ORDER BY total DESC`)
     .then((r) => r.rows);
 }
