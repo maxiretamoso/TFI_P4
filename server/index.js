@@ -41,7 +41,7 @@ const limitadorDeLogin = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
-  message: { error: "Demasiados intentos de inicio de sesión. Esperá unos minutos." },
+  message: { error: "Demasiados intentos fallidos. Probá de nuevo en 15 minutos." },
 });
 app.use(`${PREFIJO_API}/auth/login`, limitadorDeLogin);
 
