@@ -227,7 +227,7 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
     {
       titulo: "Por prioridad",
       columna: "Prioridad",
-      filas: [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })),
+      filas: porPrioridad.length ? [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })) : [],
       color: () => COLOR.verde,
     },
     {
