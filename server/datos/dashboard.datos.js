@@ -30,4 +30,74 @@ function total() {
     .then((r) => r.rows[0].total);
 }
 
-module.exports = { totalesPorEstado, totalesPorFecha, total };
+function indicadores({ abiertos, prioridadAlta, pendiente, rolDirector }) {
+  return pool
+    .query(`SELECT COUNT(*) FILTER (WHERE id_estado = ANY($1))::int AS abiertas,
+                   COUNT(*) FILTER (WHERE id_estado = ANY($1) AND prioridad = $2)::int AS altas_abiertas,
+                   COUNT(*) FILTER (WHERE creado >= now() - interval '7 days')::int AS ultimos_7_dias,
+                   COUNT(*) FILTER (
+                     WHERE id_estado = $3
+                       AND asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $4)
+                   )::int AS sin_asignar
+            FROM incidencias`, [abiertos, prioridadAlta, pendiente, rolDirector])
+    .then((r) => r.rows[0]);
+}
+
+function prioritarias({ prioridad, abiertos, limite }) {
+  return pool
+    .query(`SELECT incidencias.id_incidencia,
+                   incidencias.descripcion_pedido,
+                   incidencias.creado,
+                   incidencias.id_estado,
+                   estados.descripcion   AS estado,
+                   articulos.descripcion AS articulo,
+                   asignado.nombres      AS asignado_nombres,
+                   asignado.apellidos    AS asignado_apellidos,
+                   creador.nombres       AS creador_nombres,
+                   creador.apellidos     AS creador_apellidos
+            FROM incidencias
+            JOIN estados   ON incidencias.id_estado = estados.id_estado
+            JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
+            JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
+            JOIN usuarios AS creador  ON incidencias.creado_por = creador.id_usuario
+            WHERE incidencias.prioridad = $1 AND incidencias.id_estado = ANY($2)
+            ORDER BY incidencias.creado
+            LIMIT $3`, [prioridad, abiertos, limite])
+    .then((r) => r.rows);
+}
+
+function cargaPorEmpleado({ rolSistemas, abiertos, resuelta }) {
+  return pool
+    .query(`SELECT usuarios.id_usuario,
+                   usuarios.nombres,
+                   usuarios.apellidos,
+                   COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = ANY($2))::int AS abiertas,
+                   COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = $3)::int AS resueltas
+            FROM usuarios
+            LEFT JOIN incidencias ON incidencias.asignado_a = usuarios.id_usuario
+            WHERE usuarios.rol = $1 AND usuarios.activo = 1
+            GROUP BY usuarios.id_usuario, usuarios.nombres, usuarios.apellidos
+            ORDER BY abiertas DESC, usuarios.apellidos`, [rolSistemas, abiertos, resuelta])
+    .then((r) => r.rows);
+}
+
+function totalesPorCategoria() {
+  return pool
+    .query(`SELECT categorias.descripcion AS categoria, COUNT(*)::int AS total
+            FROM incidencias
+            JOIN articulos  ON incidencias.id_articulo = articulos.id_articulo
+            JOIN categorias ON articulos.id_categoria = categorias.id_categoria
+            GROUP BY categorias.descripcion
+            ORDER BY total DESC`)
+    .then((r) => r.rows);
+}
+
+module.exports = {
+  totalesPorEstado,
+  totalesPorFecha,
+  total,
+  indicadores,
+  prioritarias,
+  cargaPorEmpleado,
+  totalesPorCategoria,
+};

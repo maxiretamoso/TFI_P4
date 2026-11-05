@@ -17,7 +17,7 @@ const router = express.Router();
  * @swagger
  * /dashboard:
  *   get:
- *     summary: Estadísticas del panel del Director
+ *     summary: Estadísticas e incidencias prioritarias del panel del Director
  *     tags: [Dashboard]
  *     security: [{ bearerAuth: [] }]
  *     responses:
@@ -31,6 +31,13 @@ const router = express.Router();
  *                 total:
  *                   type: integer
  *                   example: 18
+ *                 indicadores:
+ *                   type: object
+ *                   properties:
+ *                     abiertas:       { type: integer, description: Pendientes más en proceso, example: 6 }
+ *                     altas_abiertas: { type: integer, description: Abiertas de prioridad Alta, example: 2 }
+ *                     ultimos_7_dias: { type: integer, description: Creadas en los últimos 7 días, example: 3 }
+ *                     sin_asignar:    { type: integer, description: Pendientes todavía a cargo del Director, example: 1 }
  *                 porEstado:
  *                   type: array
  *                   items:
@@ -65,6 +72,40 @@ const router = express.Router();
  *                   type: integer
  *                   description: Cantidad de días que cubre porFecha
  *                   example: 14
+ *                 porCategoria:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       categoria: { type: string, example: Periféricos }
+ *                       total:     { type: integer, example: 7 }
+ *                 prioritarias:
+ *                   type: array
+ *                   description: Hasta 10 incidencias abiertas de prioridad Alta, la más antigua primero
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id_incidencia:      { type: integer }
+ *                       descripcion_pedido: { type: string }
+ *                       creado:             { type: string, format: date-time }
+ *                       id_estado:          { type: integer }
+ *                       estado:             { type: string }
+ *                       articulo:           { type: string }
+ *                       asignado_nombres:   { type: string }
+ *                       asignado_apellidos: { type: string }
+ *                       creador_nombres:    { type: string }
+ *                       creador_apellidos:  { type: string }
+ *                 cargaPorEmpleado:
+ *                   type: array
+ *                   description: Incidencias abiertas y resueltas de cada empleado de Sistemas
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id_usuario: { type: integer }
+ *                       nombres:    { type: string }
+ *                       apellidos:  { type: string }
+ *                       abiertas:   { type: integer }
+ *                       resueltas:  { type: integer }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  */
