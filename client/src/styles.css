@@ -271,6 +271,23 @@ h3 {
     background-color: var(--gim-verde-suave);
 }
 
+.enlace-usuario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 8px;
+    margin: -4px -8px;
+    border-radius: 10px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.enlace-usuario:hover,
+.enlace-usuario:focus-visible {
+    background-color: var(--gim-verde-suave);
+    color: inherit;
+}
+
 .usuario-actual {
     display: flex;
     flex-direction: column;

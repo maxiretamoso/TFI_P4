@@ -72,11 +72,13 @@ function estructuraHtml(rutaActual, usuario) {
         <h1 class="titulo-app">${TITULO}</h1>
         <div class="barra-derecha">
           ${botonTema()}
-          ${avatarHtml(usuario, "avatar-barra")}
-          <span class="usuario-actual">
-            <span class="usuario-nombre">${esc(usuario.nombres)} ${esc(usuario.apellidos)}</span>
-            <span class="usuario-rol">${esc(NOMBRES_ROL[usuario.rol] ?? "")}</span>
-          </span>
+          <a class="enlace-usuario" href="#/perfil" title="Ir a Mi perfil">
+            ${avatarHtml(usuario, "avatar-barra")}
+            <span class="usuario-actual">
+              <span class="usuario-nombre">${esc(usuario.nombres)} ${esc(usuario.apellidos)}</span>
+              <span class="usuario-rol">${esc(NOMBRES_ROL[usuario.rol] ?? "")}</span>
+            </span>
+          </a>
         </div>
       </header>
       <main id="contenido-principal"></main>
