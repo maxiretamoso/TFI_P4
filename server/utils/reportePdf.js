@@ -36,10 +36,6 @@ const MARGEN = 45;
 const ALTO_FILA = 24;
 const SEPARACION_COLUMNAS = 24;
 
-function porcentaje(parte, total) {
-  return total > 0 ? Math.round((parte / total) * 100) : 0;
-}
-
 function anchoUtil(doc) {
   return doc.page.width - MARGEN * 2;
 }
@@ -138,17 +134,16 @@ function celdaConPunto(color, texto) {
   };
 }
 
-function tablaDeTotales(doc, { titulo: textoTitulo, columna, filas, total, color, x, ancho }) {
+function tablaDeTotales(doc, { titulo: textoTitulo, columna, filas, color, x, ancho }) {
   const yInicio = doc.y;
   titulo(doc, textoTitulo, { x, ancho, tamanio: 11, espacioAntes: 0 });
   tabla(
     doc,
     [
-      { titulo: columna, ancho: 0.52, dibujar: celdaConPunto(color, (f) => f.nombre) },
-      { titulo: "Cantidad", ancho: 0.26, campo: "total", alinear: "right" },
-      { titulo: "%", ancho: 0.22, campo: "porcentaje", alinear: "right" },
+      { titulo: columna, ancho: 0.64, dibujar: celdaConPunto(color, (f) => f.nombre) },
+      { titulo: "Cantidad", ancho: 0.36, campo: "total", alinear: "right" },
     ],
-    filas.map((f) => ({ ...f, porcentaje: `${porcentaje(f.total, total)}%` })),
+    filas,
     { x, ancho }
   );
   const yFin = doc.y;
@@ -156,17 +151,16 @@ function tablaDeTotales(doc, { titulo: textoTitulo, columna, filas, total, color
   return yFin;
 }
 
-// Dos tablas de totales lado a lado; deja el cursor debajo de la más alta.
-function totalesEnColumnas(doc, izquierda, derecha) {
-  const ancho = (anchoUtil(doc) - SEPARACION_COLUMNAS) / 2;
-  const filas = Math.max(izquierda.filas.length, derecha?.filas.length ?? 0);
+// Tablas de totales una al lado de la otra; deja el cursor debajo de la más alta.
+function totalesEnFila(doc, bloques) {
+  const ancho = (anchoUtil(doc) - SEPARACION_COLUMNAS * (bloques.length - 1)) / bloques.length;
+  const filas = Math.max(...bloques.map((b) => b.filas.length));
   asegurarEspacio(doc, 40 + (filas + 1) * ALTO_FILA);
 
-  const finIzquierda = tablaDeTotales(doc, { ...izquierda, x: MARGEN, ancho });
-  const finDerecha = derecha
-    ? tablaDeTotales(doc, { ...derecha, x: MARGEN + ancho + SEPARACION_COLUMNAS, ancho })
-    : finIzquierda;
-  doc.y = Math.max(finIzquierda, finDerecha) + 22;
+  const finales = bloques.map((bloque, i) =>
+    tablaDeTotales(doc, { ...bloque, x: MARGEN + i * (ancho + SEPARACION_COLUMNAS), ancho })
+  );
+  doc.y = Math.max(...finales) + 22;
   doc.x = MARGEN;
 }
 
@@ -191,7 +185,6 @@ function pieDePagina(doc) {
 
 function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) {
   const doc = new PDFDocument({ margin: MARGEN, size: "A4", bufferPages: true });
-  const total = detalle.length;
 
   encabezado(doc);
 
@@ -222,30 +215,26 @@ function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) 
   titulo(doc, "Resumen", { espacioAntes: 36 });
   doc.y += 6;
   const porId = new Map(porPrioridad.map((f) => [f.prioridad, f.total]));
-  totalesEnColumnas(
-    doc,
+  totalesEnFila(doc, [
     {
       titulo: "Por estado",
       columna: "Estado",
       filas: porEstado.map((f) => ({ nombre: f.estado, total: f.total, id_estado: f.id_estado })),
-      total,
       color: (f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde,
     },
     {
       titulo: "Por prioridad",
       columna: "Prioridad",
       filas: [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })),
-      total,
       color: () => COLOR.verde,
-    }
-  );
-  totalesEnColumnas(doc, {
-    titulo: "Por área del artículo",
-    columna: "Área",
-    filas: porArea.map((f) => ({ nombre: f.area, total: f.total })),
-    total,
-    color: () => COLOR.verde,
-  });
+    },
+    {
+      titulo: "Por área",
+      columna: "Área",
+      filas: porArea.map((f) => ({ nombre: f.area, total: f.total })),
+      color: () => COLOR.verde,
+    },
+  ]);
 
   pieDePagina(doc);
   return doc;
