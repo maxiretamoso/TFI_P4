@@ -32,7 +32,7 @@ async function pedir(metodo, ruta, cuerpo) {
   try {
     respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
   } catch {
-    throw new Error("No se pudo conectar con el servidor. ¿Está levantada la API?");
+    throw new Error("No se pudo conectar con el servidor. Probá de nuevo en unos minutos.");
   }
 
   if (respuesta.status === 401 && token && ruta !== "/auth/login") {
@@ -57,7 +57,7 @@ async function descargar(ruta) {
   try {
     respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
   } catch {
-    throw new Error("No se pudo conectar con el servidor. ¿Está levantada la API?");
+    throw new Error("No se pudo conectar con el servidor. Probá de nuevo en unos minutos.");
   }
 
   if (respuesta.status === 401 && token) {
