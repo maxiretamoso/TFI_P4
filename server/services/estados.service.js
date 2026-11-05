@@ -11,26 +11,4 @@ async function obtenerEstadoPorId(id) {
   return estado;
 }
 
-function crearEstado(descripcion) {
-  return estadosDatos.insertar(descripcion);
-}
-
-async function actualizarEstado(id, descripcion) {
-  const estado = await estadosDatos.actualizar(id, descripcion);
-  if (!estado) throw crearError(404, "Estado no encontrado");
-  return estado;
-}
-
-async function desactivarEstado(id) {
-  const estado = await estadosDatos.desactivar(id);
-  if (!estado) throw crearError(404, "Estado no encontrado");
-  return estado;
-}
-
-module.exports = {
-  listarEstados,
-  obtenerEstadoPorId,
-  crearEstado,
-  actualizarEstado,
-  desactivarEstado,
-};
+module.exports = { listarEstados, obtenerEstadoPorId };

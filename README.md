@@ -93,6 +93,10 @@ database/
 
 **Autorización en el servidor, no en la interfaz.** El cliente esconde los botones que el usuario no puede usar, pero quien decide es el middleware `verificarRol` de cada ruta y las reglas de cada servicio. Pedir un endpoint prohibido con el token de otro rol devuelve 403 aunque el botón no estuviera en pantalla.
 
+**Estados de solo lectura.** Los cuatro estados (Pendiente, En Proceso, Resuelta, Cancelada) se consultan pero no se crean, editan ni eliminan: todo el flujo de una incidencia depende de ellos.
+
+**Protecciones en usuarios.** Nadie puede cambiarse su propio rol ni darse de baja a sí mismo, y un empleado de Sistemas con incidencias abiertas asignadas no puede ser dado de baja ni cambiar de rol hasta que se reasignen.
+
 **Soft deletes.** Ninguna baja borra filas: se marca `activo = 0` y los listados filtran por `activo = 1`. Así las incidencias viejas siguen mostrando el artículo o la categoría con la que se crearon.
 
 **Transacciones.** Crear una incidencia, asignarla, finalizarla y cancelarla escriben en dos tablas (`incidencias` y `incidencias_estados`). Las dos escrituras van en la misma transacción: o se confirman las dos o no se confirma ninguna, y el historial nunca queda desfasado del estado actual.
@@ -135,7 +139,7 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | GET | `/reportes/incidencias` | Director |
 | GET | `/categorias`, `/articulos`, `/areas`, `/estados` | autenticado |
 | POST, PUT, DELETE | `/categorias`, `/articulos` | Sistemas y Director |
-| POST, PUT, DELETE | `/areas`, `/estados` | Director |
+| POST, PUT, DELETE | `/areas` | Director |
 | BREAD | `/usuarios` | Director (cada uno puede ver y editar su propio perfil) |
 | PATCH | `/usuarios/{id}/avatar` | el propio usuario o el Director |
 | GET | `/avatares` | autenticado |

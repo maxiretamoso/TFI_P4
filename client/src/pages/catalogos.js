@@ -33,14 +33,6 @@ const CATALOGOS = {
     columnas: [["descripcion", "Descripción"]],
     soloDirector: true,
   },
-  estados: {
-    titulo: "Estados",
-    singular: "estado",
-    ruta: "/estados",
-    campoId: "id_estado",
-    columnas: [["descripcion", "Descripción"]],
-    soloDirector: true,
-  },
 };
 
 let contenedor = null;
