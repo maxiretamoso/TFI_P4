@@ -166,7 +166,95 @@ h3 {
     gap: 14px;
 }
 
-.boton-tema,
+.interruptor-tema {
+    position: relative;
+    width: 64px;
+    height: 32px;
+    flex-shrink: 0;
+    padding: 0;
+    border: 1px solid var(--gim-borde);
+    border-radius: 16px;
+    background-color: #dfeaf7;
+    transition: background-color 0.35s ease;
+}
+
+.interruptor-tema[aria-checked="true"] {
+    background-color: #1f2a3d;
+    border-color: #33415a;
+}
+
+.interruptor-tema:focus-visible {
+    outline: 3px solid var(--gim-verde);
+    outline-offset: 2px;
+}
+
+.interruptor-perilla {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.35s cubic-bezier(0.4, 0.2, 0.2, 1.2), background-color 0.35s;
+}
+
+.interruptor-tema[aria-checked="true"] .interruptor-perilla {
+    transform: translateX(32px);
+    background-color: #33415a;
+}
+
+.interruptor-icono {
+    position: absolute;
+    inset: 4px;
+    display: flex;
+    transition: opacity 0.3s, transform 0.35s;
+}
+
+.interruptor-icono svg {
+    width: 100%;
+    height: 100%;
+}
+
+.icono-sol {
+    color: #e0a100;
+}
+
+.icono-sol svg {
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.icono-luna {
+    color: #f2e7b6;
+    opacity: 0;
+    transform: rotate(-90deg);
+}
+
+.icono-luna svg {
+    fill: currentColor;
+}
+
+.interruptor-tema[aria-checked="true"] .icono-sol {
+    opacity: 0;
+    transform: rotate(90deg);
+}
+
+.interruptor-tema[aria-checked="true"] .icono-luna {
+    opacity: 1;
+    transform: rotate(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .interruptor-tema,
+    .interruptor-perilla,
+    .interruptor-icono {
+        transition: none;
+    }
+}
+
 .boton-menu {
     width: 36px;
     height: 36px;
@@ -179,7 +267,6 @@ h3 {
     flex-shrink: 0;
 }
 
-.boton-tema:hover,
 .boton-menu:hover {
     background-color: var(--gim-verde-suave);
 }
