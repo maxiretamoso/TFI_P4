@@ -1,7 +1,7 @@
-const { AVATARES_PREDEFINIDOS, archivoDelPredefinido } = require("../config/avatares");
+import { AVATARES_PREDEFINIDOS, archivoDelPredefinido } from "../config/avatares.js";
 
 function listarPredefinidos() {
   return AVATARES_PREDEFINIDOS.map((id) => ({ id, avatar: archivoDelPredefinido(id) }));
 }
 
-module.exports = { listarPredefinidos };
+export { listarPredefinidos };

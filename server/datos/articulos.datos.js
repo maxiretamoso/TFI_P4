@@ -1,4 +1,4 @@
-const pool = require("../db");
+import pool from "../db/index.js";
 
 function listar() {
   return pool
@@ -46,4 +46,4 @@ function desactivar(id) {
     .then((r) => r.rows[0] || null);
 }
 
-module.exports = { listar, buscarPorId, insertar, actualizar, desactivar };
+export { listar, buscarPorId, insertar, actualizar, desactivar };

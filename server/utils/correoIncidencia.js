@@ -1,7 +1,7 @@
-const path = require("path");
+import path from "path";
 
 // Los clientes de correo ignoran <style> y CSS moderno: todo va en línea y con tablas.
-const LOGO = path.join(__dirname, "..", "assets", "logo-muni.png");
+const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 const CID_LOGO = "logo-municipalidad";
 const PRIORIDADES = { 1: "Baja", 2: "Media", 3: "Alta" };
 
@@ -90,4 +90,4 @@ function armarCorreoDeCierre({ incidencia, estado, resolucion }) {
   };
 }
 
-module.exports = { armarCorreoDeCierre };
+export { armarCorreoDeCierre };

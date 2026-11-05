@@ -1,9 +1,9 @@
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-const { crearError } = require("./httpError");
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { crearError } from "./httpError.js";
 
-const uploadDir = path.join(__dirname, "..", "publico", "avatares");
+const uploadDir = path.join(import.meta.dirname, "..", "publico", "avatares");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const EXTENSIONES = [".jpg", ".jpeg", ".png", ".webp"];
@@ -28,4 +28,4 @@ const uploadAvatar = multer({
   },
 });
 
-module.exports = { uploadAvatar, uploadDir };
+export { uploadAvatar, uploadDir };

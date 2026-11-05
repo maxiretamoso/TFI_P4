@@ -1,4 +1,4 @@
-const healthService = require("../services/health.service");
+import * as healthService from "../services/health.service.js";
 
 async function verificarSalud(req, res) {
   try {
@@ -19,4 +19,4 @@ async function verificarSalud(req, res) {
   }
 }
 
-module.exports = { verificarSalud };
+export { verificarSalud };

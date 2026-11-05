@@ -1,6 +1,6 @@
-const reportesService = require("../services/reportes.service");
-const { crearReporteIncidencias } = require("../utils/reportePdf");
-const { responderSiHayErroresDeValidacion } = require("../utils/validar");
+import * as reportesService from "../services/reportes.service.js";
+import { crearReporteIncidencias } from "../utils/reportePdf.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
 
 async function generarReporteIncidencias(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
@@ -19,4 +19,4 @@ async function generarReporteIncidencias(req, res, next) {
   }
 }
 
-module.exports = { generarReporteIncidencias };
+export { generarReporteIncidencias };

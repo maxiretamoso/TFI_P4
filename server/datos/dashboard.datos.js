@@ -1,4 +1,4 @@
-const pool = require("../db");
+import pool from "../db/index.js";
 
 function totalesPorEstado() {
   return pool
@@ -92,7 +92,7 @@ function totalesPorCategoria() {
     .then((r) => r.rows);
 }
 
-module.exports = {
+export {
   totalesPorEstado,
   totalesPorFecha,
   total,

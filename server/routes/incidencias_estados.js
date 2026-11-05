@@ -1,8 +1,8 @@
-const express = require("express");
-const verificarToken = require("../middlewares/verificarToken");
-const verificarRol = require("../middlewares/verificarRol");
-const historialController = require("../controllers/incidencias_estados.controller");
-const { ROLES } = require("../config/roles");
+import express from "express";
+import verificarToken from "../middlewares/verificarToken.js";
+import verificarRol from "../middlewares/verificarRol.js";
+import * as historialController from "../controllers/incidencias_estados.controller.js";
+import { ROLES } from "../config/roles.js";
 
 const router = express.Router();
 
@@ -28,4 +28,4 @@ const router = express.Router();
  */
 router.get("/", verificarToken, verificarRol(ROLES.DIRECTOR), historialController.listar);
 
-module.exports = router;
+export default router;

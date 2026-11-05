@@ -1,5 +1,5 @@
-const areasDatos = require("../datos/areas.datos");
-const { crearError } = require("../utils/httpError");
+import * as areasDatos from "../datos/areas.datos.js";
+import { crearError } from "../utils/httpError.js";
 
 function listarAreas() {
   return areasDatos.listar();
@@ -27,4 +27,4 @@ async function desactivarArea(id) {
   return area;
 }
 
-module.exports = { listarAreas, obtenerAreaPorId, crearArea, actualizarArea, desactivarArea };
+export { listarAreas, obtenerAreaPorId, crearArea, actualizarArea, desactivarArea };

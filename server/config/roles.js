@@ -5,4 +5,4 @@ const ROLES = Object.freeze({
   EMPLEADO_MUNICIPAL: 3,
 });
 
-module.exports = { ROLES };
+export { ROLES };

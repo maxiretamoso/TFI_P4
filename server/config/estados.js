@@ -6,4 +6,4 @@ const ESTADOS = Object.freeze({
   CANCELADA: 4,
 });
 
-module.exports = { ESTADOS };
+export { ESTADOS };

@@ -1,9 +1,9 @@
-const express = require("express");
-const { body, param, query } = require("express-validator");
-const verificarToken = require("../middlewares/verificarToken");
-const verificarRol = require("../middlewares/verificarRol");
-const incidenciasController = require("../controllers/incidencias.controller");
-const { ROLES } = require("../config/roles");
+import express from "express";
+import { body, param, query } from "express-validator";
+import verificarToken from "../middlewares/verificarToken.js";
+import verificarRol from "../middlewares/verificarRol.js";
+import * as incidenciasController from "../controllers/incidencias.controller.js";
+import { ROLES } from "../config/roles.js";
 
 const router = express.Router();
 
@@ -253,4 +253,4 @@ router.patch(
   incidenciasController.cancelar
 );
 
-module.exports = router;
+export default router;

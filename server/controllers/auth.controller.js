@@ -1,5 +1,5 @@
-const authService = require("../services/auth.service");
-const { responderSiHayErroresDeValidacion } = require("../utils/validar");
+import * as authService from "../services/auth.service.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
 
 async function login(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
@@ -25,4 +25,4 @@ async function cambiarContrasenia(req, res, next) {
   }
 }
 
-module.exports = { login, cambiarContrasenia };
+export { login, cambiarContrasenia };

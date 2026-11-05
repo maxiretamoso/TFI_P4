@@ -1,7 +1,7 @@
-const express = require("express");
-const { param } = require("express-validator");
-const verificarToken = require("../middlewares/verificarToken");
-const estadosController = require("../controllers/estados.controller");
+import express from "express";
+import { param } from "express-validator";
+import verificarToken from "../middlewares/verificarToken.js";
+import * as estadosController from "../controllers/estados.controller.js";
 
 const router = express.Router();
 
@@ -55,4 +55,4 @@ router.get("/", verificarToken, estadosController.listar);
  */
 router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], estadosController.obtenerPorId);
 
-module.exports = router;
+export default router;

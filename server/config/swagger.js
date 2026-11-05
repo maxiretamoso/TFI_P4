@@ -1,4 +1,4 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+import swaggerJsdoc from "swagger-jsdoc";
 
 const PREFIJO_API = "/api/v1";
 
@@ -93,7 +93,7 @@ const definicion = {
 
 const especificacion = swaggerJsdoc({
   definition: definicion,
-  apis: [`${__dirname}/../routes/*.js`],
+  apis: [`${import.meta.dirname}/../routes/*.js`],
 });
 
-module.exports = { especificacion, PREFIJO_API };
+export { especificacion, PREFIJO_API };

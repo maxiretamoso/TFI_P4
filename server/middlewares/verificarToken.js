@@ -1,5 +1,5 @@
-const jwt = require("jsonwebtoken");
-const authService = require("../services/auth.service");
+import jwt from "jsonwebtoken";
+import * as authService from "../services/auth.service.js";
 
 async function verificarToken(req, res, next) {
   const [tipo, token] = (req.headers.authorization ?? "").split(" ");
@@ -23,4 +23,4 @@ async function verificarToken(req, res, next) {
   }
 }
 
-module.exports = verificarToken;
+export default verificarToken;

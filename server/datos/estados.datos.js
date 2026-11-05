@@ -1,4 +1,4 @@
-const pool = require("../db");
+import pool from "../db/index.js";
 
 function listar() {
   return pool
@@ -15,4 +15,4 @@ function buscarPorId(id) {
     .then((r) => r.rows[0] || null);
 }
 
-module.exports = { listar, buscarPorId };
+export { listar, buscarPorId };

@@ -1,9 +1,9 @@
-const express = require("express");
-const { body, param } = require("express-validator");
-const verificarToken = require("../middlewares/verificarToken");
-const verificarRol = require("../middlewares/verificarRol");
-const articulosController = require("../controllers/articulos.controller");
-const { ROLES } = require("../config/roles");
+import express from "express";
+import { body, param } from "express-validator";
+import verificarToken from "../middlewares/verificarToken.js";
+import verificarRol from "../middlewares/verificarRol.js";
+import * as articulosController from "../controllers/articulos.controller.js";
+import { ROLES } from "../config/roles.js";
 
 const router = express.Router();
 
@@ -133,4 +133,4 @@ router.delete(
   articulosController.eliminar
 );
 
-module.exports = router;
+export default router;

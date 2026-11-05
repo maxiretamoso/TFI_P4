@@ -1,11 +1,11 @@
-const express = require("express");
-const { body, param, query } = require("express-validator");
-const verificarToken = require("../middlewares/verificarToken");
-const verificarRol = require("../middlewares/verificarRol");
-const usuariosController = require("../controllers/usuarios.controller");
-const { uploadAvatar } = require("../utils/avatarUpload");
-const { ROLES } = require("../config/roles");
-const { AVATARES_PREDEFINIDOS } = require("../config/avatares");
+import express from "express";
+import { body, param, query } from "express-validator";
+import verificarToken from "../middlewares/verificarToken.js";
+import verificarRol from "../middlewares/verificarRol.js";
+import * as usuariosController from "../controllers/usuarios.controller.js";
+import { uploadAvatar } from "../utils/avatarUpload.js";
+import { ROLES } from "../config/roles.js";
+import { AVATARES_PREDEFINIDOS } from "../config/avatares.js";
 
 const router = express.Router();
 
@@ -201,4 +201,4 @@ router.patch(
   usuariosController.subirAvatar
 );
 
-module.exports = router;
+export default router;

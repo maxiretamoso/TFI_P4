@@ -1,4 +1,4 @@
-const { validationResult } = require("express-validator");
+import { validationResult } from "express-validator";
 
 // Devuelve true si ya respondió con 400; el controlador debe cortar ahí.
 function responderSiHayErroresDeValidacion(req, res) {
@@ -10,4 +10,4 @@ function responderSiHayErroresDeValidacion(req, res) {
   return false;
 }
 
-module.exports = { responderSiHayErroresDeValidacion };
+export { responderSiHayErroresDeValidacion };

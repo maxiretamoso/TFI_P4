@@ -1,10 +1,10 @@
-const express = require("express");
-const { query } = require("express-validator");
-const verificarToken = require("../middlewares/verificarToken");
-const verificarRol = require("../middlewares/verificarRol");
-const reportesController = require("../controllers/reportes.controller");
-const { ROLES } = require("../config/roles");
-const { FILTROS_DE_REPORTE } = require("../services/reportes.service");
+import express from "express";
+import { query } from "express-validator";
+import verificarToken from "../middlewares/verificarToken.js";
+import verificarRol from "../middlewares/verificarRol.js";
+import * as reportesController from "../controllers/reportes.controller.js";
+import { ROLES } from "../config/roles.js";
+import { FILTROS_DE_REPORTE } from "../services/reportes.service.js";
 
 const router = express.Router();
 
@@ -46,4 +46,4 @@ router.get(
   reportesController.generarReporteIncidencias
 );
 
-module.exports = router;
+export default router;

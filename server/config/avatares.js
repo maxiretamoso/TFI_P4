@@ -12,4 +12,4 @@ function esPredefinido(archivo) {
   return Boolean(archivo) && archivo.startsWith(`${CARPETA_PREDEFINIDOS}/`);
 }
 
-module.exports = { AVATARES_PREDEFINIDOS, archivoDelPredefinido, esPredefinido };
+export { AVATARES_PREDEFINIDOS, archivoDelPredefinido, esPredefinido };

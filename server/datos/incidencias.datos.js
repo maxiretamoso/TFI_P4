@@ -1,5 +1,5 @@
-const pool = require("../db");
-const { conTransaccion } = require("../utils/transaccion");
+import pool from "../db/index.js";
+import { conTransaccion } from "../utils/transaccion.js";
 
 const DESDE = `
   FROM incidencias
@@ -204,4 +204,4 @@ function contarAsignadasEnEstados(idUsuario, estados) {
     .then((r) => r.rows[0].total);
 }
 
-module.exports = { listar, buscarPorId, insertar, cambiarEstado, asignar, contarAsignadasEnEstados };
+export { listar, buscarPorId, insertar, cambiarEstado, asignar, contarAsignadasEnEstados };

@@ -1,7 +1,7 @@
-const articulosDatos = require("../datos/articulos.datos");
-const areasDatos = require("../datos/areas.datos");
-const categoriasDatos = require("../datos/categorias.datos");
-const { crearError } = require("../utils/httpError");
+import * as articulosDatos from "../datos/articulos.datos.js";
+import * as areasDatos from "../datos/areas.datos.js";
+import * as categoriasDatos from "../datos/categorias.datos.js";
+import { crearError } from "../utils/httpError.js";
 
 async function validarReferencias(id_area, id_categoria) {
   const [area, categoria] = await Promise.all([
@@ -45,7 +45,7 @@ async function desactivarArticulo(id) {
   return articulo;
 }
 
-module.exports = {
+export {
   listarArticulos,
   obtenerArticuloPorId,
   crearArticulo,

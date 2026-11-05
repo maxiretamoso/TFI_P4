@@ -1,5 +1,5 @@
-require("dotenv").config();
-const { Pool } = require("pg");
+import "dotenv/config";
+import { Pool } from "pg";
 
 const pool = new Pool({
   host: process.env.DB_HOST,
@@ -17,4 +17,4 @@ pool.on("error", (err) => {
   console.error("Error en el pool de conexiones:", err);
 });
 
-module.exports = pool;
+export default pool;

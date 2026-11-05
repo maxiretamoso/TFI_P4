@@ -1,5 +1,5 @@
-const estadosService = require("../services/estados.service");
-const { responderSiHayErroresDeValidacion } = require("../utils/validar");
+import * as estadosService from "../services/estados.service.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
 
 async function listar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
@@ -20,4 +20,4 @@ async function obtenerPorId(req, res, next) {
   }
 }
 
-module.exports = { listar, obtenerPorId };
+export { listar, obtenerPorId };

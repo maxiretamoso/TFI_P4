@@ -1,15 +1,30 @@
-require("dotenv").config();
-require("./utils/validarEntorno")();
+import "dotenv/config";
 
-const path = require("path");
-const express = require("express");
-const cors = require("cors");
-const morgan = require("morgan");
-const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
-const swaggerUi = require("swagger-ui-express");
+import path from "path";
+import express from "express";
+import cors from "cors";
+import morgan from "morgan";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express";
 
-const { especificacion, PREFIJO_API } = require("./config/swagger");
+import { especificacion, PREFIJO_API } from "./config/swagger.js";
+import validarEntorno from "./utils/validarEntorno.js";
+import rutasAuth from "./routes/auth.js";
+import rutasHealth from "./routes/health.js";
+import rutasMe from "./routes/me.js";
+import rutasAreas from "./routes/areas.js";
+import rutasCategorias from "./routes/categorias.js";
+import rutasEstados from "./routes/estados.js";
+import rutasArticulos from "./routes/articulos.js";
+import rutasUsuarios from "./routes/usuarios.js";
+import rutasAvatares from "./routes/avatares.js";
+import rutasIncidencias from "./routes/incidencias.js";
+import rutasIncidenciasEstados from "./routes/incidencias_estados.js";
+import rutasDashboard from "./routes/dashboard.js";
+import rutasReportes from "./routes/reportes.js";
+
+validarEntorno();
 
 const app = express();
 
@@ -33,7 +48,7 @@ app.use(
 app.use(express.json());
 app.use(morgan("dev"));
 
-app.use("/publico", express.static(path.join(__dirname, "publico")));
+app.use("/publico", express.static(path.join(import.meta.dirname, "publico")));
 
 const limitadorDeLogin = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -48,19 +63,19 @@ app.use(`${PREFIJO_API}/auth/login`, limitadorDeLogin);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(especificacion));
 app.get("/api-docs.json", (req, res) => res.json(especificacion));
 
-app.use(`${PREFIJO_API}/auth`, require("./routes/auth"));
-app.use(`${PREFIJO_API}/health`, require("./routes/health"));
-app.use(`${PREFIJO_API}/me`, require("./routes/me"));
-app.use(`${PREFIJO_API}/areas`, require("./routes/areas"));
-app.use(`${PREFIJO_API}/categorias`, require("./routes/categorias"));
-app.use(`${PREFIJO_API}/estados`, require("./routes/estados"));
-app.use(`${PREFIJO_API}/articulos`, require("./routes/articulos"));
-app.use(`${PREFIJO_API}/usuarios`, require("./routes/usuarios"));
-app.use(`${PREFIJO_API}/avatares`, require("./routes/avatares"));
-app.use(`${PREFIJO_API}/incidencias`, require("./routes/incidencias"));
-app.use(`${PREFIJO_API}/incidencias-estados`, require("./routes/incidencias_estados"));
-app.use(`${PREFIJO_API}/dashboard`, require("./routes/dashboard"));
-app.use(`${PREFIJO_API}/reportes`, require("./routes/reportes"));
+app.use(`${PREFIJO_API}/auth`, rutasAuth);
+app.use(`${PREFIJO_API}/health`, rutasHealth);
+app.use(`${PREFIJO_API}/me`, rutasMe);
+app.use(`${PREFIJO_API}/areas`, rutasAreas);
+app.use(`${PREFIJO_API}/categorias`, rutasCategorias);
+app.use(`${PREFIJO_API}/estados`, rutasEstados);
+app.use(`${PREFIJO_API}/articulos`, rutasArticulos);
+app.use(`${PREFIJO_API}/usuarios`, rutasUsuarios);
+app.use(`${PREFIJO_API}/avatares`, rutasAvatares);
+app.use(`${PREFIJO_API}/incidencias`, rutasIncidencias);
+app.use(`${PREFIJO_API}/incidencias-estados`, rutasIncidenciasEstados);
+app.use(`${PREFIJO_API}/dashboard`, rutasDashboard);
+app.use(`${PREFIJO_API}/reportes`, rutasReportes);
 
 app.get("/", (req, res) => {
   res.json({ api: "Gestión de Incidencias", version: "v1", documentacion: "/api-docs" });
@@ -88,11 +103,7 @@ app.use((err, req, res, next) => {
 });
 
 const PUERTO = process.env.PORT || 3000;
-if (require.main === module) {
-  app.listen(PUERTO, () => {
-    console.log(`API escuchando en http://localhost:${PUERTO}${PREFIJO_API}`);
-    console.log(`Documentación en http://localhost:${PUERTO}/api-docs`);
-  });
-}
-
-module.exports = app;
+app.listen(PUERTO, () => {
+  console.log(`API escuchando en http://localhost:${PUERTO}${PREFIJO_API}`);
+  console.log(`Documentación en http://localhost:${PUERTO}/api-docs`);
+});

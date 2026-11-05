@@ -1,4 +1,4 @@
-const pool = require("../db");
+import pool from "../db/index.js";
 
 // Sin estados se incluyen todas las incidencias.
 function filtroPorEstados(estados) {
@@ -64,4 +64,4 @@ function detalle(estados) {
     .then((r) => r.rows);
 }
 
-module.exports = { totalesPorEstado, totalesPorPrioridad, totalesPorArea, detalle };
+export { totalesPorEstado, totalesPorPrioridad, totalesPorArea, detalle };

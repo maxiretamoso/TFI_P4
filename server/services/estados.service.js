@@ -1,5 +1,5 @@
-const estadosDatos = require("../datos/estados.datos");
-const { crearError } = require("../utils/httpError");
+import * as estadosDatos from "../datos/estados.datos.js";
+import { crearError } from "../utils/httpError.js";
 
 function listarEstados() {
   return estadosDatos.listar();
@@ -11,4 +11,4 @@ async function obtenerEstadoPorId(id) {
   return estado;
 }
 
-module.exports = { listarEstados, obtenerEstadoPorId };
+export { listarEstados, obtenerEstadoPorId };

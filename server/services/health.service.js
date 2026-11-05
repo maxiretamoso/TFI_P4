@@ -1,7 +1,7 @@
-const healthDatos = require("../datos/health.datos");
+import * as healthDatos from "../datos/health.datos.js";
 
 function verificarConexion() {
   return healthDatos.verificarConexion();
 }
 
-module.exports = { verificarConexion };
+export { verificarConexion };

@@ -1,5 +1,5 @@
-const reportesDatos = require("../datos/reportes.datos");
-const { ESTADOS } = require("../config/estados");
+import * as reportesDatos from "../datos/reportes.datos.js";
+import { ESTADOS } from "../config/estados.js";
 
 const FILTROS = {
   pendientes: { titulo: "Incidencias pendientes", estados: [ESTADOS.PENDIENTE] },
@@ -21,4 +21,6 @@ async function obtenerDatosReporte(filtro) {
   return { titulo, porEstado, porPrioridad, porArea, detalle };
 }
 
-module.exports = { obtenerDatosReporte, FILTROS_DE_REPORTE: Object.keys(FILTROS) };
+const FILTROS_DE_REPORTE = Object.keys(FILTROS);
+
+export { obtenerDatosReporte, FILTROS_DE_REPORTE };

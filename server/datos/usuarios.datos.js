@@ -1,5 +1,5 @@
-const pool = require("../db");
-const { ROLES } = require("../config/roles");
+import pool from "../db/index.js";
+import { ROLES } from "../config/roles.js";
 
 const CAMPOS = `
   usuarios.id_usuario,
@@ -110,7 +110,7 @@ function desactivar(id) {
     .then((r) => r.rows[0] || null);
 }
 
-module.exports = {
+export {
   listar,
   listarEmpleadosDeSistemas,
   buscarDirectorActivo,

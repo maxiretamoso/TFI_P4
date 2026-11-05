@@ -1,4 +1,4 @@
-const meService = require("../services/me.service");
+import * as meService from "../services/me.service.js";
 
 async function obtenerPerfil(req, res, next) {
   try {
@@ -8,4 +8,4 @@ async function obtenerPerfil(req, res, next) {
   }
 }
 
-module.exports = { obtenerPerfil };
+export { obtenerPerfil };

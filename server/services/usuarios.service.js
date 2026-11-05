@@ -1,10 +1,10 @@
-const usuariosDatos = require("../datos/usuarios.datos");
-const areasDatos = require("../datos/areas.datos");
-const incidenciasDatos = require("../datos/incidencias.datos");
-const { crearError } = require("../utils/httpError");
-const { ROLES } = require("../config/roles");
-const { ESTADOS } = require("../config/estados");
-const { hashearContrasenia } = require("./auth.service");
+import * as usuariosDatos from "../datos/usuarios.datos.js";
+import * as areasDatos from "../datos/areas.datos.js";
+import * as incidenciasDatos from "../datos/incidencias.datos.js";
+import { crearError } from "../utils/httpError.js";
+import { ROLES } from "../config/roles.js";
+import { ESTADOS } from "../config/estados.js";
+import { hashearContrasenia } from "./auth.service.js";
 
 const CODIGO_CLAVE_DUPLICADA = "23505";
 
@@ -128,7 +128,7 @@ async function actualizarAvatar(id, nombreArchivo, solicitante) {
   return usuario;
 }
 
-module.exports = {
+export {
   listarUsuarios,
   listarEmpleadosDeSistemas,
   obtenerUsuarioPorId,

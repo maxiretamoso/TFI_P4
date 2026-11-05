@@ -1,5 +1,5 @@
-const categoriasService = require("../services/categorias.service");
-const { responderSiHayErroresDeValidacion } = require("../utils/validar");
+import * as categoriasService from "../services/categorias.service.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
 
 async function listar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
@@ -49,4 +49,4 @@ async function eliminar(req, res, next) {
   }
 }
 
-module.exports = { listar, obtenerPorId, crear, actualizar, eliminar };
+export { listar, obtenerPorId, crear, actualizar, eliminar };

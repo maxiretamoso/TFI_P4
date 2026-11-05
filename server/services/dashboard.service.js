@@ -1,7 +1,7 @@
-const dashboardDatos = require("../datos/dashboard.datos");
-const reportesDatos = require("../datos/reportes.datos");
-const { ESTADOS } = require("../config/estados");
-const { ROLES } = require("../config/roles");
+import * as dashboardDatos from "../datos/dashboard.datos.js";
+import * as reportesDatos from "../datos/reportes.datos.js";
+import { ESTADOS } from "../config/estados.js";
+import { ROLES } from "../config/roles.js";
 
 const FECHAS_DEL_LISTADO = 7;
 const PRIORIDAD_ALTA = 3;
@@ -57,4 +57,4 @@ async function obtenerResumen() {
   };
 }
 
-module.exports = { obtenerResumen };
+export { obtenerResumen };

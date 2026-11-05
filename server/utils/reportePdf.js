@@ -1,8 +1,8 @@
-const path = require("path");
-const PDFDocument = require("pdfkit");
-const { ESTADOS } = require("../config/estados");
+import path from "path";
+import PDFDocument from "pdfkit";
+import { ESTADOS } from "../config/estados.js";
 
-const LOGO = path.join(__dirname, "..", "assets", "logo-muni.png");
+const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 
 const COLOR = {
   verde: "#5e8c3a",
@@ -238,4 +238,4 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
   return doc;
 }
 
-module.exports = { crearReporteIncidencias };
+export { crearReporteIncidencias };

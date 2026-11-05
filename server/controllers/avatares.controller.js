@@ -1,7 +1,7 @@
-const avataresService = require("../services/avatares.service");
+import * as avataresService from "../services/avatares.service.js";
 
 function listar(req, res) {
   res.json(avataresService.listarPredefinidos());
 }
 
-module.exports = { listar };
+export { listar };

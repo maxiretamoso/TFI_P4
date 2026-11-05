@@ -1,5 +1,5 @@
-const categoriasDatos = require("../datos/categorias.datos");
-const { crearError } = require("../utils/httpError");
+import * as categoriasDatos from "../datos/categorias.datos.js";
+import { crearError } from "../utils/httpError.js";
 
 function listarCategorias() {
   return categoriasDatos.listar();
@@ -27,7 +27,7 @@ async function desactivarCategoria(id) {
   return categoria;
 }
 
-module.exports = {
+export {
   listarCategorias,
   obtenerCategoriaPorId,
   crearCategoria,

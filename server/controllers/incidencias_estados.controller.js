@@ -1,4 +1,4 @@
-const historialService = require("../services/incidencias_estados.service");
+import * as historialService from "../services/incidencias_estados.service.js";
 
 async function listar(req, res, next) {
   try {
@@ -8,4 +8,4 @@ async function listar(req, res, next) {
   }
 }
 
-module.exports = { listar };
+export { listar };

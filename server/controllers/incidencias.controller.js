@@ -1,6 +1,6 @@
-const incidenciasService = require("../services/incidencias.service");
-const historialService = require("../services/incidencias_estados.service");
-const { responderSiHayErroresDeValidacion } = require("../utils/validar");
+import * as incidenciasService from "../services/incidencias.service.js";
+import * as historialService from "../services/incidencias_estados.service.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
 
 async function listar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
@@ -69,4 +69,4 @@ async function cancelar(req, res, next) {
   }
 }
 
-module.exports = { listar, obtenerPorId, obtenerHistorial, crear, asignar, finalizar, cancelar };
+export { listar, obtenerPorId, obtenerHistorial, crear, asignar, finalizar, cancelar };

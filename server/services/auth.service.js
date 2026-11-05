@@ -1,8 +1,8 @@
-const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const usuariosDatos = require("../datos/usuarios.datos");
-const { crearError } = require("../utils/httpError");
+import crypto from "crypto";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import * as usuariosDatos from "../datos/usuarios.datos.js";
+import { crearError } from "../utils/httpError.js";
 
 const HORAS_DE_SESION = "8h";
 
@@ -77,4 +77,4 @@ async function validarSesion(datosDelToken) {
   return { id_usuario: usuario.id_usuario, rol: usuario.rol };
 }
 
-module.exports = { login, validarSesion, cambiarContrasenia, hashearContrasenia };
+export { login, validarSesion, cambiarContrasenia, hashearContrasenia };

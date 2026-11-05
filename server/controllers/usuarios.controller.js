@@ -1,9 +1,9 @@
-const fs = require("fs");
-const path = require("path");
-const usuariosService = require("../services/usuarios.service");
-const { uploadDir } = require("../utils/avatarUpload");
-const { responderSiHayErroresDeValidacion } = require("../utils/validar");
-const { archivoDelPredefinido, esPredefinido } = require("../config/avatares");
+import fs from "fs";
+import path from "path";
+import * as usuariosService from "../services/usuarios.service.js";
+import { uploadDir } from "../utils/avatarUpload.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
+import { archivoDelPredefinido, esPredefinido } from "../config/avatares.js";
 
 function borrarArchivo(ruta) {
   try {
@@ -97,4 +97,4 @@ async function subirAvatar(req, res, next) {
   }
 }
 
-module.exports = { listar, obtenerPorId, crear, actualizar, eliminar, subirAvatar };
+export { listar, obtenerPorId, crear, actualizar, eliminar, subirAvatar };

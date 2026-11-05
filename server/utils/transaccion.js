@@ -1,4 +1,4 @@
-const pool = require("../db");
+import pool from "../db/index.js";
 
 async function conTransaccion(callback) {
   const cliente = await pool.connect();
@@ -15,4 +15,4 @@ async function conTransaccion(callback) {
   }
 }
 
-module.exports = { conTransaccion };
+export { conTransaccion };

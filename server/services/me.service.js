@@ -1,5 +1,5 @@
-const usuariosDatos = require("../datos/usuarios.datos");
-const { crearError } = require("../utils/httpError");
+import * as usuariosDatos from "../datos/usuarios.datos.js";
+import { crearError } from "../utils/httpError.js";
 
 async function obtenerPerfil(idUsuario) {
   const perfil = await usuariosDatos.buscarPerfil(idUsuario);
@@ -7,4 +7,4 @@ async function obtenerPerfil(idUsuario) {
   return perfil;
 }
 
-module.exports = { obtenerPerfil };
+export { obtenerPerfil };

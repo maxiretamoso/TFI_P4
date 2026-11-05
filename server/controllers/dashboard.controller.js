@@ -1,4 +1,4 @@
-const dashboardService = require("../services/dashboard.service");
+import * as dashboardService from "../services/dashboard.service.js";
 
 async function obtenerResumen(req, res, next) {
   try {
@@ -8,4 +8,4 @@ async function obtenerResumen(req, res, next) {
   }
 }
 
-module.exports = { obtenerResumen };
+export { obtenerResumen };

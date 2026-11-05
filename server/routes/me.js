@@ -1,6 +1,6 @@
-const express = require("express");
-const verificarToken = require("../middlewares/verificarToken");
-const meController = require("../controllers/me.controller");
+import express from "express";
+import verificarToken from "../middlewares/verificarToken.js";
+import * as meController from "../controllers/me.controller.js";
 
 const router = express.Router();
 
@@ -28,4 +28,4 @@ const router = express.Router();
  */
 router.get("/", verificarToken, meController.obtenerPerfil);
 
-module.exports = router;
+export default router;

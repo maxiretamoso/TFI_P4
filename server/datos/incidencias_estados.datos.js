@@ -1,4 +1,4 @@
-const pool = require("../db");
+import pool from "../db/index.js";
 
 function listar() {
   return pool
@@ -27,4 +27,4 @@ function listarPorIncidencia(idIncidencia) {
     .then((r) => r.rows);
 }
 
-module.exports = { listar, listarPorIncidencia };
+export { listar, listarPorIncidencia };

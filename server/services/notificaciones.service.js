@@ -1,6 +1,6 @@
-const nodemailer = require("nodemailer");
-const usuariosDatos = require("../datos/usuarios.datos");
-const { armarCorreoDeCierre } = require("../utils/correoIncidencia");
+import nodemailer from "nodemailer";
+import * as usuariosDatos from "../datos/usuarios.datos.js";
+import { armarCorreoDeCierre } from "../utils/correoIncidencia.js";
 
 function hayCorreoConfigurado() {
   return Boolean(process.env.MAIL_HOST && process.env.MAIL_USER && process.env.MAIL_PASS);
@@ -49,4 +49,4 @@ async function enviarNotificacionDeIncidencia({ incidencia, estado, resolucion }
   }
 }
 
-module.exports = { enviarNotificacionDeIncidencia };
+export { enviarNotificacionDeIncidencia };

@@ -1,10 +1,10 @@
-const incidenciasDatos = require("../datos/incidencias.datos");
-const usuariosDatos = require("../datos/usuarios.datos");
-const articulosDatos = require("../datos/articulos.datos");
-const { crearError } = require("../utils/httpError");
-const { enviarNotificacionDeIncidencia } = require("./notificaciones.service");
-const { ROLES } = require("../config/roles");
-const { ESTADOS } = require("../config/estados");
+import * as incidenciasDatos from "../datos/incidencias.datos.js";
+import * as usuariosDatos from "../datos/usuarios.datos.js";
+import * as articulosDatos from "../datos/articulos.datos.js";
+import { crearError } from "../utils/httpError.js";
+import { enviarNotificacionDeIncidencia } from "./notificaciones.service.js";
+import { ROLES } from "../config/roles.js";
+import { ESTADOS } from "../config/estados.js";
 
 const LIMITE_POR_DEFECTO = 20;
 const LIMITE_MAXIMO = 100;
@@ -151,4 +151,4 @@ async function cancelar(id, solicitante) {
   return actualizada;
 }
 
-module.exports = { listar, obtenerPorId, crear, asignar, finalizar, cancelar };
+export { listar, obtenerPorId, crear, asignar, finalizar, cancelar };

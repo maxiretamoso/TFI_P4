@@ -23,4 +23,4 @@ function validarEntorno() {
   }
 }
 
-module.exports = validarEntorno;
+export default validarEntorno;

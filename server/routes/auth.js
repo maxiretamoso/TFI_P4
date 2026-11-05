@@ -1,7 +1,7 @@
-const express = require("express");
-const { body } = require("express-validator");
-const verificarToken = require("../middlewares/verificarToken");
-const authController = require("../controllers/auth.controller");
+import express from "express";
+import { body } from "express-validator";
+import verificarToken from "../middlewares/verificarToken.js";
+import * as authController from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
@@ -90,4 +90,4 @@ router.patch(
   authController.cambiarContrasenia
 );
 
-module.exports = router;
+export default router;
