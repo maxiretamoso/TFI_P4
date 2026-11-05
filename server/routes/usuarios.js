@@ -38,6 +38,7 @@ router.use(verificarToken);
  *               type: array
  *               items: { $ref: '#/components/schemas/Usuario' }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       403: { $ref: '#/components/responses/SinPermiso' }
  *   post:
  *     summary: Crea un usuario
  *     tags: [Usuarios]
@@ -62,7 +63,12 @@ router.use(verificarToken);
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       409: { description: Ya existe un usuario con ese correo }
  */
-router.get("/", [query("rol").optional().isIn(["sistemas"])], usuariosController.listar);
+router.get(
+  "/",
+  verificarRol(ROLES.DIRECTOR),
+  [query("rol").optional().isIn(["sistemas"])],
+  usuariosController.listar
+);
 
 router.post(
   "/",

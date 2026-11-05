@@ -33,8 +33,9 @@ async function listar(req, res, next) {
 }
 
 async function obtenerPorId(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    res.json(await usuariosService.obtenerUsuarioPorId(req.params.id));
+    res.json(await usuariosService.obtenerUsuarioPorId(req.params.id, req.usuario));
   } catch (error) {
     next(error);
   }

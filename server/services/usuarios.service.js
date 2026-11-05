@@ -22,7 +22,10 @@ function listarEmpleadosDeSistemas() {
   return usuariosDatos.listarEmpleadosDeSistemas();
 }
 
-async function obtenerUsuarioPorId(id) {
+async function obtenerUsuarioPorId(id, solicitante) {
+  if (!esDirector(solicitante) && !esElMismo(id, solicitante)) {
+    throw crearError(403, "Solo podés ver tu propio perfil");
+  }
   const usuario = await usuariosDatos.buscarPorId(id);
   if (!usuario) throw crearError(404, "Usuario no encontrado");
   return usuario;
