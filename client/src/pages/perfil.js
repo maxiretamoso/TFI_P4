@@ -41,7 +41,7 @@ export async function pintar(zona) {
   try {
     [perfil, predefinidos] = await Promise.all([api.get("/me"), api.get("/avatares")]);
   } catch (e) {
-    contenedor.innerHTML = `<div class="tarjeta-lista">${mensajeError(e.message)}</div>`;
+    contenedor.innerHTML = `<div class="tarjeta-lista">${mensajeError(e.message, { fijo: true })}</div>`;
     return;
   }
 

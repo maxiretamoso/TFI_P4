@@ -20,7 +20,7 @@ export async function pintar(zona) {
   try {
     articulos = await api.get("/articulos");
   } catch (e) {
-    contenedor.querySelector(".zona-lista").innerHTML = mensajeError(e.message);
+    contenedor.querySelector(".zona-lista").innerHTML = mensajeError(e.message, { fijo: true });
     return;
   }
 

@@ -48,7 +48,7 @@ export async function pintar(zona) {
     contenedor.querySelector(".zona-articulos").innerHTML = "";
     contenedor.querySelector("#form-alta").hidden = false;
   } catch (e) {
-    contenedor.querySelector(".zona-articulos").innerHTML = mensajeError(e.message);
+    contenedor.querySelector(".zona-articulos").innerHTML = mensajeError(e.message, { fijo: true });
   }
 }
 

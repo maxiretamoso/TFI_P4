@@ -51,8 +51,9 @@ export function cargando(texto = "Cargando...") {
   </p>`;
 }
 
-export function mensajeError(texto) {
-  return texto ? `<p class="mensaje-error" role="alert">${esc(texto)}</p>` : "";
+export function mensajeError(texto, { fijo = false } = {}) {
+  if (!texto) return "";
+  return `<p class="mensaje-error${fijo ? " mensaje-fijo" : ""}" role="alert">${esc(texto)}</p>`;
 }
 
 export function badgeEstado(inc) {

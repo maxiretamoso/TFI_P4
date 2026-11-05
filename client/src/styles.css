@@ -633,6 +633,66 @@ h3 {
     margin: 8px 0;
 }
 
+.avisos-flotantes {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1090;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    width: min(380px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.avisos-flotantes .mensaje-error,
+.avisos-flotantes .mensaje-ok {
+    margin: 0;
+    padding: 12px 16px;
+    border: 1px solid var(--gim-borde);
+    border-left-width: 4px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    pointer-events: auto;
+    cursor: pointer;
+    animation: aparecer 0.25s ease;
+}
+
+.avisos-flotantes .mensaje-error {
+    border-left-color: var(--gim-cancelada);
+}
+
+.avisos-flotantes .mensaje-ok {
+    border-left-color: var(--gim-resuelta);
+}
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+.avisos-flotantes .desapareciendo {
+    animation: desvanecer 0.4s ease forwards;
+}
+
+@keyframes desvanecer {
+    to {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .avisos-flotantes .mensaje-error,
+    .avisos-flotantes .mensaje-ok,
+    .avisos-flotantes .desapareciendo {
+        animation-duration: 0.01s;
+    }
+}
+
 .mensaje-ok {
     color: var(--gim-resuelta-texto);
     background-color: var(--gim-resuelta-fondo);

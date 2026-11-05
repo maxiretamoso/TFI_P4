@@ -220,7 +220,7 @@ export async function pintar(zona) {
   try {
     resumen = await api.get("/dashboard");
   } catch (e) {
-    zona.innerHTML = mensajeError(e.message);
+    zona.innerHTML = mensajeError(e.message, { fijo: true });
     return;
   }
 
