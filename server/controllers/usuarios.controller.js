@@ -19,6 +19,7 @@ function borrarAvatarAnterior(nombreArchivo) {
 }
 
 async function listar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     const soloSistemas = req.query.rol === "sistemas";
     res.json(
@@ -59,6 +60,7 @@ async function actualizar(req, res, next) {
 }
 
 async function eliminar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     await usuariosService.desactivarUsuario(req.params.id, req.usuario);
     res.status(204).end();
@@ -68,6 +70,10 @@ async function eliminar(req, res, next) {
 }
 
 async function subirAvatar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) {
+    borrarArchivo(req.file?.path);
+    return;
+  }
   try {
     if (!req.file) {
       return res.status(400).json({ error: "Falta el archivo en el campo 'avatar'" });

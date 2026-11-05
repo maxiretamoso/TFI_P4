@@ -2,6 +2,7 @@ const estadosService = require("../services/estados.service");
 const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 
 async function listar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.json(await estadosService.listarEstados());
   } catch (error) {
@@ -10,6 +11,7 @@ async function listar(req, res, next) {
 }
 
 async function obtenerPorId(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     const estado = await estadosService.obtenerEstadoPorId(req.params.id);
     res.json(estado);
@@ -38,6 +40,7 @@ async function actualizar(req, res, next) {
 }
 
 async function eliminar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     await estadosService.desactivarEstado(req.params.id);
     res.status(204).end();

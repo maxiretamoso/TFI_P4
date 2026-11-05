@@ -12,6 +12,7 @@ async function listar(req, res, next) {
 }
 
 async function obtenerPorId(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.json(await incidenciasService.obtenerPorId(req.params.id, req.usuario));
   } catch (error) {
@@ -20,6 +21,7 @@ async function obtenerPorId(req, res, next) {
 }
 
 async function obtenerHistorial(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     await incidenciasService.obtenerPorId(req.params.id, req.usuario);
     res.json(await historialService.listarHistorialDeIncidencia(req.params.id));
@@ -59,6 +61,7 @@ async function finalizar(req, res, next) {
 }
 
 async function cancelar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.json(await incidenciasService.cancelar(req.params.id, req.usuario));
   } catch (error) {

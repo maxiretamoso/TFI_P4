@@ -2,6 +2,7 @@ const areasService = require("../services/areas.service");
 const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 
 async function listar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.json(await areasService.listarAreas());
   } catch (error) {
@@ -10,6 +11,7 @@ async function listar(req, res, next) {
 }
 
 async function obtenerPorId(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     const area = await areasService.obtenerAreaPorId(req.params.id);
     res.json(area);
@@ -38,6 +40,7 @@ async function actualizar(req, res, next) {
 }
 
 async function eliminar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     await areasService.desactivarArea(req.params.id);
     res.status(204).end();

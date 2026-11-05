@@ -2,6 +2,7 @@ const categoriasService = require("../services/categorias.service");
 const { responderSiHayErroresDeValidacion } = require("../utils/validar");
 
 async function listar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     res.json(await categoriasService.listarCategorias());
   } catch (error) {
@@ -10,6 +11,7 @@ async function listar(req, res, next) {
 }
 
 async function obtenerPorId(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     const categoria = await categoriasService.obtenerCategoriaPorId(req.params.id);
     res.json(categoria);
@@ -38,6 +40,7 @@ async function actualizar(req, res, next) {
 }
 
 async function eliminar(req, res, next) {
+  if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
     await categoriasService.desactivarCategoria(req.params.id);
     res.status(204).end();
