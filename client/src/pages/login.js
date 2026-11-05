@@ -1,5 +1,6 @@
 import { api } from "../api.js";
 import { guardarSesion } from "../session.js";
+import { rutaDeInicio } from "../permisos.js";
 import { mensajeError } from "../ui.js";
 import { botonTema, activarBotonTema } from "../tema.js";
 
@@ -64,7 +65,7 @@ async function manejarEnvio(evento) {
       contrasenia: campoContrasenia.value,
     });
     guardarSesion(datos);
-    window.location.hash = "#/";
+    window.location.hash = `#${rutaDeInicio(datos.usuario)}`;
   } catch (e) {
     zona.innerHTML = mensajeError(e.message);
     boton.disabled = false;

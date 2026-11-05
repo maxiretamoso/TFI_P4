@@ -5,15 +5,26 @@ import * as usuarios from "./pages/usuarios.js";
 import * as perfil from "./pages/perfil.js";
 import * as dashboard from "./pages/dashboard.js";
 import * as reportes from "./pages/reportes.js";
+import * as nueva from "./pages/nueva.js";
 import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
 import { esc, ROLES, NOMBRES_ROL } from "./ui.js";
 import { botonTema, activarBotonTema } from "./tema.js";
+import { rutaDeInicio } from "./permisos.js";
 
 const TODOS = [ROLES.DIRECTOR, ROLES.EMPLEADO_SISTEMAS, ROLES.EMPLEADO_MUNICIPAL];
 
 const RUTAS = {
   "/dashboard": { pagina: dashboard, texto: "Dashboard", roles: [ROLES.DIRECTOR] },
-  "/": { pagina: incidencias, texto: "Incidencias", roles: TODOS },
+  "/": {
+    pagina: incidencias,
+    texto: {
+      [ROLES.DIRECTOR]: "Incidencias",
+      [ROLES.EMPLEADO_SISTEMAS]: "Mis asignadas",
+      [ROLES.EMPLEADO_MUNICIPAL]: "Mis incidencias",
+    },
+    roles: TODOS,
+  },
+  "/nueva": { pagina: nueva, texto: "Nueva incidencia", roles: [ROLES.EMPLEADO_MUNICIPAL] },
   "/catalogos": {
     pagina: catalogos,
     texto: "Catálogos",
@@ -26,13 +37,17 @@ const RUTAS = {
 
 const TITULO = "Gestión de Incidencias Municipales";
 
+function textoDelEnlace(config, usuario) {
+  return typeof config.texto === "string" ? config.texto : config.texto[usuario.rol];
+}
+
 function enlacesDelMenu(rutaActual, usuario) {
   return Object.entries(RUTAS)
     .filter(([, config]) => config.roles.includes(usuario.rol))
     .map(([ruta, config]) => {
       const activa = ruta === rutaActual;
       return `<li>
-        <a class="enlace-menu${activa ? " activo" : ""}" href="#${ruta}"${activa ? ' aria-current="page"' : ""}>${config.texto}</a>
+        <a class="enlace-menu${activa ? " activo" : ""}" href="#${ruta}"${activa ? ' aria-current="page"' : ""}>${textoDelEnlace(config, usuario)}</a>
       </li>`;
     })
     .join("");
@@ -90,15 +105,16 @@ export async function enrutar() {
     return;
   }
 
+  const usuario = leerUsuario();
+
   if (rutaPedida === "/login") {
-    window.location.hash = "#/";
+    window.location.hash = `#${rutaDeInicio(usuario)}`;
     return;
   }
 
-  const usuario = leerUsuario();
   const config = RUTAS[rutaPedida];
   const permitida = config && config.roles.includes(usuario.rol);
-  const ruta = permitida ? rutaPedida : "/";
+  const ruta = permitida ? rutaPedida : rutaDeInicio(usuario);
 
   app.innerHTML = estructuraHtml(ruta, usuario);
   activarBotonTema(app);

@@ -43,3 +43,7 @@ export function puedeGestionarCatalogos(usuario) {
 export function puedeGestionarUsuarios(usuario) {
   return esDirector(usuario);
 }
+
+export function rutaDeInicio(usuario) {
+  return esDirector(usuario) ? "/dashboard" : "/";
+}

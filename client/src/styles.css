@@ -327,6 +327,27 @@ h3 {
     margin-bottom: 24px;
 }
 
+.tarjeta-angosta {
+    max-width: 640px;
+}
+
+.texto-ayuda {
+    color: var(--gim-texto-suave);
+}
+
+.encabezado-lista {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.encabezado-lista h2 {
+    margin: 0;
+}
+
 /* Tablas */
 
 .tabla-scroll {

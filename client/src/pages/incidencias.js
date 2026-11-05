@@ -16,7 +16,6 @@ let contenedor = null;
 let usuario = null;
 let incidencias = [];
 let paginado = { pagina: 1, paginas: 1, total: 0, limite: POR_PAGINA };
-let articulos = [];
 let empleadosDeSistemas = [];
 let error = "";
 let finalizandoId = null;
@@ -28,41 +27,11 @@ function tituloDeLista() {
   return "Mis incidencias";
 }
 
-function formularioDeAlta() {
-  if (!puedeCrearIncidencias(usuario)) return "";
-
-  const opcionesPrioridad = Object.entries(PRIORIDADES)
-    .map(([valor, etiqueta]) => `<option value="${valor}">${etiqueta}</option>`)
-    .join("");
-
-  return `<h2>Nueva incidencia</h2>
-    <form class="form-alta row g-2 align-items-end" id="form-alta">
-      <div class="col-12 col-md-4">
-        <label class="form-label" for="articulo">Artículo:</label>
-        <select class="form-select" id="articulo" required>
-          <option value="">Elegir artículo...</option>
-        </select>
-      </div>
-      <div class="col-12 col-md-3">
-        <label class="form-label" for="prioridad">Prioridad:</label>
-        <select class="form-select" id="prioridad">${opcionesPrioridad}</select>
-      </div>
-      <div class="col-12 col-md-3">
-        <label class="form-label" for="pedido">Pedido:</label>
-        <input class="form-control" type="text" id="pedido" placeholder="Describí el problema" required maxlength="250">
-      </div>
-      <div class="col-12 col-md-2">
-        <button class="btn btn-gim w-100" type="submit" id="boton-crear">Crear</button>
-      </div>
-    </form>`;
-}
-
 export async function pintar(zona) {
   contenedor = zona;
   usuario = leerUsuario();
   incidencias = [];
   paginado = { pagina: 1, paginas: 1, total: 0, limite: POR_PAGINA };
-  articulos = [];
   empleadosDeSistemas = [];
   error = "";
   finalizandoId = null;
@@ -70,14 +39,15 @@ export async function pintar(zona) {
 
   contenedor.innerHTML = `
     <div class="tarjeta-lista">
-      ${formularioDeAlta()}
-      <h2>${tituloDeLista()}</h2>
+      <div class="encabezado-lista">
+        <h2>${tituloDeLista()}</h2>
+        ${puedeCrearIncidencias(usuario) ? '<a class="btn btn-gim" href="#/nueva">+ Nueva incidencia</a>' : ""}
+      </div>
       <div class="zona-error"></div>
       <div class="tabla-scroll zona-lista">${cargando("Cargando incidencias...")}</div>
       <div class="zona-paginacion"></div>
     </div>`;
 
-  contenedor.querySelector("#form-alta")?.addEventListener("submit", crear);
   contenedor.querySelector(".zona-lista").addEventListener("click", manejarAccion);
   contenedor.querySelector(".zona-paginacion").addEventListener("click", cambiarPagina);
 
@@ -99,23 +69,13 @@ function guardarPagina(respuesta) {
 async function cargarDatos() {
   try {
     const pedidos = [pedirIncidencias(1)];
-    if (puedeCrearIncidencias(usuario)) pedidos.push(api.get("/articulos"));
     if (esDirector(usuario)) pedidos.push(api.get("/usuarios?rol=sistemas"));
 
     const respuestas = await Promise.all(pedidos);
     guardarPagina(respuestas[0]);
 
-    if (puedeCrearIncidencias(usuario)) {
-      articulos = respuestas[1];
-      contenedor.querySelector("#articulo").innerHTML =
-        `<option value="">Elegir artículo...</option>` +
-        articulos
-          .map((a) => `<option value="${a.id_articulo}">${esc(a.descripcion)}</option>`)
-          .join("");
-    }
-
     if (esDirector(usuario)) {
-      empleadosDeSistemas = respuestas[respuestas.length - 1];
+      empleadosDeSistemas = respuestas[1];
     }
     error = "";
   } catch (e) {
@@ -262,34 +222,6 @@ async function recargar(pagina = paginado.pagina) {
   }
   pintarError();
   pintarLista();
-}
-
-async function crear(evento) {
-  evento.preventDefault();
-
-  const boton = contenedor.querySelector("#boton-crear");
-  error = "";
-  pintarError();
-  boton.disabled = true;
-  boton.innerHTML = `<span class="spinner-border spinner-border-sm" aria-hidden="true"></span> Creando...`;
-
-  try {
-    await api.post("/incidencias", {
-      id_articulo: Number(contenedor.querySelector("#articulo").value),
-      prioridad: Number(contenedor.querySelector("#prioridad").value),
-      descripcion_pedido: contenedor.querySelector("#pedido").value,
-    });
-    contenedor.querySelector("#articulo").value = "";
-    contenedor.querySelector("#prioridad").value = "1";
-    contenedor.querySelector("#pedido").value = "";
-    await recargar();
-  } catch (e) {
-    error = e.message;
-    pintarError();
-  } finally {
-    boton.disabled = false;
-    boton.textContent = "Crear";
-  }
 }
 
 async function cancelar(inc) {
