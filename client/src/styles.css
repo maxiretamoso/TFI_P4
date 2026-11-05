@@ -557,6 +557,179 @@ h3 {
     margin-bottom: 20px;
 }
 
+/* Dashboard */
+
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.kpi {
+    background-color: var(--gim-tarjeta);
+    border: 1px solid var(--gim-borde);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-etiqueta {
+    color: var(--gim-texto-suave);
+    font-size: 0.9rem;
+}
+
+.kpi-numero {
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: var(--gim-verde-texto);
+}
+
+.grilla-graficos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+    gap: 16px;
+}
+
+.tarjeta-grafico {
+    background-color: var(--gim-tarjeta);
+    border: 1px solid var(--gim-borde);
+    border-radius: 12px;
+    padding: 16px 18px;
+}
+
+.tarjeta-grafico h3 {
+    margin-top: 0;
+}
+
+.grafico-torta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.grafico-torta svg {
+    width: 150px;
+    height: 150px;
+    flex-shrink: 0;
+}
+
+.torta-centro {
+    font-size: 7px;
+    font-weight: 600;
+    fill: var(--bs-body-color);
+}
+
+.referencias {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 2;
+}
+
+.punto {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.grafico-columnas {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    height: 170px;
+}
+
+.columna {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 0;
+}
+
+.columna-barra {
+    width: 100%;
+    min-height: 2px;
+    background-color: var(--gim-verde);
+    border-radius: 4px 4px 0 0;
+}
+
+.columna-valor,
+.columna-fecha {
+    font-size: 0.7rem;
+    color: var(--gim-texto-suave);
+    height: 1.2em;
+    white-space: nowrap;
+}
+
+.columna-fecha {
+    border-top: 1px solid var(--gim-borde);
+    width: 100%;
+    text-align: center;
+    padding-top: 2px;
+    height: 1.6em;
+}
+
+.texto-grafico {
+    color: var(--gim-texto-suave);
+    font-size: 0.9rem;
+    margin: 10px 0 0;
+}
+
+.barras {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.barras li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.barra-nombre {
+    width: 90px;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.barra-pista {
+    flex: 1;
+    height: 12px;
+    background-color: var(--gim-verde-suave);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.barra-relleno {
+    display: block;
+    height: 100%;
+    background-color: var(--gim-verde);
+    border-radius: 6px;
+}
+
+.barra-total {
+    width: 28px;
+    text-align: right;
+    font-weight: 600;
+}
+
+@media (max-width: 991.98px) {
+    .grilla-graficos {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 /* Perfil */
 
 .perfil-datos {
