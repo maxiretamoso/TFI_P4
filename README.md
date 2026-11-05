@@ -2,6 +2,8 @@
 
 Trabajo Final Integrador — Programación IV · UNER · Facultad de Ciencias de la Administración · Licenciatura en Sistemas · 2026
 
+**Grupo 8** · Integrante: Retamoso Trotta, Maximo Felipe
+
 Aplicación web para que el área de Sistemas de un municipio registre, asigne, resuelva y reporte incidencias sobre artículos. Un empleado municipal informa un problema, el Director lo asigna a un responsable de Sistemas, y éste lo finaliza describiendo la solución. Cada cambio de estado queda registrado en un historial y, al finalizar o cancelar una incidencia, se envía un correo de aviso.
 
 ## Funcionalidades
