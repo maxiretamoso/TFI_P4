@@ -33,7 +33,8 @@ const formatoFechaHora = new Intl.DateTimeFormat("es-AR", {
   hourCycle: "h23",
 });
 const MARGEN = 45;
-const ALTO_FILA = 22;
+const ALTO_FILA = 24;
+const SEPARACION_COLUMNAS = 24;
 
 function porcentaje(parte, total) {
   return total > 0 ? Math.round((parte / total) * 100) : 0;
@@ -54,16 +55,17 @@ function encabezado(doc) {
     .text("Gestión de Incidencias Municipales", 0, 56, { width: ancho - MARGEN, align: "right" })
     .text(`Generado el ${formatoFechaHora.format(new Date())}`, 0, 70, { width: ancho - MARGEN, align: "right" });
 
-  doc.y = 122;
+  doc.y = 96;
 }
 
-function titulo(doc, texto) {
-  asegurarEspacio(doc, 60);
-  doc.moveDown(0.6);
-  const y = doc.y;
-  doc.rect(MARGEN, y + 2, 4, 14).fill(COLOR.verde);
-  doc.fillColor(COLOR.texto).font("Helvetica-Bold").fontSize(13).text(texto, MARGEN + 12, y);
-  doc.moveDown(0.5);
+// Título de sección en verde con una línea fina debajo. "espacioAntes" separa del bloque anterior.
+function titulo(doc, texto, { x = MARGEN, ancho = anchoUtil(doc), tamanio = 13, espacioAntes = 30 } = {}) {
+  asegurarEspacio(doc, espacioAntes + 90);
+  const y = doc.y + espacioAntes;
+  doc.fillColor(COLOR.verdeOscuro).font("Helvetica-Bold").fontSize(tamanio).text(texto, x, y, { width: ancho });
+  const linea = y + tamanio + 6;
+  doc.moveTo(x, linea).lineTo(x + ancho, linea).lineWidth(0.75).stroke(COLOR.borde);
+  doc.y = linea + 10;
 }
 
 function asegurarEspacio(doc, alto) {
@@ -75,17 +77,16 @@ function asegurarEspacio(doc, alto) {
 
 // Dibuja una tabla con encabezado verde y filas alternadas; si no entra, sigue en otra página
 // repitiendo el encabezado. Cada columna puede dibujar su celda a mano con "dibujar".
-function tabla(doc, columnas, filas) {
-  const anchoTotal = anchoUtil(doc);
+function tabla(doc, columnas, filas, { x: xTabla = MARGEN, ancho: anchoTotal = anchoUtil(doc) } = {}) {
   const anchos = columnas.map((c) => c.ancho * anchoTotal);
 
   const dibujarEncabezado = () => {
     const y = doc.y;
-    doc.rect(MARGEN, y, anchoTotal, ALTO_FILA).fill(COLOR.verdeSuave);
-    let x = MARGEN;
+    doc.rect(xTabla, y, anchoTotal, ALTO_FILA).fill(COLOR.verdeSuave);
+    let x = xTabla;
     columnas.forEach((c, i) => {
       doc.fillColor(COLOR.verdeOscuro).font("Helvetica-Bold").fontSize(9)
-        .text(c.titulo, x + 6, y + 7, { width: anchos[i] - 12, align: c.alinear ?? "left", height: 11, ellipsis: true });
+        .text(c.titulo, x + 8, y + 8, { width: anchos[i] - 16, align: c.alinear ?? "left", height: 11, ellipsis: true });
       x += anchos[i];
     });
     doc.y = y + ALTO_FILA;
@@ -94,7 +95,7 @@ function tabla(doc, columnas, filas) {
   dibujarEncabezado();
 
   if (filas.length === 0) {
-    doc.fillColor(COLOR.textoSuave).font("Helvetica").fontSize(9).text("Sin datos.", MARGEN + 6, doc.y + 7);
+    doc.fillColor(COLOR.textoSuave).font("Helvetica").fontSize(9).text("Sin datos.", xTabla + 8, doc.y + 8);
     doc.y += ALTO_FILA;
     return;
   }
@@ -106,17 +107,17 @@ function tabla(doc, columnas, filas) {
       dibujarEncabezado();
     }
     const y = doc.y;
-    if (indice % 2 === 1) doc.rect(MARGEN, y, anchoTotal, ALTO_FILA).fill(COLOR.fila);
-    doc.moveTo(MARGEN, y + ALTO_FILA).lineTo(MARGEN + anchoTotal, y + ALTO_FILA).lineWidth(0.5).stroke(COLOR.borde);
+    if (indice % 2 === 1) doc.rect(xTabla, y, anchoTotal, ALTO_FILA).fill(COLOR.fila);
+    doc.moveTo(xTabla, y + ALTO_FILA).lineTo(xTabla + anchoTotal, y + ALTO_FILA).lineWidth(0.5).stroke(COLOR.borde);
 
-    let x = MARGEN;
+    let x = xTabla;
     columnas.forEach((c, i) => {
       if (c.dibujar) {
         c.dibujar(doc, fila, x, y, anchos[i]);
       } else {
         doc.fillColor(COLOR.texto).font("Helvetica").fontSize(9)
-          .text(String(fila[c.campo] ?? ""), x + 6, y + 7, {
-            width: anchos[i] - 12,
+          .text(String(fila[c.campo] ?? ""), x + 8, y + 8, {
+            width: anchos[i] - 16,
             align: c.alinear ?? "left",
             height: 11,
             ellipsis: true,
@@ -131,22 +132,42 @@ function tabla(doc, columnas, filas) {
 
 function celdaConPunto(color, texto) {
   return (doc, fila, x, y, ancho) => {
-    doc.circle(x + 11, y + ALTO_FILA / 2, 3.5).fill(color(fila));
+    doc.circle(x + 13, y + ALTO_FILA / 2, 3.5).fill(color(fila));
     doc.fillColor(COLOR.texto).font("Helvetica").fontSize(9)
-      .text(texto(fila), x + 20, y + 7, { width: ancho - 26, height: 11, ellipsis: true });
+      .text(texto(fila), x + 22, y + 8, { width: ancho - 30, height: 11, ellipsis: true });
   };
 }
 
-function tablaDeTotales(doc, nombreColumna, filas, total, color) {
+function tablaDeTotales(doc, { titulo: textoTitulo, columna, filas, total, color, x, ancho }) {
+  const yInicio = doc.y;
+  titulo(doc, textoTitulo, { x, ancho, tamanio: 11, espacioAntes: 0 });
   tabla(
     doc,
     [
-      { titulo: nombreColumna, ancho: 0.6, dibujar: celdaConPunto(color, (f) => f.nombre) },
-      { titulo: "Cantidad", ancho: 0.2, campo: "total", alinear: "right" },
-      { titulo: "%", ancho: 0.2, campo: "porcentaje", alinear: "right" },
+      { titulo: columna, ancho: 0.52, dibujar: celdaConPunto(color, (f) => f.nombre) },
+      { titulo: "Cantidad", ancho: 0.26, campo: "total", alinear: "right" },
+      { titulo: "%", ancho: 0.22, campo: "porcentaje", alinear: "right" },
     ],
-    filas.map((f) => ({ ...f, porcentaje: `${porcentaje(f.total, total)}%` }))
+    filas.map((f) => ({ ...f, porcentaje: `${porcentaje(f.total, total)}%` })),
+    { x, ancho }
   );
+  const yFin = doc.y;
+  doc.y = yInicio;
+  return yFin;
+}
+
+// Dos tablas de totales lado a lado; deja el cursor debajo de la más alta.
+function totalesEnColumnas(doc, izquierda, derecha) {
+  const ancho = (anchoUtil(doc) - SEPARACION_COLUMNAS) / 2;
+  const filas = Math.max(izquierda.filas.length, derecha?.filas.length ?? 0);
+  asegurarEspacio(doc, 40 + (filas + 1) * ALTO_FILA);
+
+  const finIzquierda = tablaDeTotales(doc, { ...izquierda, x: MARGEN, ancho });
+  const finDerecha = derecha
+    ? tablaDeTotales(doc, { ...derecha, x: MARGEN + ancho + SEPARACION_COLUMNAS, ancho })
+    : finIzquierda;
+  doc.y = Math.max(finIzquierda, finDerecha) + 22;
+  doc.x = MARGEN;
 }
 
 function pieDePagina(doc) {
@@ -174,18 +195,18 @@ function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) 
 
   encabezado(doc);
 
-  titulo(doc, "Detalle de incidencias");
+  titulo(doc, "Detalle de incidencias", { espacioAntes: 28 });
   tabla(
     doc,
     [
       { titulo: "#", ancho: 0.05, campo: "id_incidencia" },
       { titulo: "Fecha", ancho: 0.13, campo: "fecha" },
       { titulo: "Artículo", ancho: 0.16, campo: "articulo" },
-      { titulo: "Pedido", ancho: 0.22, campo: "descripcion_pedido" },
+      { titulo: "Pedido", ancho: 0.2, campo: "descripcion_pedido" },
       { titulo: "Prioridad", ancho: 0.11, campo: "prioridad_texto" },
       {
         titulo: "Estado",
-        ancho: 0.14,
+        ancho: 0.16,
         dibujar: celdaConPunto((f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde, (f) => f.estado),
       },
       { titulo: "Asignada a", ancho: 0.19, campo: "asignado" },
@@ -198,27 +219,33 @@ function crearReporteIncidencias({ porEstado, porPrioridad, porArea, detalle }) 
     }))
   );
 
-  titulo(doc, "Totales por estado");
-  tablaDeTotales(
-    doc,
-    "Estado",
-    porEstado.map((f) => ({ nombre: f.estado, total: f.total, id_estado: f.id_estado })),
-    total,
-    (f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde
-  );
-
-  titulo(doc, "Totales por prioridad");
+  titulo(doc, "Resumen", { espacioAntes: 36 });
+  doc.y += 6;
   const porId = new Map(porPrioridad.map((f) => [f.prioridad, f.total]));
-  tablaDeTotales(
+  totalesEnColumnas(
     doc,
-    "Prioridad",
-    [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })),
-    total,
-    () => COLOR.verde
+    {
+      titulo: "Por estado",
+      columna: "Estado",
+      filas: porEstado.map((f) => ({ nombre: f.estado, total: f.total, id_estado: f.id_estado })),
+      total,
+      color: (f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde,
+    },
+    {
+      titulo: "Por prioridad",
+      columna: "Prioridad",
+      filas: [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })),
+      total,
+      color: () => COLOR.verde,
+    }
   );
-
-  titulo(doc, "Totales por área del artículo");
-  tablaDeTotales(doc, "Área", porArea.map((f) => ({ nombre: f.area, total: f.total })), total, () => COLOR.verde);
+  totalesEnColumnas(doc, {
+    titulo: "Por área del artículo",
+    columna: "Área",
+    filas: porArea.map((f) => ({ nombre: f.area, total: f.total })),
+    total,
+    color: () => COLOR.verde,
+  });
 
   pieDePagina(doc);
   return doc;
