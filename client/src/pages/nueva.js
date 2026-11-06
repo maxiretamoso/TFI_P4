@@ -15,7 +15,7 @@ export async function pintar(zona) {
       <h2>Nueva incidencia</h2>
       <p class="texto-ayuda">Contá qué equipo tiene el problema y qué está pasando. El área de Sistemas la recibe y te avisa cuando la resuelva.</p>
       <div class="zona-articulos">${cargando("Cargando artículos...")}</div>
-      <form id="form-alta" hidden>
+      <form id="form-alta" novalidate hidden>
         <div class="mb-3">
           <label class="form-label" for="articulo">Artículo</label>
           <select class="form-select" id="articulo" required></select>
