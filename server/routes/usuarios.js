@@ -78,7 +78,7 @@ router.post(
     body("id_area").isInt({ min: 1 }),
     body("nombres").isString().trim().isLength({ min: 1, max: 250 }),
     body("apellidos").isString().trim().isLength({ min: 1, max: 250 }),
-    body("usuario").isEmail().withMessage("El usuario debe ser un correo válido").normalizeEmail(),
+    body("usuario").trim().isEmail().withMessage("El usuario debe ser un correo válido").toLowerCase(),
     body("contrasenia").isString().isLength({ min: 6, max: 100 }),
     body("rol").isInt({ min: 1, max: 3 }),
   ],
@@ -144,7 +144,7 @@ router.put(
     body("id_area").optional().isInt({ min: 1 }),
     body("nombres").optional().isString().trim().isLength({ min: 1, max: 250 }),
     body("apellidos").optional().isString().trim().isLength({ min: 1, max: 250 }),
-    body("usuario").optional().isEmail().normalizeEmail(),
+    body("usuario").optional().trim().isEmail().withMessage("El usuario debe ser un correo válido").toLowerCase(),
     body("rol").optional().isInt({ min: 1, max: 3 }),
   ],
   usuariosController.actualizar

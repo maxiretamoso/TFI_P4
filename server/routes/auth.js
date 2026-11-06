@@ -49,7 +49,7 @@ const router = express.Router();
 router.post(
   "/login",
   [
-    body("usuario").isString().trim().notEmpty().withMessage("El usuario es obligatorio"),
+    body("usuario").isString().trim().notEmpty().withMessage("El usuario es obligatorio").toLowerCase(),
     body("contrasenia").isString().notEmpty().withMessage("La contraseña es obligatoria"),
   ],
   authController.login
