@@ -27,7 +27,7 @@ const PUEDEN_GESTIONAR = [ROLES.DIRECTOR];
  *       200: { description: Lista de áreas }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *   post:
- *     summary: Crea una areas
+ *     summary: Crea un área
  *     tags: [Areas]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -58,7 +58,7 @@ router.post(
  * @swagger
  * /areas/{id}:
  *   get:
- *     summary: Obtiene una areas por id
+ *     summary: Obtiene un área por id
  *     tags: [Areas]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -67,7 +67,7 @@ router.post(
  *       200: { description: El recurso pedido }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   put:
- *     summary: Modifica una areas
+ *     summary: Modifica un área
  *     tags: [Areas]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -86,7 +86,7 @@ router.post(
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   delete:
- *     summary: Da de baja una areas (soft delete, activo = 0)
+ *     summary: Da de baja un área (soft delete, activo = 0)
  *     tags: [Areas]
  *     security: [{ bearerAuth: [] }]
  *     parameters:

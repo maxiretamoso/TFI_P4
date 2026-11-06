@@ -27,7 +27,7 @@ const PUEDEN_GESTIONAR = [ROLES.EMPLEADO_SISTEMAS, ROLES.DIRECTOR];
  *       200: { description: Lista de categorías }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *   post:
- *     summary: Crea una categorias
+ *     summary: Crea una categoría
  *     tags: [Categorias]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -58,7 +58,7 @@ router.post(
  * @swagger
  * /categorias/{id}:
  *   get:
- *     summary: Obtiene una categorias por id
+ *     summary: Obtiene una categoría por id
  *     tags: [Categorias]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -67,7 +67,7 @@ router.post(
  *       200: { description: El recurso pedido }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   put:
- *     summary: Modifica una categorias
+ *     summary: Modifica una categoría
  *     tags: [Categorias]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -86,7 +86,7 @@ router.post(
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *   delete:
- *     summary: Da de baja una categorias (soft delete, activo = 0)
+ *     summary: Da de baja una categoría (soft delete, activo = 0)
  *     tags: [Categorias]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
