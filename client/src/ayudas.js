@@ -49,8 +49,13 @@ function mostrar(elemento) {
   actual = elemento;
 }
 
+// Oculto sigue ocupando lugar: se lo devuelve a la esquina para que no ensanche la página.
 function ocultar() {
-  globo?.classList.remove("visible");
+  if (globo) {
+    globo.classList.remove("visible");
+    globo.style.left = "0px";
+    globo.style.top = "0px";
+  }
   actual = null;
 }
 
@@ -68,4 +73,5 @@ export function activarAyudas() {
   document.addEventListener("click", ocultar);
   window.addEventListener("scroll", ocultar, true);
   window.addEventListener("hashchange", ocultar);
+  window.addEventListener("resize", ocultar);
 }
