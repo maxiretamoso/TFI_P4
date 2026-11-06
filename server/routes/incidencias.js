@@ -102,6 +102,7 @@ router.get(
  *             schema: { $ref: '#/components/schemas/Incidencia' }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       409: { description: No hay un Director activo que pueda recibir la incidencia }
  */
 router.post(
   "/",

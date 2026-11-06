@@ -45,6 +45,7 @@ const router = express.Router();
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       401: { description: Usuario o contraseña incorrectos }
  *       403: { description: El usuario está dado de baja }
+ *       429: { description: Demasiados intentos fallidos; hay que esperar 15 minutos }
  */
 router.post(
   "/login",
