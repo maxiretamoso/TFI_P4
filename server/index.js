@@ -30,17 +30,22 @@ const app = express();
 
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
+const PUERTO = process.env.PORT || 3000;
+
 // Sin CLIENT_URL se acepta cualquier origen (desarrollo).
 const origenesPermitidos = (process.env.CLIENT_URL || "")
   .split(",")
   .map((origen) => origen.trim())
   .filter(Boolean);
 
+// Swagger se sirve desde la propia API, así que su origen siempre se acepta.
+const origenesPropios = [`http://localhost:${PUERTO}`, `http://127.0.0.1:${PUERTO}`];
+
 app.use(
   cors({
     origin(origen, devolver) {
       if (!origen || origenesPermitidos.length === 0) return devolver(null, true);
-      if (origenesPermitidos.includes(origen)) return devolver(null, true);
+      if (origenesPermitidos.includes(origen) || origenesPropios.includes(origen)) return devolver(null, true);
       devolver(Object.assign(new Error("Origen no permitido"), { status: 403 }));
     },
   })
@@ -102,7 +107,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PUERTO = process.env.PORT || 3000;
 app.listen(PUERTO, () => {
   console.log(`API escuchando en http://localhost:${PUERTO}${PREFIJO_API}`);
   console.log(`Documentación en http://localhost:${PUERTO}/api-docs`);
