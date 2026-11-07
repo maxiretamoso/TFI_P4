@@ -113,13 +113,13 @@ database/
 
 **Estados de solo lectura.** Los cuatro estados (Pendiente, En Proceso, Resuelta, Cancelada) se consultan pero no se crean, editan ni eliminan: todo el flujo de una incidencia depende de ellos.
 
-**Protecciones en usuarios.** Nadie puede cambiarse su propio rol ni darse de baja a sí mismo, y un empleado de Sistemas con incidencias abiertas asignadas no puede ser dado de baja ni cambiar de rol hasta que se reasignen.
+**Protecciones en usuarios.** Nadie puede cambiarse su propio rol ni darse de baja a sí mismo, y un empleado de Sistemas con incidencias abiertas asignadas no puede ser dado de baja ni cambiar de rol hasta que se reasignen. El Director y los empleados de Sistemas pertenecen al área Sistemas: el formulario la fija al elegir esos roles y el servidor rechaza otra. El área indica dónde trabaja cada usuario; lo que puede hacer lo define el rol.
 
 **Cambios de estado sin carreras.** Asignar, finalizar y cancelar actualizan la incidencia solo si sigue en un estado que lo permite (la condición va en el mismo `UPDATE`). Si dos personas actúan a la vez sobre la misma incidencia, la segunda recibe 409 en lugar de aplicar un segundo cambio.
 
 **Sesión verificada en cada pedido.** Además de validar el token, el servidor comprueba que el usuario siga activo y toma su rol actual de la base: una baja o un cambio de rol se aplican de inmediato, sin esperar a que venza el token.
 
-**Soft deletes.** Ninguna baja borra filas: se marca `activo = 0` y los listados filtran por `activo = 1`. Así las incidencias viejas siguen mostrando el artículo o la categoría con la que se crearon.
+**Soft deletes.** Ninguna baja borra filas: se marca `activo = 0` y los listados filtran por `activo = 1`. Así las incidencias viejas siguen mostrando el artículo o la categoría con la que se crearon. Lo que está en uso no se puede dar de baja (409): un área con usuarios o artículos activos, una categoría con artículos activos o un artículo con incidencias pendientes o en proceso.
 
 **Transacciones.** Crear una incidencia, asignarla, finalizarla y cancelarla escriben en dos tablas (`incidencias` y `incidencias_estados`). Las dos escrituras van en la misma transacción: o se confirman las dos o no se confirma ninguna, y el historial nunca queda desfasado del estado actual.
 
