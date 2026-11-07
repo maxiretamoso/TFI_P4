@@ -9,4 +9,10 @@ activarCierreDeAvisos();
 activarAyudas();
 window.addEventListener("hashchange", enrutar);
 
+// Las rutas van después del #: localhost:5173/catalogos pasa a localhost:5173/#/catalogos.
+if (window.location.pathname !== "/") {
+  const ruta = window.location.hash || `#${window.location.pathname.replace(/\/+$/, "")}`;
+  history.replaceState(null, "", `/${ruta}`);
+}
+
 enrutar();
