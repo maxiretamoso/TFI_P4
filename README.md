@@ -169,8 +169,3 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | BREAD | `/usuarios` | Director (cada uno puede ver y editar su propio perfil) |
 | PATCH | `/usuarios/{id}/avatar` | el propio usuario o el Director |
 | GET | `/avatares` | autenticado |
-
-## Notas sobre la base
-
-- En el diagrama de la cátedra la columna `incidencias_estados.fecha_hora_estado` es `time with time zone`, que guarda la hora de cada cambio pero no el día. En `database/incidencias_db.sql` se cambió a `timestamp with time zone` para que el historial tenga fecha y hora, y así poder mostrar cuándo se resolvió o canceló cada incidencia (en la lista y en el reporte PDF). Es el único cambio de tipo respecto del diagrama.
-- En el script original de la cátedra el estado 3 figuraba como "Resuela"; en `database/incidencias_db.sql` se corrigió a "Resuelta".
