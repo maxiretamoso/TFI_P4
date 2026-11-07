@@ -56,6 +56,17 @@ Los valores salen de la tabla `usuarios` del script de la cátedra:
 | 2 | Empleado del área de Sistemas |
 | 3 | Empleado Municipal |
 
+## Usuarios de prueba
+
+Son los que trae `database/incidencias_db.sql`. La contraseña es la parte del correo anterior a la @.
+
+| Usuario | Contraseña | Nombre | Rol | Área |
+|---|---|---|---|---|
+| `pamalm@correo.com` | `pamalm` | Pamela Almeida | Director | Sistemas |
+| `carper@correo.com` | `carper` | Carlos Perez | Empleado de Sistemas | Sistemas |
+| `cargom@correo.com` | `cargom` | Carmen Gomez | Empleado de Sistemas | Sistemas |
+| `estren@correo.com` | `estren` | Esteban Reniero | Empleado Municipal | Legales |
+
 ## Estructura
 
 ```
