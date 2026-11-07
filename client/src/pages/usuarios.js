@@ -38,7 +38,7 @@ export async function pintar(zona) {
     .join("");
 
   const formulario = esDirector
-    ? `<form class="row g-2 align-items-end mb-4">
+    ? `<form class="row g-2 align-items-end mb-4" novalidate>
         <div class="col-12 col-md-3">
           <label class="form-label" for="campo-nombres">Nombre/s:</label>
           <input class="form-control" type="text" id="campo-nombres" maxlength="100" required>
@@ -244,6 +244,17 @@ function cancelarEdicion() {
   refrescarForm();
 }
 
+// La contraseña solo se pide al crear: al editar, su campo está oculto.
+function errorDelFormulario() {
+  if (!nombres.trim() || !apellidos.trim()) return "Completá el nombre y el apellido.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nombreUsuario.trim())) {
+    return "El usuario tiene que ser un correo, por ejemplo nombre@correo.com.";
+  }
+  if (!editandoId && contrasenia.length < 6) return "La contraseña tiene que tener al menos 6 caracteres.";
+  if (!idArea) return "Elegí el área.";
+  return "";
+}
+
 async function guardar(evento) {
   evento.preventDefault();
 
@@ -253,7 +264,11 @@ async function guardar(evento) {
   contrasenia = contenedor.querySelector("#campo-contrasenia").value;
   idArea = contenedor.querySelector("#campo-area").value;
   rol = contenedor.querySelector("#campo-rol").value;
-  error = "";
+  error = errorDelFormulario();
+  if (error) {
+    pintarError();
+    return;
+  }
 
   const datos = {
     nombres,
