@@ -142,7 +142,7 @@ function tarjetasDeIndicadores(resumen) {
     ["Total", resumen.total, "incidencias registradas", ""],
     ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
     ["Pendientes", sin_asignar, "sin asignar", "sin_asignar=true"],
-    ["En proceso", totalDe(ESTADOS.EN_PROCESO), "asignadas a Sistemas", `estado=${ESTADOS.EN_PROCESO}`],
+    ["En proceso", totalDe(ESTADOS.EN_PROCESO), "asignadas", `estado=${ESTADOS.EN_PROCESO}`],
     ["Resueltas", `${porcentaje(totalDe(ESTADOS.RESUELTA), resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
     ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
   ];
