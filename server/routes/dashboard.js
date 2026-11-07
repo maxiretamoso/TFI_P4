@@ -90,6 +90,7 @@ const router = express.Router();
  *                       articulo:           { type: string }
  *                       asignado_nombres:   { type: string }
  *                       asignado_apellidos: { type: string }
+ *                       asignado_rol:       { type: integer, description: Rol del responsable; 1 (Director) significa que todavía no se asignó }
  *                       creador_nombres:    { type: string }
  *                       creador_apellidos:  { type: string }
  *                 cargaPorEmpleado:

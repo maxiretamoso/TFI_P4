@@ -1,5 +1,15 @@
 import { api } from "../api.js";
-import { esc, cargando, mensajeError, PRIORIDADES, ESTADOS, badgeEstado, fecha, fechaHora } from "../ui.js";
+import {
+  esc,
+  cargando,
+  mensajeError,
+  PRIORIDADES,
+  ESTADOS,
+  badgeEstado,
+  fecha,
+  fechaHora,
+  nombreDelAsignado,
+} from "../ui.js";
 
 const COLOR_ESTADO = {
   [ESTADOS.PENDIENTE]: "var(--gim-pendiente)",
@@ -164,7 +174,7 @@ function tablaDePrioritarias(resumen) {
         <td>${esc(inc.articulo)}</td>
         <td class="celda-pedido" data-ayuda-si-cortado>${esc(inc.descripcion_pedido)}</td>
         <td>${badgeEstado(inc)}</td>
-        <td>${esc(inc.asignado_nombres)} ${esc(inc.asignado_apellidos)}</td>
+        <td>${nombreDelAsignado(inc.asignado_nombres, inc.asignado_apellidos, inc.asignado_rol)}</td>
         <td>${esc(inc.creador_nombres)} ${esc(inc.creador_apellidos)}</td>
         <td data-ayuda="${fechaHora(inc.creado)}">${antiguedad(inc.creado)}</td>
       </tr>`

@@ -61,6 +61,12 @@ export function mensajeError(texto, { fijo = false } = {}) {
   return `<p class="mensaje-error${fijo ? " mensaje-fijo" : ""}" role="alert">${esc(texto)}</p>`;
 }
 
+// Una incidencia a cargo de un Director todavía no se asignó a nadie de Sistemas.
+export function nombreDelAsignado(nombres, apellidos, rol) {
+  if (rol === ROLES.DIRECTOR) return "Sin asignar";
+  return nombres ? `${esc(nombres)} ${esc(apellidos)}` : "—";
+}
+
 export function badgeEstado(inc) {
   return `<span class="estado estado-${inc.id_estado}">${esc(inc.estado)}</span>`;
 }

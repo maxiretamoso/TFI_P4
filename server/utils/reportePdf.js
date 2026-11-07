@@ -1,6 +1,7 @@
 import path from "path";
 import PDFDocument from "pdfkit";
 import { ESTADOS } from "../config/estados.js";
+import { ROLES } from "../config/roles.js";
 
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 
@@ -210,7 +211,7 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
       cierre:
         CERRADAS.includes(inc.id_estado) && inc.fecha_estado ? formatoFecha.format(new Date(inc.fecha_estado)) : "-",
       prioridad_texto: PRIORIDADES[inc.prioridad] ?? inc.prioridad,
-      asignado: `${inc.asignado_nombres} ${inc.asignado_apellidos}`,
+      asignado: inc.asignado_rol === ROLES.DIRECTOR ? "Sin asignar" : `${inc.asignado_nombres} ${inc.asignado_apellidos}`,
     }))
   );
 

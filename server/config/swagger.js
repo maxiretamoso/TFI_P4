@@ -55,6 +55,12 @@ const definicion = {
           estado: { type: "string" },
           creado_por: { type: "integer" },
           asignado_a: { type: "integer" },
+          asignado_a_nombre: { type: "string" },
+          asignado_a_apellido: { type: "string" },
+          asignado_a_rol: {
+            type: "integer",
+            description: "Rol del responsable. 1 (Director) significa que todavía no se asignó a nadie de Sistemas",
+          },
           creado: { type: "string", format: "date-time" },
           prioridad: { type: "integer", enum: [1, 2, 3] },
           descripcion_pedido: { type: "string" },

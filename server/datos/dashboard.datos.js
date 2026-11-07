@@ -52,6 +52,7 @@ function prioritarias({ prioridad, abiertos, limite }) {
                    articulos.descripcion AS articulo,
                    asignado.nombres      AS asignado_nombres,
                    asignado.apellidos    AS asignado_apellidos,
+                   asignado.rol          AS asignado_rol,
                    creador.nombres       AS creador_nombres,
                    creador.apellidos     AS creador_apellidos
             FROM incidencias

@@ -25,6 +25,7 @@ const SELECCION = `
          creador.apellidos     AS creado_por_apellido,
          asignado.nombres      AS asignado_a_nombre,
          asignado.apellidos    AS asignado_a_apellido,
+         asignado.rol          AS asignado_a_rol,
          (SELECT max(incidencias_estados.fecha_hora_estado)
           FROM incidencias_estados
           WHERE incidencias_estados.id_incidencia = incidencias.id_incidencia

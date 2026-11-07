@@ -1,7 +1,18 @@
 import { api } from "../api.js";
 import { leerUsuario } from "../session.js";
 import { confirmar } from "../confirmar.js";
-import { PRIORIDADES, ESTADOS, esc, fecha, fechaHora, cargando, mensajeError, badgeEstado, paginacion } from "../ui.js";
+import {
+  PRIORIDADES,
+  ESTADOS,
+  esc,
+  fecha,
+  fechaHora,
+  cargando,
+  mensajeError,
+  badgeEstado,
+  paginacion,
+  nombreDelAsignado,
+} from "../ui.js";
 import {
   puedeCrearIncidencias,
   puedeCancelar,
@@ -218,9 +229,7 @@ function pintarError() {
 }
 
 function filaIncidencia(inc) {
-  const asignado = inc.asignado_a_nombre
-    ? `${esc(inc.asignado_a_nombre)} ${esc(inc.asignado_a_apellido)}`
-    : "—";
+  const asignado = nombreDelAsignado(inc.asignado_a_nombre, inc.asignado_a_apellido, inc.asignado_a_rol);
 
   let acciones = "";
   if (puedeCancelar(usuario, inc)) {

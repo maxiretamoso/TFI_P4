@@ -55,6 +55,7 @@ function detalle(estados) {
                    estados.descripcion   AS estado,
                    asignado.apellidos    AS asignado_apellidos,
                    asignado.nombres      AS asignado_nombres,
+                   asignado.rol          AS asignado_rol,
                    (SELECT max(incidencias_estados.fecha_hora_estado)
                     FROM incidencias_estados
                     WHERE incidencias_estados.id_incidencia = incidencias.id_incidencia
