@@ -102,10 +102,7 @@ export function paginacion({ pagina, paginas, total, limite }) {
   </div>`;
 }
 
-const URL_SERVIDOR = (import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1").replace(
-  /\/api\/v1\/?$/,
-  ""
-);
+const URL_SERVIDOR = "http://localhost:3000";
 
 export function urlDelAvatar(archivo) {
   return archivo ? `${URL_SERVIDOR}/publico/avatares/${archivo}` : "";

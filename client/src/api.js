@@ -1,4 +1,4 @@
-const URL_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const URL_BASE = "http://localhost:3000/api/v1";
 
 function cerrarSesionPorTokenVencido() {
   localStorage.removeItem("token");
