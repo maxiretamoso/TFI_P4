@@ -10,6 +10,8 @@ export const NOMBRES_ROL = {
   [ROLES.EMPLEADO_MUNICIPAL]: "Municipal",
 };
 
+export const AREA_SISTEMAS = 3;
+
 export const ESTADOS = {
   PENDIENTE: 1,
   EN_PROCESO: 2,

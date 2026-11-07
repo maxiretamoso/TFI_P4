@@ -2,7 +2,7 @@ import { api } from "../api.js";
 import { puedeGestionarUsuarios } from "../permisos.js";
 import { leerUsuario } from "../session.js";
 import { confirmar } from "../confirmar.js";
-import { NOMBRES_ROL, esc, cargando, mensajeError } from "../ui.js";
+import { NOMBRES_ROL, ROLES, AREA_SISTEMAS, esc, cargando, mensajeError } from "../ui.js";
 
 let contenedor = null;
 let esDirector = false;
@@ -100,6 +100,7 @@ export async function pintar(zona) {
   if (esDirector) {
     contenedor.querySelector("form").addEventListener("submit", guardar);
     contenedor.querySelector(".zona-cancelar button").addEventListener("click", cancelarEdicion);
+    contenedor.querySelector("#campo-rol").addEventListener("change", ajustarAreaSegunRol);
   }
 
   contenedor.querySelector(".buscador input").addEventListener("input", (evento) => {
@@ -116,7 +117,10 @@ export async function pintar(zona) {
     ]);
     usuarios = listaUsuarios;
     areas = listaAreas;
-    if (esDirector) llenarSelectArea();
+    if (esDirector) {
+      llenarSelectArea();
+      ajustarAreaSegunRol();
+    }
   } catch (e) {
     error = e.message;
   }
@@ -207,6 +211,16 @@ function refrescarForm() {
     ? "Guardar"
     : "Agregar";
   contenedor.querySelector(".zona-cancelar").hidden = !editandoId;
+  ajustarAreaSegunRol();
+}
+
+// El Director y los empleados de Sistemas son del área Sistemas; el Municipal elige.
+function ajustarAreaSegunRol() {
+  const campoArea = contenedor.querySelector("#campo-area");
+  const rolElegido = Number(contenedor.querySelector("#campo-rol").value);
+  const areaFija = rolElegido === ROLES.DIRECTOR || rolElegido === ROLES.EMPLEADO_SISTEMAS;
+  if (areaFija) campoArea.value = String(AREA_SISTEMAS);
+  campoArea.disabled = areaFija;
 }
 
 async function empezarEdicion(item) {

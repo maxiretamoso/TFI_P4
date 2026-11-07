@@ -4,6 +4,7 @@ import * as incidenciasDatos from "../datos/incidencias.datos.js";
 import { crearError } from "../utils/httpError.js";
 import { ROLES } from "../config/roles.js";
 import { ESTADOS } from "../config/estados.js";
+import { AREA_SISTEMAS } from "../config/areas.js";
 import { hashearContrasenia } from "./auth.service.js";
 
 const CODIGO_CLAVE_DUPLICADA = "23505";
@@ -48,9 +49,17 @@ async function obtenerUsuarioPorId(id, solicitante) {
   return usuario;
 }
 
+// El Director y los empleados de Sistemas son del área Sistemas; el Municipal elige.
+async function validarArea(id_area, rol) {
+  const area = await areasDatos.buscarPorId(id_area);
+  if (!area || area.activo !== 1) throw crearError(400, "El área indicada no existe");
+  if ([ROLES.DIRECTOR, ROLES.EMPLEADO_SISTEMAS].includes(Number(rol)) && Number(id_area) !== AREA_SISTEMAS) {
+    throw crearError(400, "El Director y los empleados de Sistemas pertenecen al área Sistemas");
+  }
+}
+
 async function crearUsuario(datos) {
-  const area = await areasDatos.buscarPorId(datos.id_area);
-  if (!area) throw crearError(400, "El área indicada no existe");
+  await validarArea(datos.id_area, datos.rol);
 
   try {
     return await usuariosDatos.insertar({
@@ -88,9 +97,7 @@ async function actualizarUsuario(id, datos, solicitante) {
   if (cambiaRol) await exigirSinIncidenciasAbiertas(actual, "cambiarle el rol");
 
   const id_area = datos.id_area ?? actual.id_area;
-  if (id_area !== actual.id_area && !(await areasDatos.buscarPorId(id_area))) {
-    throw crearError(400, "El área indicada no existe");
-  }
+  await validarArea(id_area, datos.rol ?? actual.rol);
 
   try {
     return await usuariosDatos.actualizar(id, {

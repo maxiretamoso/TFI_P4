@@ -52,7 +52,7 @@ router.use(verificarToken);
  *             type: object
  *             required: [id_area, nombres, apellidos, usuario, contrasenia, rol]
  *             properties:
- *               id_area:     { type: integer }
+ *               id_area:     { type: integer, description: 'Director y Sistemas deben ser del área Sistemas (3); el Municipal elige' }
  *               nombres:     { type: string, maxLength: 250 }
  *               apellidos:   { type: string, maxLength: 250 }
  *               usuario:     { type: string, format: email }
@@ -111,7 +111,7 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
- *               id_area:     { type: integer }
+ *               id_area:     { type: integer, description: 'Director y Sistemas deben ser del área Sistemas (3); el Municipal elige' }
  *               nombres:     { type: string }
  *               apellidos:   { type: string }
  *               usuario:     { type: string, format: email }
