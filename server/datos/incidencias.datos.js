@@ -117,7 +117,7 @@ async function listar(filtros) {
   const [filas, conteo, conteoDelRol] = await Promise.all([
     pool.query(
       `${SELECCION} ${where}
-       ORDER BY incidencias.creado DESC, incidencias.id_incidencia DESC
+       ORDER BY incidencias.id_incidencia
        LIMIT $${valores.length + 1} OFFSET $${valores.length + 2}`,
       [...valores, limite, desplazamiento]
     ),
