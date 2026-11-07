@@ -44,12 +44,7 @@ function tituloDeLista() {
 function descripcionDelFiltro() {
   const partes = [];
   if (filtros.get("buscar")) partes.push(`"${filtros.get("buscar")}"`);
-  const estados = filtros.get("estado");
-  if (estados === `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`) {
-    partes.push("Abiertas (pendientes o en proceso)");
-  } else if (estados) {
-    partes.push(estados.split(",").map((id) => NOMBRES_ESTADO_PLURAL[id] ?? id).join(" y "));
-  }
+  if (filtros.get("estado")) partes.push(nombreDeEstados(filtros.get("estado")));
   if (filtros.get("prioridad")) partes.push(`prioridad ${PRIORIDADES[filtros.get("prioridad")] ?? ""}`);
   if (filtros.get("sin_asignar")) partes.push("sin asignar");
   if (filtros.get("desde")) partes.push(`creadas desde el ${fecha(filtros.get("desde"))}`);
@@ -58,20 +53,41 @@ function descripcionDelFiltro() {
   return partes.join(" · ");
 }
 
+function nombreDeEstados(valor) {
+  return valor
+    .split(",")
+    .map((id, i) => {
+      const nombre = NOMBRES_ESTADO_PLURAL[id] ?? id;
+      return i === 0 ? nombre : nombre.toLowerCase();
+    })
+    .join(" y ");
+}
+
+// Si el filtro trae una combinación que no está entre las opciones (por ejemplo desde
+// un enlace), se muestra mientras esté aplicada y se quita al elegir otra.
+function opcionesDeEstado(estado) {
+  const abiertas = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
+  const fijas = esDirector(usuario) ? [[abiertas, "Abiertas"]] : [];
+  fijas.push(...Object.entries(NOMBRES_ESTADO_PLURAL));
+
+  const temporal =
+    estado && !fijas.some(([valor]) => valor === estado)
+      ? `<option value="${esc(estado)}" data-temporal selected>${esc(nombreDeEstados(estado))}</option>`
+      : "";
+  return opcion("", "Todos los estados", estado) + temporal + fijas.map(([valor, texto]) => opcion(valor, texto, estado)).join("");
+}
+
 function opcion(valor, texto, actual) {
   return `<option value="${valor}"${String(actual ?? "") === String(valor) ? " selected" : ""}>${texto}</option>`;
 }
 
 function barraDeFiltros() {
-  const abiertas = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
   const estado = filtros.get("estado");
   const prioridad = filtros.get("prioridad");
   return `<form class="barra-filtros" id="form-filtros" role="search">
     <input class="form-control" type="search" name="buscar" placeholder="Buscar por pedido o artículo" aria-label="Buscar por pedido o artículo" value="${esc(filtros.get("buscar") ?? "")}">
     <select class="form-select" name="estado" aria-label="Filtrar por estado">
-      ${opcion("", "Todos los estados", estado)}
-      ${opcion(abiertas, "Abiertas", estado)}
-      ${Object.entries(NOMBRES_ESTADO_PLURAL).map(([id, nombre]) => opcion(id, nombre, estado)).join("")}
+      ${opcionesDeEstado(estado)}
     </select>
     <select class="form-select" name="prioridad" aria-label="Filtrar por prioridad">
       ${opcion("", "Todas las prioridades", prioridad)}
@@ -95,6 +111,7 @@ function barraDeFiltros() {
 function aplicarFiltros(evento) {
   evento?.preventDefault();
   const formulario = contenedor.querySelector("#form-filtros");
+  formulario.querySelector("option[data-temporal]:not(:checked)")?.remove();
   const nuevos = new URLSearchParams();
   for (const [clave, valor] of new FormData(formulario)) {
     if (valor.trim()) nuevos.set(clave, valor.trim());
