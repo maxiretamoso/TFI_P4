@@ -170,12 +170,7 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | PATCH | `/usuarios/{id}/avatar` | el propio usuario o el Director |
 | GET | `/avatares` | autenticado |
 
-## Cambios respecto del script de la cátedra
+## Notas sobre la base
 
-`database/incidencias_db.sql` parte del script original y respeta sus tablas, columnas y datos. Los cambios son estos:
-
-- **Fecha en el historial.** En el diagrama, `incidencias_estados.fecha_hora_estado` es `time with time zone`, que guarda la hora de cada cambio pero no el día. Se cambió a `timestamp with time zone` para que el historial tenga fecha y hora, y así poder mostrar cuándo se resolvió o canceló cada incidencia (en la lista y en el reporte PDF). Es el único cambio de tipo.
-- **"Resuela" → "Resuelta".** El estado 3 estaba mal escrito en el script original.
-- **Claves foráneas.** El script original no tenía. Se agregaron 9 para que la base no acepte, por ejemplo, una incidencia sobre un artículo que no existe: 8 con `ON DELETE RESTRICT` y la del historial con `ON DELETE CASCADE`. Como la aplicación nunca borra filas, funcionan como red de seguridad.
-- **Extensión `pgcrypto`.** Se crea al final del script, porque es la que se usa en las clases para trabajar con las contraseñas en SHA-256.
-- **Que corra en cualquier instalación.** Se agregó `SET client_encoding = 'UTF8'` para que los acentos se carguen bien en Windows, se usa `CREATE SCHEMA IF NOT EXISTS public`, y se quitaron las líneas `OWNER TO postgre` (fallaban si el usuario de PostgreSQL tenía otro nombre) y los `SET` de configuración del volcado original (algunos, como `transaction_timeout`, no existen en versiones anteriores a PostgreSQL 17).
+- En el diagrama de la cátedra la columna `incidencias_estados.fecha_hora_estado` es `time with time zone`, que guarda la hora de cada cambio pero no el día. En `database/incidencias_db.sql` se cambió a `timestamp with time zone` para que el historial tenga fecha y hora, y así poder mostrar cuándo se resolvió o canceló cada incidencia (en la lista y en el reporte PDF). Es el único cambio de tipo respecto del diagrama.
+- En el script original de la cátedra el estado 3 figuraba como "Resuela"; en `database/incidencias_db.sql` se corrigió a "Resuelta".
