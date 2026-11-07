@@ -18,7 +18,7 @@ function listar() {
             FROM usuarios
             JOIN areas ON usuarios.id_area = areas.id_area
             WHERE usuarios.activo = 1
-            ORDER BY usuarios.apellidos, usuarios.nombres`)
+            ORDER BY usuarios.id_usuario`)
     .then((r) => r.rows);
 }
 
