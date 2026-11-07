@@ -50,8 +50,8 @@ export async function pintar(zona) {
         </div>
 
         <div class="col-12 col-md-3">
-          <label class="form-label" for="campo-usuario">Usuario:</label>
-          <input class="form-control" type="text" id="campo-usuario" maxlength="100" required>
+          <label class="form-label" for="campo-usuario">Usuario (correo):</label>
+          <input class="form-control" type="email" id="campo-usuario" maxlength="100" placeholder="nombre@correo.com" autocomplete="off" required>
         </div>
 
         <div class="col-12 col-md-3 zona-contrasenia">
