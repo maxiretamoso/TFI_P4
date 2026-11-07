@@ -126,15 +126,15 @@ function graficoPorCategoria(resumen) {
 }
 
 function tarjetasDeIndicadores(resumen) {
-  const resueltas = resumen.porEstado.find((f) => f.id_estado === ESTADOS.RESUELTA)?.total ?? 0;
-  const { abiertas, altas_abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
+  const totalDe = (idEstado) => resumen.porEstado.find((f) => f.id_estado === idEstado)?.total ?? 0;
+  const { abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
   const indicadores = [
     ["Total", resumen.total, "incidencias registradas", ""],
     ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
-    ["Alta sin resolver", altas_abiertas, "abiertas de prioridad Alta", `estado=${ABIERTAS}&prioridad=${PRIORIDAD_ALTA}`],
+    ["Pendientes", sin_asignar, "Sin asignar, a cargo del Director", "sin_asignar=true"],
+    ["En proceso", totalDe(ESTADOS.EN_PROCESO), "asignadas a Sistemas", `estado=${ESTADOS.EN_PROCESO}`],
+    ["Resueltas", `${porcentaje(totalDe(ESTADOS.RESUELTA), resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
     ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
-    ["Sin asignar", sin_asignar, "pendientes a cargo del Director", "sin_asignar=true"],
-    ["Resueltas", `${porcentaje(resueltas, resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
   ];
   return `<div class="indicadores">${indicadores
     .map(

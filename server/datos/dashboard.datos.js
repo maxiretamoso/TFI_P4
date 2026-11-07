@@ -30,16 +30,15 @@ function total() {
     .then((r) => r.rows[0].total);
 }
 
-function indicadores({ abiertos, prioridadAlta, pendiente, rolDirector }) {
+function indicadores({ abiertos, pendiente, rolDirector }) {
   return pool
     .query(`SELECT COUNT(*) FILTER (WHERE id_estado = ANY($1))::int AS abiertas,
-                   COUNT(*) FILTER (WHERE id_estado = ANY($1) AND prioridad = $2)::int AS altas_abiertas,
                    COUNT(*) FILTER (WHERE creado >= current_date - 6)::int AS ultimos_7_dias,
                    COUNT(*) FILTER (
-                     WHERE id_estado = $3
-                       AND asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $4)
+                     WHERE id_estado = $2
+                       AND asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $3)
                    )::int AS sin_asignar
-            FROM incidencias`, [abiertos, prioridadAlta, pendiente, rolDirector])
+            FROM incidencias`, [abiertos, pendiente, rolDirector])
     .then((r) => r.rows[0]);
 }
 

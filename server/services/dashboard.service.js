@@ -28,7 +28,6 @@ async function obtenerResumen() {
     dashboardDatos.totalesPorCategoria(),
     dashboardDatos.indicadores({
       abiertos: ABIERTOS,
-      prioridadAlta: PRIORIDAD_ALTA,
       pendiente: ESTADOS.PENDIENTE,
       rolDirector: ROLES.DIRECTOR,
     }),
