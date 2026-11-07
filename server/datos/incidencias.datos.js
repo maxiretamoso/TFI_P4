@@ -109,10 +109,11 @@ function armarFiltros({
 
 async function listar(filtros) {
   const { where, valores } = armarFiltros(filtros);
-  const { pagina, limite } = filtros;
+  const { pagina, limite, creadoPor, asignadoA } = filtros;
   const desplazamiento = (pagina - 1) * limite;
+  const delRol = armarFiltros({ creadoPor, asignadoA });
 
-  const [filas, conteo] = await Promise.all([
+  const [filas, conteo, conteoDelRol] = await Promise.all([
     pool.query(
       `${SELECCION} ${where}
        ORDER BY incidencias.creado DESC, incidencias.id_incidencia DESC
@@ -120,9 +121,10 @@ async function listar(filtros) {
       [...valores, limite, desplazamiento]
     ),
     pool.query(`SELECT COUNT(*)::int AS total ${DESDE} ${where}`, valores),
+    pool.query(`SELECT COUNT(*)::int AS total ${DESDE} ${delRol.where}`, delRol.valores),
   ]);
 
-  return { items: filas.rows, total: conteo.rows[0].total };
+  return { items: filas.rows, total: conteo.rows[0].total, totalSinFiltros: conteoDelRol.rows[0].total };
 }
 
 function buscarPorId(id) {

@@ -75,16 +75,21 @@ function botonDePagina(numero, texto, { activa = false, deshabilitada = false, e
   </li>`;
 }
 
-export function paginacion({ pagina, paginas, total, limite }) {
-  if (total === 0) return "";
+export function paginacion({ pagina, paginas, total, total_sin_filtros: totalSinFiltros = total, limite }) {
+  if (totalSinFiltros === 0) return "";
+  const filtrado = total !== totalSinFiltros;
 
   if (paginas <= 1) {
-    return `<p class="texto-paginacion">Mostrando ${total} ${total === 1 ? "incidencia" : "incidencias"}</p>`;
+    const texto = filtrado
+      ? `${total} de ${totalSinFiltros} incidencias`
+      : `${total} ${total === 1 ? "incidencia" : "incidencias"}`;
+    return `<p class="texto-paginacion">Mostrando ${texto}</p>`;
   }
 
   const desde = (pagina - 1) * limite + 1;
   const hasta = Math.min(pagina * limite, total);
-  const resumen = `<p class="texto-paginacion">Mostrando ${desde}–${hasta} de ${total}</p>`;
+  const enTotal = filtrado ? ` (${totalSinFiltros} en total)` : "";
+  const resumen = `<p class="texto-paginacion">Mostrando ${desde}–${hasta} de ${total}${enTotal}</p>`;
 
   const inicio = Math.max(1, Math.min(pagina - 2, paginas - 4));
   const fin = Math.min(paginas, inicio + 4);

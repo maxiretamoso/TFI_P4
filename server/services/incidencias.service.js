@@ -33,7 +33,7 @@ async function listar(solicitante, consulta = {}) {
   const pagina = Math.max(aEntero(consulta.pagina, 1), 1);
   const limite = Math.min(Math.max(aEntero(consulta.limite, LIMITE_POR_DEFECTO), 1), LIMITE_MAXIMO);
 
-  const { items, total } = await incidenciasDatos.listar({
+  const { items, total, totalSinFiltros } = await incidenciasDatos.listar({
     ...filtroSegunRol(solicitante),
     estados: consulta.estado ? consulta.estado.split(",").map(Number) : null,
     prioridad: consulta.prioridad ? aEntero(consulta.prioridad, null) : null,
@@ -50,7 +50,14 @@ async function listar(solicitante, consulta = {}) {
     limite,
   });
 
-  return { items, total, pagina, limite, paginas: Math.max(Math.ceil(total / limite), 1) };
+  return {
+    items,
+    total,
+    total_sin_filtros: totalSinFiltros,
+    pagina,
+    limite,
+    paginas: Math.max(Math.ceil(total / limite), 1),
+  };
 }
 
 async function obtenerPorId(id, solicitante) {

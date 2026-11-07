@@ -47,7 +47,8 @@ router.use(verificarToken);
  *               type: object
  *               properties:
  *                 items:   { type: array, items: { $ref: '#/components/schemas/Incidencia' } }
- *                 total:   { type: integer }
+ *                 total:   { type: integer, description: Incidencias que cumplen los filtros }
+ *                 total_sin_filtros: { type: integer, description: Incidencias que el usuario puede ver, sin aplicar filtros }
  *                 pagina:  { type: integer }
  *                 limite:  { type: integer }
  *                 paginas: { type: integer }
