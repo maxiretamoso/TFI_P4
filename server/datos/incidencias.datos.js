@@ -211,4 +211,20 @@ function contarAsignadasEnEstados(idUsuario, estados) {
     .then((r) => r.rows[0].total);
 }
 
-export { listar, buscarPorId, insertar, cambiarEstado, asignar, contarAsignadasEnEstados };
+function contarDelArticuloEnEstados(idArticulo, estados) {
+  return pool
+    .query(`SELECT COUNT(*)::int AS total
+            FROM incidencias
+            WHERE id_articulo = $1 AND id_estado = ANY($2)`, [idArticulo, estados])
+    .then((r) => r.rows[0].total);
+}
+
+export {
+  listar,
+  buscarPorId,
+  insertar,
+  cambiarEstado,
+  asignar,
+  contarAsignadasEnEstados,
+  contarDelArticuloEnEstados,
+};

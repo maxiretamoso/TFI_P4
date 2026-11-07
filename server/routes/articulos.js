@@ -109,6 +109,7 @@ router.post(
  *       204: { description: Artículo dado de baja }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       409: { description: El artículo tiene incidencias pendientes o en proceso }
  */
 router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], articulosController.obtenerPorId);
 

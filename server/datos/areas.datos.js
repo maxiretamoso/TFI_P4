@@ -33,4 +33,11 @@ function desactivar(id) {
     .then((r) => r.rows[0] || null);
 }
 
-export { listar, buscarPorId, insertar, actualizar, desactivar };
+function contarEnUso(id) {
+  return pool
+    .query(`SELECT (SELECT COUNT(*) FROM usuarios WHERE id_area = $1 AND activo = 1)::int AS usuarios,
+                   (SELECT COUNT(*) FROM articulos WHERE id_area = $1 AND activo = 1)::int AS articulos`, [id])
+    .then((r) => r.rows[0]);
+}
+
+export { listar, buscarPorId, insertar, actualizar, desactivar, contarEnUso };

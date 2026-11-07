@@ -95,6 +95,7 @@ router.post(
  *       204: { description: Dada de baja }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       409: { description: El área tiene usuarios o artículos activos }
  */
 router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], areasController.obtenerPorId);
 

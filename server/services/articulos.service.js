@@ -1,15 +1,17 @@
 import * as articulosDatos from "../datos/articulos.datos.js";
 import * as areasDatos from "../datos/areas.datos.js";
 import * as categoriasDatos from "../datos/categorias.datos.js";
+import * as incidenciasDatos from "../datos/incidencias.datos.js";
 import { crearError } from "../utils/httpError.js";
+import { ESTADOS } from "../config/estados.js";
 
 async function validarReferencias(id_area, id_categoria) {
   const [area, categoria] = await Promise.all([
     areasDatos.buscarPorId(id_area),
     categoriasDatos.buscarPorId(id_categoria),
   ]);
-  if (!area) throw crearError(400, "El área indicada no existe");
-  if (!categoria) throw crearError(400, "La categoría indicada no existe");
+  if (!area || area.activo !== 1) throw crearError(400, "El área indicada no existe");
+  if (!categoria || categoria.activo !== 1) throw crearError(400, "La categoría indicada no existe");
 }
 
 function listarArticulos() {
@@ -40,9 +42,18 @@ async function actualizarArticulo(id, datos) {
 }
 
 async function desactivarArticulo(id) {
-  const articulo = await articulosDatos.desactivar(id);
+  const articulo = await articulosDatos.buscarPorId(id);
   if (!articulo) throw crearError(404, "Artículo no encontrado");
-  return articulo;
+
+  const abiertas = await incidenciasDatos.contarDelArticuloEnEstados(id, [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO]);
+  if (abiertas > 0) {
+    throw crearError(
+      409,
+      `No se puede dar de baja: el artículo tiene ${abiertas} incidencia${abiertas === 1 ? "" : "s"} sin resolver.`
+    );
+  }
+
+  return articulosDatos.desactivar(id);
 }
 
 export {

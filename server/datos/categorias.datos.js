@@ -33,4 +33,10 @@ function desactivar(id) {
     .then((r) => r.rows[0] || null);
 }
 
-export { listar, buscarPorId, insertar, actualizar, desactivar };
+function contarArticulos(id) {
+  return pool
+    .query(`SELECT COUNT(*)::int AS total FROM articulos WHERE id_categoria = $1 AND activo = 1`, [id])
+    .then((r) => r.rows[0].total);
+}
+
+export { listar, buscarPorId, insertar, actualizar, desactivar, contarArticulos };
