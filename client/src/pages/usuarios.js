@@ -40,12 +40,12 @@ export async function pintar(zona) {
   const formulario = esDirector
     ? `<form class="row g-2 align-items-end mb-4">
         <div class="col-12 col-md-3">
-          <label class="form-label" for="campo-nombres">Nombres:</label>
+          <label class="form-label" for="campo-nombres">Nombre/s:</label>
           <input class="form-control" type="text" id="campo-nombres" maxlength="100" required>
         </div>
 
         <div class="col-12 col-md-3">
-          <label class="form-label" for="campo-apellidos">Apellidos:</label>
+          <label class="form-label" for="campo-apellidos">Apellido/s:</label>
           <input class="form-control" type="text" id="campo-apellidos" maxlength="100" required>
         </div>
 
