@@ -11,7 +11,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 **Todos los roles**
 - Inicio de sesión con token JWT.
 - Mi perfil: datos del usuario, elección de un avatar predefinido o subida de una foto propia (que se puede ampliar), y cambio de contraseña.
-- Lista de incidencias con búsqueda en vivo y filtros por estado, prioridad y fecha.
+- Lista de incidencias con búsqueda en vivo, filtros por estado, prioridad y fecha, y paginación que indica cuántas cumplen el filtro sobre el total ("Mostrando 1 de 4 incidencias").
 - Modo claro y oscuro, con la preferencia guardada en el navegador.
 - Diseño responsivo: en el celular el menú lateral se pliega.
 
@@ -27,7 +27,8 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 **Director del área de Sistemas**
 - Dashboard con totales por estado, por fecha, por prioridad, por área y por categoría; indicadores generales; incidencias prioritarias abiertas; y carga de trabajo de cada empleado de Sistemas. Cada dato lleva a la lista de incidencias ya filtrada.
 - Reporte de incidencias en PDF, completo o filtrado por pendientes, en proceso, resueltas o canceladas.
-- Asignar incidencias a empleados de Sistemas y cancelar las pendientes.
+- Asignar (o reasignar) incidencias a empleados de Sistemas y cancelar las pendientes.
+- Filtros extra en la lista: "Abiertas" (pendientes y en proceso juntas) y "Sin asignar".
 - BREAD de usuarios, áreas, categorías y artículos.
 
 ## Stack
@@ -124,6 +125,10 @@ database/
 
 **Flujo de una incidencia.** Nace en estado Pendiente y a cargo del Director, porque `asignado_a` es `NOT NULL` en el diagrama de la cátedra y es el Director quien reparte el trabajo. Al asignarla a un empleado de Sistemas pasa a En Proceso; al finalizarla, a Resuelta; y una Pendiente se puede cancelar.
 
+**Incidencias sin asignar.** Mientras una incidencia está a nombre de un Director, la lista, el dashboard, el reporte PDF y el correo la muestran como "Sin asignar" en lugar del nombre del Director, porque todavía nadie de Sistemas la tiene. Si hay más de un Director, la incidencia nueva queda a nombre del primero activo, pero cualquiera de ellos la ve y la puede asignar.
+
+**Rutas del cliente.** Si se escribe una dirección que no existe o que el rol no puede ver, el router lleva a la pantalla de inicio del usuario en lugar de mostrar un error. Una dirección escrita sin `#` (por ejemplo `/catalogos`) se convierte a `#/catalogos` antes de decidir.
+
 **Correo en segundo plano.** El aviso por correo al finalizar o cancelar se envía sin esperar la respuesta del servidor de correo, para no demorar la operación. Un fallo de envío queda registrado en la consola y no afecta a la incidencia. Los estilos del correo van escritos en cada etiqueta, porque los clientes de correo descartan los CSS externos.
 
 **Contraseñas.** Los usuarios que trae el script de la cátedra tienen la contraseña en SHA-256, así que el login acepta ese formato. Toda contraseña que se cree o se cambie desde la aplicación se guarda con bcrypt. La contraseña solo se cambia desde `PATCH /auth/contrasenia`, que exige la actual; editar un usuario no la modifica.
@@ -165,7 +170,12 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | PATCH | `/usuarios/{id}/avatar` | el propio usuario o el Director |
 | GET | `/avatares` | autenticado |
 
-## Notas sobre la base
+## Cambios respecto del script de la cátedra
 
-- En el diagrama de la cátedra la columna `incidencias_estados.fecha_hora_estado` es `time with time zone`, que guarda la hora de cada cambio pero no el día. En `database/incidencias_db.sql` se cambió a `timestamp with time zone` para que el historial tenga fecha y hora, y así poder mostrar cuándo se resolvió o canceló cada incidencia (en la lista y en el reporte PDF). Es el único cambio de tipo respecto del diagrama.
-- En el script original de la cátedra el estado 3 figuraba como "Resuela"; en `database/incidencias_db.sql` se corrigió a "Resuelta".
+`database/incidencias_db.sql` parte del script original y respeta sus tablas, columnas y datos. Los cambios son estos:
+
+- **Fecha en el historial.** En el diagrama, `incidencias_estados.fecha_hora_estado` es `time with time zone`, que guarda la hora de cada cambio pero no el día. Se cambió a `timestamp with time zone` para que el historial tenga fecha y hora, y así poder mostrar cuándo se resolvió o canceló cada incidencia (en la lista y en el reporte PDF). Es el único cambio de tipo.
+- **"Resuela" → "Resuelta".** El estado 3 estaba mal escrito en el script original.
+- **Claves foráneas.** El script original no tenía. Se agregaron 9 para que la base no acepte, por ejemplo, una incidencia sobre un artículo que no existe: 8 con `ON DELETE RESTRICT` y la del historial con `ON DELETE CASCADE`. Como la aplicación nunca borra filas, funcionan como red de seguridad.
+- **Extensión `pgcrypto`.** Se crea al final del script, porque es la que se usa en las clases para trabajar con las contraseñas en SHA-256.
+- **Que corra en cualquier instalación.** Se agregó `SET client_encoding = 'UTF8'` para que los acentos se carguen bien en Windows, se usa `CREATE SCHEMA IF NOT EXISTS public`, y se quitaron las líneas `OWNER TO postgre` (fallaban si el usuario de PostgreSQL tenía otro nombre) y los `SET` de configuración del volcado original (algunos, como `transaction_timeout`, no existen en versiones anteriores a PostgreSQL 17).
