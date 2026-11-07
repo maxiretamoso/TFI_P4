@@ -140,11 +140,11 @@ function tarjetasDeIndicadores(resumen) {
   const { abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
   const indicadores = [
     ["Total", resumen.total, "incidencias registradas", ""],
+    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
     ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
     ["Pendientes", sin_asignar, "sin asignar", "sin_asignar=true"],
     ["En proceso", totalDe(ESTADOS.EN_PROCESO), "asignadas", `estado=${ESTADOS.EN_PROCESO}`],
     ["Resueltas", `${porcentaje(totalDe(ESTADOS.RESUELTA), resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
-    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
   ];
   return `<div class="indicadores">${indicadores
     .map(
