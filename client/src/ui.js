@@ -78,10 +78,13 @@ function botonDePagina(numero, texto, { activa = false, deshabilitada = false, e
 export function paginacion({ pagina, paginas, total, limite }) {
   if (total === 0) return "";
 
+  if (paginas <= 1) {
+    return `<p class="texto-paginacion">Mostrando ${total} ${total === 1 ? "incidencia" : "incidencias"}</p>`;
+  }
+
   const desde = (pagina - 1) * limite + 1;
   const hasta = Math.min(pagina * limite, total);
   const resumen = `<p class="texto-paginacion">Mostrando ${desde}–${hasta} de ${total}</p>`;
-  if (paginas <= 1) return resumen;
 
   const inicio = Math.max(1, Math.min(pagina - 2, paginas - 4));
   const fin = Math.min(paginas, inicio + 4);
