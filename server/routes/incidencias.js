@@ -81,7 +81,7 @@ router.get(
  * /incidencias:
  *   post:
  *     summary: Crea una incidencia
- *     description: Nace en estado Pendiente y a cargo del Director, que luego la asigna.
+ *     description: Nace en estado Pendiente y a cargo del Director, que luego la asigna. El artículo tiene que ser del área del empleado (si no, 403).
  *     tags: [Incidencias]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:

@@ -1,6 +1,7 @@
 import pool from "../db/index.js";
 
-function listar() {
+// Sin idArea devuelve los artículos de todas las áreas.
+function listar(idArea = null) {
   return pool
     .query(`SELECT articulos.id_articulo,
                    articulos.descripcion,
@@ -13,7 +14,8 @@ function listar() {
             JOIN areas      ON articulos.id_area = areas.id_area
             JOIN categorias ON articulos.id_categoria = categorias.id_categoria
             WHERE articulos.activo = 1
-            ORDER BY articulos.descripcion`)
+              AND ($1::int IS NULL OR articulos.id_area = $1)
+            ORDER BY articulos.descripcion`, [idArea])
     .then((r) => r.rows);
 }
 

@@ -4,6 +4,7 @@ import * as categoriasDatos from "../datos/categorias.datos.js";
 import * as incidenciasDatos from "../datos/incidencias.datos.js";
 import { crearError } from "../utils/httpError.js";
 import { ESTADOS } from "../config/estados.js";
+import { ROLES } from "../config/roles.js";
 
 async function validarReferencias(id_area, id_categoria) {
   const [area, categoria] = await Promise.all([
@@ -14,8 +15,10 @@ async function validarReferencias(id_area, id_categoria) {
   if (!categoria || categoria.activo !== 1) throw crearError(400, "La categoría indicada no existe");
 }
 
-function listarArticulos() {
-  return articulosDatos.listar();
+// El Municipal solo ve los artículos de su área; Sistemas y el Director, todos.
+function listarArticulos(solicitante) {
+  const soloSuArea = solicitante.rol === ROLES.EMPLEADO_MUNICIPAL ? solicitante.id_area : null;
+  return articulosDatos.listar(soloSuArea);
 }
 
 async function obtenerArticuloPorId(id) {

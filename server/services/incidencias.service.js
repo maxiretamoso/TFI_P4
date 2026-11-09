@@ -71,6 +71,9 @@ async function obtenerPorId(id, solicitante) {
 async function crear({ id_articulo, prioridad, descripcion_pedido }, solicitante) {
   const articulo = await articulosDatos.buscarPorId(id_articulo);
   if (!articulo || articulo.activo !== 1) throw crearError(400, "El artículo indicado no existe");
+  if (articulo.id_area !== solicitante.id_area) {
+    throw crearError(403, "Solo podés reportar artículos de tu área");
+  }
 
   const director = await usuariosDatos.buscarDirectorActivo();
   if (!director) {

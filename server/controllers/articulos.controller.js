@@ -4,7 +4,7 @@ import * as articulosService from "../services/articulos.service.js";
 async function listar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   try {
-    res.json(await articulosService.listarArticulos());
+    res.json(await articulosService.listarArticulos(req.usuario));
   } catch (error) {
     next(error);
   }

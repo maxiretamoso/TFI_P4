@@ -40,6 +40,13 @@ export async function pintar(zona) {
 
   try {
     const articulos = await api.get("/articulos");
+    if (articulos.length === 0) {
+      contenedor.querySelector(".zona-articulos").innerHTML = mensajeError(
+        "Todavía no hay artículos cargados en tu área. Pedile a Sistemas que los agregue.",
+        { fijo: true }
+      );
+      return;
+    }
     contenedor.querySelector("#articulo").innerHTML =
       `<option value="">Elegir artículo...</option>` +
       articulos

@@ -12,7 +12,7 @@ export async function pintar(zona) {
         <h2>Artículos</h2>
         <a class="btn btn-gim" href="#/nueva">+ Nueva incidencia</a>
       </div>
-      <p class="texto-ayuda">Equipos y elementos sobre los que podés reportar una incidencia.</p>
+      <p class="texto-ayuda">Equipos de tu área sobre los que podés reportar una incidencia.</p>
       <input class="form-control buscador" type="search" id="buscar-articulo" placeholder="Buscar por artículo, área o categoría" aria-label="Buscar artículos">
       <div class="tabla-scroll zona-lista">${cargando("Cargando artículos...")}</div>
     </div>`;
@@ -45,7 +45,11 @@ function pintarTabla(texto) {
             </tr>`
           )
           .join("")
-      : `<tr><td colspan="3">No hay artículos que coincidan con la búsqueda.</td></tr>`;
+      : `<tr><td colspan="3">${
+          articulos.length === 0
+            ? "Todavía no hay artículos cargados en tu área."
+            : "No hay artículos que coincidan con la búsqueda."
+        }</td></tr>`;
 
   contenedor.querySelector(".zona-lista").innerHTML = `
     <table>

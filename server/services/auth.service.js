@@ -20,7 +20,10 @@ function compararContrasenia(contrasenia, hash) {
   if (esHashBcrypt(hash)) return bcrypt.compare(contrasenia, hash);
   const calculado = Buffer.from(sha256(contrasenia), "hex");
   const guardado = Buffer.from(hash, "hex");
-  return Promise.resolve(calculado.length === guardado.length && crypto.timingSafeEqual(calculado, guardado));
+  return Promise.resolve(
+    calculado.length === guardado.length &&
+      crypto.timingSafeEqual(calculado, guardado),
+  );
 }
 
 function hashearContrasenia(contrasenia) {
@@ -31,7 +34,7 @@ function firmarToken(usuario) {
   return jwt.sign(
     { id_usuario: usuario.id_usuario, rol: usuario.rol },
     process.env.JWT_SECRET,
-    { expiresIn: HORAS_DE_SESION }
+    { expiresIn: HORAS_DE_SESION },
   );
 }
 
@@ -39,10 +42,14 @@ async function login(usuario, contrasenia) {
   const encontrado = await usuariosDatos.buscarCredenciales(usuario);
   if (!encontrado) throw crearError(401, "Usuario o contraseña incorrectos");
 
-  const coincide = await compararContrasenia(contrasenia, encontrado.contrasenia);
+  const coincide = await compararContrasenia(
+    contrasenia,
+    encontrado.contrasenia,
+  );
   if (!coincide) throw crearError(401, "Usuario o contraseña incorrectos");
 
-  if (encontrado.activo !== 1) throw crearError(403, "El usuario está dado de baja");
+  if (encontrado.activo !== 1)
+    throw crearError(403, "El usuario está dado de baja");
 
   return {
     token: firmarToken(encontrado),
@@ -64,7 +71,10 @@ async function cambiarContrasenia(idUsuario, actual, nueva) {
   const coincide = await compararContrasenia(actual, encontrado.contrasenia);
   if (!coincide) throw crearError(400, "La contraseña actual no es correcta");
 
-  await usuariosDatos.actualizarContrasenia(idUsuario, await hashearContrasenia(nueva));
+  await usuariosDatos.actualizarContrasenia(
+    idUsuario,
+    await hashearContrasenia(nueva),
+  );
   return { mensaje: "Contraseña actualizada" };
 }
 
@@ -74,7 +84,11 @@ async function validarSesion(datosDelToken) {
   if (!usuario || usuario.activo !== 1) {
     throw crearError(401, "Tu sesión ya no es válida. Iniciá sesión de nuevo.");
   }
-  return { id_usuario: usuario.id_usuario, rol: usuario.rol };
+  return {
+    id_usuario: usuario.id_usuario,
+    rol: usuario.rol,
+    id_area: usuario.id_area,
+  };
 }
 
 export { login, validarSesion, cambiarContrasenia, hashearContrasenia };

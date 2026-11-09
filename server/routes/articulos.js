@@ -21,6 +21,7 @@ const PUEDEN_GESTIONAR = [ROLES.EMPLEADO_SISTEMAS, ROLES.DIRECTOR];
  * /articulos:
  *   get:
  *     summary: Lista los artículos activos
+ *     description: El Empleado Municipal recibe solo los artículos de su área; Sistemas y el Director, todos.
  *     tags: [Articulos]
  *     security: [{ bearerAuth: [] }]
  *     responses:
