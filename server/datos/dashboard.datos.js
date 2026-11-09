@@ -33,7 +33,6 @@ function total() {
 function indicadores({ abiertos, pendiente, rolDirector }) {
   return pool
     .query(`SELECT COUNT(*) FILTER (WHERE id_estado = ANY($1))::int AS abiertas,
-                   COUNT(*) FILTER (WHERE creado >= current_date - 6)::int AS ultimos_7_dias,
                    COUNT(*) FILTER (
                      WHERE id_estado = $2
                        AND asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $3)

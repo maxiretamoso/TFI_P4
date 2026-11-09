@@ -35,7 +35,6 @@ const router = express.Router();
  *                   type: object
  *                   properties:
  *                     abiertas:       { type: integer, description: Pendientes más en proceso, example: 6 }
- *                     ultimos_7_dias: { type: integer, description: Creadas en los últimos 7 días, example: 3 }
  *                     sin_asignar:    { type: integer, description: Pendientes todavía a cargo del Director, example: 1 }
  *                 porEstado:
  *                   type: array

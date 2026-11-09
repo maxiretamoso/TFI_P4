@@ -21,13 +21,6 @@ const COLOR_ESTADO = {
 const ABIERTAS = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
 const PRIORIDAD_ALTA = 3;
 
-function fechaHaceDias(dias) {
-  const dia = new Date();
-  dia.setDate(dia.getDate() - dias);
-  const mes = String(dia.getMonth() + 1).padStart(2, "0");
-  return `${dia.getFullYear()}-${mes}-${String(dia.getDate()).padStart(2, "0")}`;
-}
-
 function enlaceALista(filtros, etiqueta) {
   const consulta = new URLSearchParams(filtros);
   if (etiqueta) consulta.set("etiqueta", etiqueta);
@@ -137,10 +130,10 @@ function graficoPorCategoria(resumen) {
 
 function tarjetasDeIndicadores(resumen) {
   const totalDe = (idEstado) => resumen.porEstado.find((f) => f.id_estado === idEstado)?.total ?? 0;
-  const { abiertas, ultimos_7_dias, sin_asignar } = resumen.indicadores;
+  const { abiertas, sin_asignar } = resumen.indicadores;
   const indicadores = [
     ["Total", resumen.total, "incidencias registradas", ""],
-    ["Últimos 7 días", ultimos_7_dias, "incidencias creadas", `desde=${fechaHaceDias(6)}`],
+    ["Canceladas", totalDe(ESTADOS.CANCELADA), "incidencias canceladas", `estado=${ESTADOS.CANCELADA}`],
     ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
     ["Pendientes", sin_asignar, "sin asignar", "sin_asignar=true"],
     ["En proceso", totalDe(ESTADOS.EN_PROCESO), "asignadas", `estado=${ESTADOS.EN_PROCESO}`],
