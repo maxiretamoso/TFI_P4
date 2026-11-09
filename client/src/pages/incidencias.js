@@ -236,7 +236,7 @@ function pintarError() {
 }
 
 function filaIncidencia(inc) {
-  const asignado = nombreDelAsignado(inc.asignado_a_nombre, inc.asignado_a_apellido, inc.asignado_a_rol);
+  const asignado = nombreDelAsignado(inc.asignado_a_nombre, inc.asignado_a_apellido);
 
   let acciones = "";
   if (puedeCancelar(usuario, inc)) {

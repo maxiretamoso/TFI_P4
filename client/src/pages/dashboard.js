@@ -158,7 +158,7 @@ function tablaDePrioritarias(resumen) {
         <td>${esc(inc.articulo)}</td>
         <td class="celda-pedido" data-ayuda-si-cortado>${esc(inc.descripcion_pedido)}</td>
         <td>${badgeEstado(inc)}</td>
-        <td>${nombreDelAsignado(inc.asignado_nombres, inc.asignado_apellidos, inc.asignado_rol)}</td>
+        <td>${nombreDelAsignado(inc.asignado_nombres, inc.asignado_apellidos)}</td>
         <td>${esc(inc.creador_nombres)} ${esc(inc.creador_apellidos)}</td>
         <td data-ayuda="${fechaHora(inc.creado)}">${antiguedad(inc.creado)}</td>
       </tr>`
