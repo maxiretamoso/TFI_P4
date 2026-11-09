@@ -123,9 +123,9 @@ database/
 
 **Transacciones.** Crear una incidencia, asignarla, finalizarla y cancelarla escriben en dos tablas (`incidencias` y `incidencias_estados`). Las dos escrituras van en la misma transacción: o se confirman las dos o no se confirma ninguna, y el historial nunca queda desfasado del estado actual.
 
-**Flujo de una incidencia.** Nace en estado Pendiente y sin asignar: `asignado_a` queda en `NULL` hasta que el Director, que es quien reparte el trabajo, elige a un empleado de Sistemas. Al asignarla a un empleado de Sistemas pasa a En Proceso; al finalizarla, a Resuelta; y una Pendiente se puede cancelar.
+**Flujo de una incidencia.** Nace en estado Pendiente y sin asignar, hasta que el Director, que es quien reparte el trabajo, elige a un empleado de Sistemas. Al asignarla pasa a En Proceso; al finalizarla, a Resuelta; y una Pendiente se puede cancelar.
 
-**Incidencias sin asignar.** En el script de la cátedra `asignado_a` era `NOT NULL`; se le quitó esa restricción para que una incidencia nueva no tenga que quedar a nombre de nadie. Mientras está en `NULL`, la lista, el dashboard, el reporte PDF y el correo la muestran como "Sin asignar", y el Director la encuentra con el filtro "Sin asignar". Una pendiente que se cancela antes de asignarse queda sin asignar.
+**Incidencias sin asignar.** Mientras nadie de Sistemas tiene la incidencia, la lista, el dashboard, el reporte PDF y el correo la muestran como "Sin asignar", y el Director la encuentra con el filtro "Sin asignar". Una pendiente que se cancela antes de asignarse queda sin asignar.
 
 **Rutas del cliente.** Si se escribe una dirección que no existe o que el rol no puede ver, el router lleva a la pantalla de inicio del usuario en lugar de mostrar un error. Una dirección escrita sin `#` (por ejemplo `/catalogos`) se convierte a `#/catalogos` antes de decidir.
 
