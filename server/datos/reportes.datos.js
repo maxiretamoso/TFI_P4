@@ -55,7 +55,6 @@ function detalle(estados) {
                    estados.descripcion   AS estado,
                    asignado.apellidos    AS asignado_apellidos,
                    asignado.nombres      AS asignado_nombres,
-                   asignado.rol          AS asignado_rol,
                    (SELECT max(incidencias_estados.fecha_hora_estado)
                     FROM incidencias_estados
                     WHERE incidencias_estados.id_incidencia = incidencias.id_incidencia
@@ -63,7 +62,7 @@ function detalle(estados) {
             FROM incidencias
             JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
             JOIN estados   ON incidencias.id_estado = estados.id_estado
-            JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
+            LEFT JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
             ${where}
             ORDER BY incidencias.creado DESC, incidencias.id_incidencia DESC`, valores)
     .then((r) => r.rows);

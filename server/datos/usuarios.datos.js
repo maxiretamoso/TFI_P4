@@ -31,16 +31,6 @@ function listarEmpleadosDeSistemas() {
     .then((r) => r.rows);
 }
 
-function buscarDirectorActivo() {
-  return pool
-    .query(`SELECT ${CAMPOS}
-            FROM usuarios
-            WHERE usuarios.rol = $1 AND usuarios.activo = 1
-            ORDER BY usuarios.id_usuario
-            LIMIT 1`, [ROLES.DIRECTOR])
-    .then((r) => r.rows[0] || null);
-}
-
 function buscarPorId(id) {
   return pool
     .query(`SELECT ${CAMPOS} FROM usuarios WHERE usuarios.id_usuario = $1`, [id])
@@ -113,7 +103,6 @@ function desactivar(id) {
 export {
   listar,
   listarEmpleadosDeSistemas,
-  buscarDirectorActivo,
   buscarPorId,
   buscarPerfil,
   buscarCredenciales,

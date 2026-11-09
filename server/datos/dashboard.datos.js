@@ -40,13 +40,12 @@ function prioritarias({ prioridad, estados, limite }) {
                    articulos.descripcion AS articulo,
                    asignado.nombres      AS asignado_nombres,
                    asignado.apellidos    AS asignado_apellidos,
-                   asignado.rol          AS asignado_rol,
                    creador.nombres       AS creador_nombres,
                    creador.apellidos     AS creador_apellidos
             FROM incidencias
             JOIN estados   ON incidencias.id_estado = estados.id_estado
             JOIN articulos ON incidencias.id_articulo = articulos.id_articulo
-            JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
+            LEFT JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
             JOIN usuarios AS creador  ON incidencias.creado_por = creador.id_usuario
             WHERE incidencias.prioridad = $1 AND incidencias.id_estado = ANY($2)
             ORDER BY incidencias.creado

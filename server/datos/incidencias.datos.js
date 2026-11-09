@@ -6,7 +6,7 @@ const DESDE = `
   JOIN estados        ON incidencias.id_estado = estados.id_estado
   JOIN articulos      ON incidencias.id_articulo = articulos.id_articulo
   JOIN usuarios AS creador  ON incidencias.creado_por = creador.id_usuario
-  JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
+  LEFT JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
 `;
 
 const SELECCION = `
@@ -25,7 +25,6 @@ const SELECCION = `
          creador.apellidos     AS creado_por_apellido,
          asignado.nombres      AS asignado_a_nombre,
          asignado.apellidos    AS asignado_a_apellido,
-         asignado.rol          AS asignado_a_rol,
          (SELECT max(incidencias_estados.fecha_hora_estado)
           FROM incidencias_estados
           WHERE incidencias_estados.id_incidencia = incidencias.id_incidencia
@@ -42,8 +41,6 @@ function armarFiltros({
   desde,
   fecha,
   sinAsignar,
-  pendiente,
-  rolDirector,
   area,
   categoria,
   asignado,
@@ -95,11 +92,7 @@ function armarFiltros({
     condiciones.push(`incidencias.asignado_a = $${valores.length}`);
   }
   if (sinAsignar) {
-    valores.push(pendiente, rolDirector);
-    condiciones.push(
-      `incidencias.id_estado = $${valores.length - 1}
-       AND incidencias.asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $${valores.length})`
-    );
+    condiciones.push("incidencias.asignado_a IS NULL");
   }
 
   return {

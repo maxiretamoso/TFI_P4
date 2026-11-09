@@ -34,7 +34,7 @@ router.use(verificarToken);
  *       - { in: query, name: buscar,    schema: { type: string }, description: Texto en el pedido o el artículo }
  *       - { in: query, name: desde,     schema: { type: string, format: date }, description: Creadas desde esa fecha (AAAA-MM-DD) }
  *       - { in: query, name: fecha,     schema: { type: string, format: date }, description: Creadas ese día (AAAA-MM-DD) }
- *       - { in: query, name: sin_asignar, schema: { type: boolean }, description: Solo las pendientes que siguen a cargo del Director }
+ *       - { in: query, name: sin_asignar, schema: { type: boolean }, description: Solo las que todavía no tienen a nadie asignado (asignado_a en null) }
  *       - { in: query, name: area,      schema: { type: integer }, description: id_area del artículo }
  *       - { in: query, name: categoria, schema: { type: integer }, description: id_categoria del artículo }
  *       - { in: query, name: asignado,  schema: { type: integer }, description: id_usuario del responsable }
@@ -82,7 +82,7 @@ router.get(
  * /incidencias:
  *   post:
  *     summary: Crea una incidencia
- *     description: Nace en estado Pendiente y a cargo del Director, que luego la asigna. El artículo tiene que ser del área del empleado (si no, 403).
+ *     description: Nace en estado Pendiente y sin asignar (asignado_a en null) hasta que el Director la asigna. El artículo tiene que ser del área del empleado (si no, 403).
  *     tags: [Incidencias]
  *     security: [{ bearerAuth: [] }]
  *     requestBody:
@@ -104,7 +104,6 @@ router.get(
  *             schema: { $ref: '#/components/schemas/Incidencia' }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
- *       409: { description: No hay un Director activo que pueda recibir la incidencia }
  */
 router.post(
   "/",

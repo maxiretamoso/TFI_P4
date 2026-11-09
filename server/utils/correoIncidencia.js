@@ -1,5 +1,4 @@
 import path from "path";
-import { ROLES } from "../config/roles.js";
 
 // Los clientes de correo ignoran <style> y CSS moderno: todo va en línea y con tablas.
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
@@ -47,11 +46,10 @@ function armarCorreoDeCierre({ incidencia, estado, resolucion }) {
     fila("Prioridad", PRIORIDADES[incidencia.prioridad] ?? incidencia.prioridad),
     fila("Creada", formatoFecha.format(new Date(incidencia.creado))),
   ];
-  if (incidencia.asignado_a_rol === ROLES.DIRECTOR) {
-    filas.push(fila("Responsable", "Sin asignar"));
-  } else if (incidencia.asignado_a_nombre) {
-    filas.push(fila("Responsable", escapar(`${incidencia.asignado_a_nombre} ${incidencia.asignado_a_apellido}`)));
-  }
+  const responsable = incidencia.asignado_a_nombre
+    ? escapar(`${incidencia.asignado_a_nombre} ${incidencia.asignado_a_apellido}`)
+    : "Sin asignar";
+  filas.push(fila("Responsable", responsable));
   if (estado === "finalizada" && resolucion) filas.push(fila("Resolución", escapar(resolucion)));
 
   const html = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#e8e9e1;padding:24px 0;font-family:Arial,Helvetica,sans-serif">

@@ -54,13 +54,13 @@ const definicion = {
           id_estado: { type: "integer" },
           estado: { type: "string" },
           creado_por: { type: "integer" },
-          asignado_a: { type: "integer" },
-          asignado_a_nombre: { type: "string" },
-          asignado_a_apellido: { type: "string" },
-          asignado_a_rol: {
+          asignado_a: {
             type: "integer",
-            description: "Rol del responsable. 1 (Director) significa que todavía no se asignó a nadie de Sistemas",
+            nullable: true,
+            description: "id_usuario del empleado de Sistemas a cargo; null mientras no se asignó",
           },
+          asignado_a_nombre: { type: "string", nullable: true },
+          asignado_a_apellido: { type: "string", nullable: true },
           creado: { type: "string", format: "date-time" },
           prioridad: { type: "integer", enum: [1, 2, 3] },
           descripcion_pedido: { type: "string" },

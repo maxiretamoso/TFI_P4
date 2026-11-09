@@ -44,8 +44,6 @@ async function listar(solicitante, consulta = {}) {
     categoria: consulta.categoria ? aEntero(consulta.categoria, null) : null,
     asignado: consulta.asignado ? aEntero(consulta.asignado, null) : null,
     sinAsignar: consulta.sin_asignar === "true" || consulta.sin_asignar === "1",
-    pendiente: ESTADOS.PENDIENTE,
-    rolDirector: ROLES.DIRECTOR,
     pagina,
     limite,
   });
@@ -68,7 +66,7 @@ async function obtenerPorId(id, solicitante) {
   return incidencia;
 }
 
-// asignado_a es NOT NULL: nace a cargo del Director hasta que la asigne.
+// Nace Pendiente y sin asignar (asignado_a en NULL) hasta que el Director elija a alguien de Sistemas.
 async function crear({ id_articulo, prioridad, descripcion_pedido }, solicitante) {
   const articulo = await articulosDatos.buscarPorId(id_articulo);
   if (!articulo || articulo.activo !== 1) throw crearError(400, "El artículo indicado no existe");
@@ -76,16 +74,11 @@ async function crear({ id_articulo, prioridad, descripcion_pedido }, solicitante
     throw crearError(403, "Solo podés reportar artículos de tu área");
   }
 
-  const director = await usuariosDatos.buscarDirectorActivo();
-  if (!director) {
-    throw crearError(409, "No hay un Director activo que pueda recibir la incidencia");
-  }
-
   return incidenciasDatos.insertar({
     id_articulo,
     id_estado: ESTADOS.PENDIENTE,
     creado_por: solicitante.id_usuario,
-    asignado_a: director.id_usuario,
+    asignado_a: null,
     prioridad,
     descripcion_pedido,
   });
