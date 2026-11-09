@@ -11,13 +11,13 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 **Todos los roles**
 - Inicio de sesión con token JWT.
 - Mi perfil: datos del usuario, elección de un avatar predefinido o subida de una foto propia (que se puede ampliar), y cambio de contraseña.
-- Lista de incidencias con búsqueda en vivo, filtros por estado, prioridad y fecha, y paginación que indica cuántas cumplen el filtro sobre el total ("Mostrando 1 de 4 incidencias").
+- Lista de incidencias ordenada de la más reciente a la más vieja, con búsqueda en vivo, filtros por estado, prioridad y fecha (el calendario de "Desde" empieza en el año de la incidencia más vieja), y paginación que indica cuántas cumplen el filtro sobre el total ("Mostrando 1 de 4 incidencias").
 - Modo claro y oscuro, con la preferencia guardada en el navegador.
 - Diseño responsivo: en el celular el menú lateral se pliega.
 
 **Empleado Municipal**
-- Listar los artículos, con buscador.
-- Crear una incidencia sobre un artículo.
+- Listar los artículos de su área, con buscador.
+- Crear una incidencia sobre un artículo de su área.
 - Listar sus incidencias y cancelar las que siguen pendientes.
 
 **Empleado del área de Sistemas**
@@ -117,7 +117,7 @@ database/
 
 **Cambios de estado sin carreras.** Asignar, finalizar y cancelar actualizan la incidencia solo si sigue en un estado que lo permite (la condición va en el mismo `UPDATE`). Si dos personas actúan a la vez sobre la misma incidencia, la segunda recibe 409 en lugar de aplicar un segundo cambio.
 
-**Sesión verificada en cada pedido.** Además de validar el token, el servidor comprueba que el usuario siga activo y toma su rol actual de la base: una baja o un cambio de rol se aplican de inmediato, sin esperar a que venza el token.
+**Sesión verificada en cada pedido.** Además de validar el token, el servidor comprueba que el usuario siga activo y toma su rol actual de la base: una baja o un cambio de rol se aplican de inmediato, sin esperar a que venza el token. El token dura 8 horas: vencido, el próximo pedido recibe 401 y el cliente vuelve al login con el aviso "La sesión venció".
 
 **Soft deletes.** Ninguna baja borra filas: se marca `activo = 0` y los listados filtran por `activo = 1`. Así las incidencias viejas siguen mostrando el artículo o la categoría con la que se crearon. Lo que está en uso no se puede dar de baja (409): un área con usuarios o artículos activos, una categoría con artículos activos o un artículo con incidencias pendientes o en proceso.
 
@@ -163,7 +163,7 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | GET | `/incidencias-estados` | Director |
 | GET | `/dashboard` | Director (incluye totales por fecha) |
 | GET | `/reportes/incidencias` | Director (filtro opcional: pendientes, en_proceso, resueltas, canceladas) |
-| GET | `/categorias`, `/articulos`, `/areas`, `/estados` | autenticado |
+| GET | `/categorias`, `/articulos`, `/areas`, `/estados` | autenticado (el Municipal recibe solo los artículos de su área) |
 | POST, PUT, DELETE | `/categorias`, `/articulos` | Sistemas y Director |
 | POST, PUT, DELETE | `/areas` | Director |
 | BREAD | `/usuarios` | Director (cada uno puede ver y editar su propio perfil) |
