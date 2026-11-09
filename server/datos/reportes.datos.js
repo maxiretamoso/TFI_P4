@@ -65,7 +65,7 @@ function detalle(estados) {
             JOIN estados   ON incidencias.id_estado = estados.id_estado
             JOIN usuarios AS asignado ON incidencias.asignado_a = asignado.id_usuario
             ${where}
-            ORDER BY incidencias.id_incidencia`, valores)
+            ORDER BY incidencias.creado DESC, incidencias.id_incidencia DESC`, valores)
     .then((r) => r.rows);
 }
 

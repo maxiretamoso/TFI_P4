@@ -117,15 +117,25 @@ async function listar(filtros) {
   const [filas, conteo, conteoDelRol] = await Promise.all([
     pool.query(
       `${SELECCION} ${where}
-       ORDER BY incidencias.id_incidencia
+       ORDER BY incidencias.creado DESC, incidencias.id_incidencia DESC
        LIMIT $${valores.length + 1} OFFSET $${valores.length + 2}`,
       [...valores, limite, desplazamiento]
     ),
     pool.query(`SELECT COUNT(*)::int AS total ${DESDE} ${where}`, valores),
-    pool.query(`SELECT COUNT(*)::int AS total ${DESDE} ${delRol.where}`, delRol.valores),
+    pool.query(
+      `SELECT COUNT(*)::int AS total,
+              EXTRACT(YEAR FROM MIN(incidencias.creado) AT TIME ZONE 'America/Argentina/Buenos_Aires')::int AS primer_anio
+       ${DESDE} ${delRol.where}`,
+      delRol.valores
+    ),
   ]);
 
-  return { items: filas.rows, total: conteo.rows[0].total, totalSinFiltros: conteoDelRol.rows[0].total };
+  return {
+    items: filas.rows,
+    total: conteo.rows[0].total,
+    totalSinFiltros: conteoDelRol.rows[0].total,
+    primerAnio: conteoDelRol.rows[0].primer_anio,
+  };
 }
 
 function buscarPorId(id) {

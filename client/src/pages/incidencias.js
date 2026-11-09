@@ -123,6 +123,8 @@ function aplicarFiltros(evento) {
   evento?.preventDefault();
   const formulario = contenedor.querySelector("#form-filtros");
   formulario.querySelector("option[data-temporal]:not(:checked)")?.remove();
+  const desde = formulario.querySelector('[name="desde"]');
+  if (desde.value && desde.min && desde.value < desde.min) desde.value = desde.min;
   const nuevos = new URLSearchParams();
   for (const [clave, valor] of new FormData(formulario)) {
     if (valor.trim()) nuevos.set(clave, valor.trim());
@@ -205,6 +207,13 @@ function guardarPagina(respuesta) {
   const { items, ...resto } = respuesta;
   incidencias = items;
   paginado = resto;
+  limitarFechaDesde();
+}
+
+// "Desde" no deja elegir años anteriores a la incidencia más vieja que ve el usuario.
+function limitarFechaDesde() {
+  const campo = contenedor.querySelector('#form-filtros [name="desde"]');
+  if (campo && paginado.primer_anio) campo.min = `${paginado.primer_anio}-01-01`;
 }
 
 async function cargarDatos() {

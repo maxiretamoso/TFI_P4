@@ -49,6 +49,7 @@ router.use(verificarToken);
  *                 items:   { type: array, items: { $ref: '#/components/schemas/Incidencia' } }
  *                 total:   { type: integer, description: Incidencias que cumplen los filtros }
  *                 total_sin_filtros: { type: integer, description: Incidencias que el usuario puede ver, sin aplicar filtros }
+ *                 primer_anio: { type: integer, nullable: true, description: Año de la incidencia más vieja que el usuario puede ver (mínimo del filtro desde) }
  *                 pagina:  { type: integer }
  *                 limite:  { type: integer }
  *                 paginas: { type: integer }
