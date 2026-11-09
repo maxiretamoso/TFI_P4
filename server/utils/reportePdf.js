@@ -15,14 +15,18 @@ const COLOR = {
   fila: "#f6f6f0",
 };
 
-const COLOR_ESTADO = {
-  [ESTADOS.PENDIENTE]: "#d98e04",
-  [ESTADOS.EN_PROCESO]: "#3a7bd5",
-  [ESTADOS.RESUELTA]: "#5e8c3a",
-  [ESTADOS.CANCELADA]: "#d64541",
+// En el detalle van las siglas para dejarle lugar al artículo y al pedido; el resumen las explica.
+const PRIORIDADES = {
+  3: { sigla: "A", nombre: "Alta" },
+  2: { sigla: "M", nombre: "Media" },
+  1: { sigla: "B", nombre: "Baja" },
 };
-
-const PRIORIDADES = { 1: "Baja", 2: "Media", 3: "Alta" };
+const ESTADOS_ABREVIADOS = {
+  [ESTADOS.PENDIENTE]: { sigla: "P", nombre: "Pendiente" },
+  [ESTADOS.EN_PROCESO]: { sigla: "EP", nombre: "En proceso" },
+  [ESTADOS.RESUELTA]: { sigla: "R", nombre: "Resuelta" },
+  [ESTADOS.CANCELADA]: { sigla: "C", nombre: "Cancelada" },
+};
 const CERRADAS = [ESTADOS.RESUELTA, ESTADOS.CANCELADA];
 
 // Hora de Argentina en 24 h, sin segundos, sin depender de la zona del servidor.
@@ -36,6 +40,7 @@ const formatoFechaHora = new Intl.DateTimeFormat("es-AR", {
 });
 const MARGEN = 45;
 const ALTO_FILA = 24;
+const RELLENO = 6;
 const SEPARACION_COLUMNAS = 24;
 
 function anchoUtil(doc) {
@@ -73,18 +78,38 @@ function asegurarEspacio(doc, alto) {
   }
 }
 
-// Dibuja una tabla con encabezado verde y filas alternadas; si no entra, sigue en otra página
-// repitiendo el encabezado. Cada columna puede dibujar su celda a mano con "dibujar".
+// Bordes finos alrededor de cada celda de una fila.
+function bordesDeFila(doc, xTabla, y, anchos) {
+  let x = xTabla;
+  anchos.forEach((ancho) => {
+    doc.rect(x, y, ancho, ALTO_FILA).lineWidth(0.5).stroke(COLOR.borde);
+    x += ancho;
+  });
+}
+
+function textoDeCelda(doc, texto, x, y, ancho, alinear) {
+  doc.text(String(texto ?? ""), x + RELLENO, y + 8, {
+    width: ancho - RELLENO * 2,
+    align: alinear ?? "left",
+    height: 11,
+    ellipsis: true,
+    lineBreak: false,
+  });
+}
+
+// Tabla con encabezado verde, filas alternadas y bordes en cada celda; si no entra, sigue en
+// otra página repitiendo el encabezado.
 function tabla(doc, columnas, filas, { x: xTabla = MARGEN, ancho: anchoTotal = anchoUtil(doc) } = {}) {
   const anchos = columnas.map((c) => c.ancho * anchoTotal);
 
   const dibujarEncabezado = () => {
     const y = doc.y;
     doc.rect(xTabla, y, anchoTotal, ALTO_FILA).fill(COLOR.verdeSuave);
+    bordesDeFila(doc, xTabla, y, anchos);
     let x = xTabla;
+    doc.fillColor(COLOR.verdeOscuro).font("Helvetica-Bold").fontSize(9);
     columnas.forEach((c, i) => {
-      doc.fillColor(COLOR.verdeOscuro).font("Helvetica-Bold").fontSize(9)
-        .text(c.titulo, x + 8, y + 8, { width: anchos[i] - 16, align: c.alinear ?? "left", height: 11, ellipsis: true });
+      textoDeCelda(doc, c.titulo, x, y, anchos[i], c.alinear);
       x += anchos[i];
     });
     doc.y = y + ALTO_FILA;
@@ -93,8 +118,12 @@ function tabla(doc, columnas, filas, { x: xTabla = MARGEN, ancho: anchoTotal = a
   dibujarEncabezado();
 
   if (filas.length === 0) {
-    doc.fillColor(COLOR.textoSuave).font("Helvetica").fontSize(9).text("Sin datos.", xTabla + 8, doc.y + 8);
-    doc.y += ALTO_FILA;
+    const y = doc.y;
+    doc.rect(xTabla, y, anchoTotal, ALTO_FILA).lineWidth(0.5).stroke(COLOR.borde);
+    doc.fillColor(COLOR.textoSuave).font("Helvetica").fontSize(9);
+    textoDeCelda(doc, "Sin datos.", xTabla, y, anchoTotal);
+    doc.y = y + ALTO_FILA;
+    doc.x = MARGEN;
     return;
   }
 
@@ -106,21 +135,12 @@ function tabla(doc, columnas, filas, { x: xTabla = MARGEN, ancho: anchoTotal = a
     }
     const y = doc.y;
     if (indice % 2 === 1) doc.rect(xTabla, y, anchoTotal, ALTO_FILA).fill(COLOR.fila);
-    doc.moveTo(xTabla, y + ALTO_FILA).lineTo(xTabla + anchoTotal, y + ALTO_FILA).lineWidth(0.5).stroke(COLOR.borde);
+    bordesDeFila(doc, xTabla, y, anchos);
 
     let x = xTabla;
+    doc.fillColor(COLOR.texto).font("Helvetica").fontSize(9);
     columnas.forEach((c, i) => {
-      if (c.dibujar) {
-        c.dibujar(doc, fila, x, y, anchos[i]);
-      } else {
-        doc.fillColor(COLOR.texto).font("Helvetica").fontSize(9)
-          .text(String(fila[c.campo] ?? ""), x + 8, y + 8, {
-            width: anchos[i] - 16,
-            align: c.alinear ?? "left",
-            height: 11,
-            ellipsis: true,
-          });
-      }
+      textoDeCelda(doc, fila[c.campo], x, y, anchos[i], c.alinear);
       x += anchos[i];
     });
     doc.y = y + ALTO_FILA;
@@ -128,22 +148,14 @@ function tabla(doc, columnas, filas, { x: xTabla = MARGEN, ancho: anchoTotal = a
   doc.x = MARGEN;
 }
 
-function celdaConPunto(color, texto) {
-  return (doc, fila, x, y, ancho) => {
-    doc.circle(x + 13, y + ALTO_FILA / 2, 3.5).fill(color(fila));
-    doc.fillColor(COLOR.texto).font("Helvetica").fontSize(9)
-      .text(texto(fila), x + 22, y + 8, { width: ancho - 30, height: 11, ellipsis: true });
-  };
-}
-
-function tablaDeTotales(doc, { titulo: textoTitulo, columna, filas, color, x, ancho }) {
+function tablaDeTotales(doc, { titulo: textoTitulo, columna, filas, x, ancho }) {
   const yInicio = doc.y;
   titulo(doc, textoTitulo, { x, ancho, tamanio: 11, espacioAntes: 0 });
   tabla(
     doc,
     [
-      { titulo: columna, ancho: 0.64, dibujar: celdaConPunto(color, (f) => f.nombre) },
-      { titulo: "Cantidad", ancho: 0.36, campo: "total", alinear: "right" },
+      { titulo: columna, ancho: 0.62, campo: "nombre" },
+      { titulo: "Cantidad", ancho: 0.38, campo: "total", alinear: "right" },
     ],
     filas,
     { x, ancho }
@@ -192,25 +204,22 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
   tabla(
     doc,
     [
-      { titulo: "#", ancho: 0.04, campo: "id_incidencia" },
-      { titulo: "Creada", ancho: 0.13, campo: "fecha" },
-      { titulo: "Cerrada", ancho: 0.13, campo: "cierre" },
-      { titulo: "Artículo", ancho: 0.14, campo: "articulo" },
-      { titulo: "Pedido", ancho: 0.15, campo: "descripcion_pedido" },
-      { titulo: "Prioridad", ancho: 0.11, campo: "prioridad_texto" },
-      {
-        titulo: "Estado",
-        ancho: 0.14,
-        dibujar: celdaConPunto((f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde, (f) => f.estado),
-      },
-      { titulo: "Asignada a", ancho: 0.16, campo: "asignado" },
+      { titulo: "#", ancho: 0.06, campo: "id_incidencia", alinear: "right" },
+      { titulo: "Creada", ancho: 0.12, campo: "fecha" },
+      { titulo: "Cerrada", ancho: 0.12, campo: "cierre" },
+      { titulo: "Artículo", ancho: 0.19, campo: "articulo" },
+      { titulo: "Pedido", ancho: 0.23, campo: "descripcion_pedido" },
+      { titulo: "Prior.", ancho: 0.07, campo: "prioridad_sigla", alinear: "center" },
+      { titulo: "Est.", ancho: 0.06, campo: "estado_sigla", alinear: "center" },
+      { titulo: "Asignada a", ancho: 0.15, campo: "asignado" },
     ],
     detalle.map((inc) => ({
       ...inc,
       fecha: formatoFecha.format(new Date(inc.creado)),
       cierre:
         CERRADAS.includes(inc.id_estado) && inc.fecha_estado ? formatoFecha.format(new Date(inc.fecha_estado)) : "-",
-      prioridad_texto: PRIORIDADES[inc.prioridad] ?? inc.prioridad,
+      prioridad_sigla: PRIORIDADES[inc.prioridad]?.sigla ?? inc.prioridad,
+      estado_sigla: ESTADOS_ABREVIADOS[inc.id_estado]?.sigla ?? inc.estado,
       asignado: inc.asignado_rol === ROLES.DIRECTOR ? "Sin asignar" : `${inc.asignado_nombres} ${inc.asignado_apellidos}`,
     }))
   );
@@ -222,20 +231,22 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
     {
       titulo: "Por estado",
       columna: "Estado",
-      filas: porEstado.map((f) => ({ nombre: f.estado, total: f.total, id_estado: f.id_estado })),
-      color: (f) => COLOR_ESTADO[f.id_estado] ?? COLOR.verde,
+      filas: porEstado.map((f) => {
+        const abreviado = ESTADOS_ABREVIADOS[f.id_estado];
+        return { nombre: abreviado ? `${abreviado.sigla} - ${abreviado.nombre}` : f.estado, total: f.total };
+      }),
     },
     {
       titulo: "Por prioridad",
       columna: "Prioridad",
-      filas: porPrioridad.length ? [3, 2, 1].map((p) => ({ nombre: PRIORIDADES[p], total: porId.get(p) ?? 0 })) : [],
-      color: () => COLOR.verde,
+      filas: porPrioridad.length
+        ? [3, 2, 1].map((p) => ({ nombre: `${PRIORIDADES[p].sigla} - ${PRIORIDADES[p].nombre}`, total: porId.get(p) ?? 0 }))
+        : [],
     },
     {
       titulo: "Por área",
       columna: "Área",
       filas: porArea.map((f) => ({ nombre: f.area, total: f.total })),
-      color: () => COLOR.verde,
     },
   ]);
 
