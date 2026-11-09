@@ -18,8 +18,16 @@ const COLOR_ESTADO = {
   [ESTADOS.CANCELADA]: "var(--gim-cancelada)",
 };
 
-const ABIERTAS = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
+const NOMBRE_EN_PLURAL = {
+  [ESTADOS.PENDIENTE]: "Pendientes",
+  [ESTADOS.EN_PROCESO]: "En proceso",
+  [ESTADOS.RESUELTA]: "Resueltas",
+  [ESTADOS.CANCELADA]: "Canceladas",
+};
+
+const SIN_RESOLVER = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
 const PRIORIDAD_ALTA = 3;
+const RADIO_TORTA = 15.915;
 
 function enlaceALista(filtros, etiqueta) {
   const consulta = new URLSearchParams(filtros);
@@ -34,14 +42,14 @@ function porcentaje(parte, total) {
 // Torta hecha con círculos SVG: cada estado es un trazo cuyo largo es su porcentaje.
 function graficoPorEstado(resumen) {
   let acumulado = 0;
-  const segmentos = resumen.porEstado
+  const tramos = resumen.porEstado
     .filter((f) => f.total > 0)
     .map((f) => {
       const largo = (f.total / resumen.total) * 100;
-      const segmento = `<circle cx="21" cy="21" r="15.915" fill="none" stroke="${COLOR_ESTADO[f.id_estado]}"
+      const tramo = `<circle cx="21" cy="21" r="${RADIO_TORTA}" fill="none" stroke="${COLOR_ESTADO[f.id_estado]}"
         stroke-width="6" stroke-dasharray="${largo} ${100 - largo}" stroke-dashoffset="${25 - acumulado}"></circle>`;
       acumulado += largo;
-      return segmento;
+      return tramo;
     })
     .join("");
 
@@ -50,20 +58,25 @@ function graficoPorEstado(resumen) {
       (f) => `<li>
         <a class="referencia-enlace" href="#/?estado=${f.id_estado}">
           <span class="punto" style="background: ${COLOR_ESTADO[f.id_estado]}"></span>
-          ${esc(f.estado)} <strong>${f.total}</strong>
+          ${NOMBRE_EN_PLURAL[f.id_estado] ?? esc(f.estado)} <strong>${f.total}</strong>
           <span class="porcentaje">${porcentaje(f.total, resumen.total)}%</span>
         </a>
       </li>`
     )
     .join("");
 
-  const descripcion = resumen.porEstado.map((f) => `${f.estado}: ${f.total}`).join(", ");
+  const descripcion = resumen.porEstado
+    .map((f) => `${NOMBRE_EN_PLURAL[f.id_estado] ?? f.estado}: ${f.total}`)
+    .join(", ");
 
   return `<div class="grafico-torta">
     <svg viewBox="0 0 42 42" role="img" aria-label="Incidencias por estado. ${esc(descripcion)}">
-      <circle cx="21" cy="21" r="15.915" fill="none" stroke="var(--gim-borde)" stroke-width="6"></circle>
-      ${segmentos}
-      <text x="21" y="23.5" text-anchor="middle" class="torta-centro">${resumen.total}</text>
+      <circle cx="21" cy="21" r="${RADIO_TORTA}" fill="none" stroke="var(--gim-borde)" stroke-width="6"></circle>
+      ${tramos}
+      <a href="#/" class="torta-enlace" aria-label="Ver todas las incidencias">
+        <circle cx="21" cy="21" r="11" class="torta-fondo-centro"></circle>
+        <text x="21" y="23.5" text-anchor="middle" class="torta-centro">${resumen.total}</text>
+      </a>
     </svg>
     <ul class="referencias">${referencias}</ul>
   </div>`;
@@ -128,28 +141,6 @@ function graficoPorCategoria(resumen) {
   );
 }
 
-function tarjetasDeIndicadores(resumen) {
-  const totalDe = (idEstado) => resumen.porEstado.find((f) => f.id_estado === idEstado)?.total ?? 0;
-  const { abiertas, sin_asignar } = resumen.indicadores;
-  const indicadores = [
-    ["Total", resumen.total, "incidencias registradas", ""],
-    ["Canceladas", totalDe(ESTADOS.CANCELADA), "incidencias canceladas", `estado=${ESTADOS.CANCELADA}`],
-    ["Abiertas", abiertas, "sin terminar: pendientes o en proceso", `estado=${ABIERTAS}`],
-    ["Pendientes", sin_asignar, "sin asignar", "sin_asignar=true"],
-    ["En proceso", totalDe(ESTADOS.EN_PROCESO), "asignadas", `estado=${ESTADOS.EN_PROCESO}`],
-    ["Resueltas", `${porcentaje(totalDe(ESTADOS.RESUELTA), resumen.total)}%`, "del total", `estado=${ESTADOS.RESUELTA}`],
-  ];
-  return `<div class="indicadores">${indicadores
-    .map(
-      ([titulo, valor, detalle, filtro]) => `<a class="indicador" href="#/${filtro ? `?${filtro}` : ""}">
-        <span class="indicador-valor">${valor}</span>
-        <span class="indicador-titulo">${titulo}</span>
-        <span class="indicador-detalle">${detalle}</span>
-      </a>`
-    )
-    .join("")}</div>`;
-}
-
 function antiguedad(fecha) {
   const dias = Math.floor((Date.now() - new Date(fecha)) / 86400000);
   if (dias <= 0) return "hoy";
@@ -158,11 +149,11 @@ function antiguedad(fecha) {
 
 function tablaDePrioritarias(resumen) {
   if (resumen.prioritarias.length === 0) {
-    return `<p class="texto-grafico">No hay incidencias de prioridad Alta abiertas.</p>`;
+    return `<p class="texto-grafico">No hay incidencias de prioridad Alta sin resolver.</p>`;
   }
   const filas = resumen.prioritarias
     .map(
-      (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: ABIERTAS, prioridad: PRIORIDAD_ALTA })}">
+      (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: SIN_RESOLVER, prioridad: PRIORIDAD_ALTA })}">
         <td>${inc.id_incidencia}</td>
         <td>${esc(inc.articulo)}</td>
         <td class="celda-pedido" data-ayuda-si-cortado>${esc(inc.descripcion_pedido)}</td>
@@ -187,24 +178,24 @@ function cargaDeEmpleados(resumen) {
     return `<p class="texto-grafico">No hay empleados de Sistemas activos.</p>`;
   }
 
-  const maximo = Math.max(...resumen.cargaPorEmpleado.map((e) => e.abiertas + e.resueltas), 1);
+  const maximo = Math.max(...resumen.cargaPorEmpleado.map((e) => e.en_proceso + e.resueltas), 1);
   const filas = resumen.cargaPorEmpleado
     .map(
       (e) => `<li>
         <a class="fila-enlace" href="${enlaceALista({ asignado: e.id_usuario }, `asignadas a ${e.nombres} ${e.apellidos}`)}">
           <span class="barra-nombre carga-nombre">${esc(e.nombres)} ${esc(e.apellidos)}</span>
           <span class="barra-pista carga-pista">
-            <span class="carga-abiertas" style="width: ${(e.abiertas / maximo) * 100}%"></span>
+            <span class="carga-en-proceso" style="width: ${(e.en_proceso / maximo) * 100}%"></span>
             <span class="carga-resueltas" style="width: ${(e.resueltas / maximo) * 100}%"></span>
           </span>
-          <span class="carga-numeros" data-ayuda="Abiertas / resueltas">${e.abiertas} / ${e.resueltas}</span>
+          <span class="carga-numeros" data-ayuda="En proceso / resueltas">${e.en_proceso} / ${e.resueltas}</span>
         </a>
       </li>`
     )
     .join("");
   return `<ul class="barras">${filas}</ul>
     <p class="referencias-linea">
-      <span><span class="punto" style="background: var(--gim-pendiente)"></span>Abiertas</span>
+      <span><span class="punto" style="background: var(--gim-proceso)"></span>En proceso</span>
       <span><span class="punto" style="background: var(--gim-resuelta)"></span>Resueltas</span>
     </p>`;
 }
@@ -228,7 +219,10 @@ export async function pintar(zona) {
         <h3>Por estado</h3>
         ${graficoPorEstado(resumen)}
       </section>
-      ${tarjetasDeIndicadores(resumen)}
+      <section class="tarjeta-grafico">
+        <h3>Carga de trabajo del equipo de Sistemas</h3>
+        ${cargaDeEmpleados(resumen)}
+      </section>
     </div>
 
     <section class="tarjeta-grafico tarjeta-completa">
@@ -257,11 +251,7 @@ export async function pintar(zona) {
         ${graficoPorCategoria(resumen)}
       </section>
     </div>
-
-    <section class="tarjeta-grafico tarjeta-completa">
-      <h3>Carga de trabajo del equipo de Sistemas</h3>
-      ${cargaDeEmpleados(resumen)}
-    </section>`;
+`;
 
   zona.querySelector(".tabla-dashboard")?.addEventListener("click", (evento) => {
     const fila = evento.target.closest("tr[data-enlace]");

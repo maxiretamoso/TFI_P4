@@ -30,18 +30,7 @@ function total() {
     .then((r) => r.rows[0].total);
 }
 
-function indicadores({ abiertos, pendiente, rolDirector }) {
-  return pool
-    .query(`SELECT COUNT(*) FILTER (WHERE id_estado = ANY($1))::int AS abiertas,
-                   COUNT(*) FILTER (
-                     WHERE id_estado = $2
-                       AND asignado_a IN (SELECT id_usuario FROM usuarios WHERE rol = $3)
-                   )::int AS sin_asignar
-            FROM incidencias`, [abiertos, pendiente, rolDirector])
-    .then((r) => r.rows[0]);
-}
-
-function prioritarias({ prioridad, abiertos, limite }) {
+function prioritarias({ prioridad, estados, limite }) {
   return pool
     .query(`SELECT incidencias.id_incidencia,
                    incidencias.descripcion_pedido,
@@ -61,22 +50,22 @@ function prioritarias({ prioridad, abiertos, limite }) {
             JOIN usuarios AS creador  ON incidencias.creado_por = creador.id_usuario
             WHERE incidencias.prioridad = $1 AND incidencias.id_estado = ANY($2)
             ORDER BY incidencias.creado
-            LIMIT $3`, [prioridad, abiertos, limite])
+            LIMIT $3`, [prioridad, estados, limite])
     .then((r) => r.rows);
 }
 
-function cargaPorEmpleado({ rolSistemas, abiertos, resuelta }) {
+function cargaPorEmpleado({ rolSistemas, enProceso, resuelta }) {
   return pool
     .query(`SELECT usuarios.id_usuario,
                    usuarios.nombres,
                    usuarios.apellidos,
-                   COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = ANY($2))::int AS abiertas,
+                   COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = $2)::int AS en_proceso,
                    COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = $3)::int AS resueltas
             FROM usuarios
             LEFT JOIN incidencias ON incidencias.asignado_a = usuarios.id_usuario
             WHERE usuarios.rol = $1 AND usuarios.activo = 1
             GROUP BY usuarios.id_usuario, usuarios.nombres, usuarios.apellidos
-            ORDER BY abiertas DESC, usuarios.apellidos`, [rolSistemas, abiertos, resuelta])
+            ORDER BY en_proceso DESC, usuarios.apellidos`, [rolSistemas, enProceso, resuelta])
     .then((r) => r.rows);
 }
 
@@ -95,7 +84,6 @@ export {
   totalesPorEstado,
   totalesPorFecha,
   total,
-  indicadores,
   prioritarias,
   cargaPorEmpleado,
   totalesPorCategoria,

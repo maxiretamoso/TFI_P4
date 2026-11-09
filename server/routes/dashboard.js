@@ -31,11 +31,6 @@ const router = express.Router();
  *                 total:
  *                   type: integer
  *                   example: 18
- *                 indicadores:
- *                   type: object
- *                   properties:
- *                     abiertas:       { type: integer, description: Pendientes más en proceso, example: 6 }
- *                     sin_asignar:    { type: integer, description: Pendientes todavía a cargo del Director, example: 1 }
  *                 porEstado:
  *                   type: array
  *                   items:
@@ -77,7 +72,7 @@ const router = express.Router();
  *                       total:     { type: integer, example: 7 }
  *                 prioritarias:
  *                   type: array
- *                   description: Hasta 10 incidencias abiertas de prioridad Alta, la más antigua primero
+ *                   description: Hasta 10 incidencias de prioridad Alta sin resolver (pendientes o en proceso), la más antigua primero
  *                   items:
  *                     type: object
  *                     properties:
@@ -94,14 +89,14 @@ const router = express.Router();
  *                       creador_apellidos:  { type: string }
  *                 cargaPorEmpleado:
  *                   type: array
- *                   description: Incidencias abiertas y resueltas de cada empleado de Sistemas
+ *                   description: Incidencias en proceso y resueltas de cada empleado de Sistemas
  *                   items:
  *                     type: object
  *                     properties:
  *                       id_usuario: { type: integer }
  *                       nombres:    { type: string }
  *                       apellidos:  { type: string }
- *                       abiertas:   { type: integer }
+ *                       en_proceso: { type: integer }
  *                       resueltas:  { type: integer }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
