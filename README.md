@@ -25,7 +25,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 - BREAD de categorías y artículos.
 
 **Director del área de Sistemas**
-- Dashboard con totales por estado (el total lleva a la lista completa), carga de trabajo de cada empleado de Sistemas (en proceso y resueltas), incidencias prioritarias sin resolver y totales por fecha, prioridad, área y categoría. Cada dato lleva a la lista de incidencias ya filtrada.
+- Dashboard con totales por estado (el total lleva a la lista completa), carga de trabajo de cada empleado de Sistemas (en proceso, resueltas y canceladas), incidencias prioritarias sin resolver y totales por fecha, prioridad, área y categoría. Cada dato lleva a la lista de incidencias ya filtrada.
 - Reporte de incidencias en PDF, completo o filtrado por pendientes, en proceso, resueltas o canceladas. En el detalle la prioridad y el estado van abreviados (A/M/B, P/EP/R/C) y el resumen explica cada sigla.
 - Asignar (o reasignar) incidencias a empleados de Sistemas y cancelar las pendientes.
 - Filtro extra en la lista: "Sin asignar".
