@@ -11,7 +11,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 **Todos los roles**
 - Inicio de sesión con token JWT.
 - Mi perfil: datos del usuario, elección de un avatar predefinido o subida de una foto propia (que se puede ampliar), y cambio de contraseña.
-- Lista de incidencias ordenada de la más reciente a la más vieja, con búsqueda en vivo, filtros por estado, prioridad y fecha (el calendario de "Desde" empieza en el año de la incidencia más vieja), y paginación que indica cuántas cumplen el filtro sobre el total ("Mostrando 1 de 4 incidencias").
+- Lista de incidencias ordenada de la más reciente a la más vieja, con búsqueda en vivo, filtros por estado, prioridad y fecha (el calendario de "Desde" empieza en el año de la incidencia más vieja), y paginación de a 15 que indica cuántas cumplen el filtro sobre el total ("Mostrando 1 de 4 incidencias").
 - Modo claro y oscuro, con la preferencia guardada en el navegador.
 - Diseño responsivo: en el celular el menú lateral se pliega.
 
@@ -25,10 +25,10 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 - BREAD de categorías y artículos.
 
 **Director del área de Sistemas**
-- Dashboard con totales por estado, por fecha, por prioridad, por área y por categoría; indicadores generales; incidencias prioritarias abiertas; y carga de trabajo de cada empleado de Sistemas. Cada dato lleva a la lista de incidencias ya filtrada.
-- Reporte de incidencias en PDF, completo o filtrado por pendientes, en proceso, resueltas o canceladas.
+- Dashboard con totales por estado (el total lleva a la lista completa), carga de trabajo de cada empleado de Sistemas (en proceso y resueltas), incidencias prioritarias sin resolver y totales por fecha, prioridad, área y categoría. Cada dato lleva a la lista de incidencias ya filtrada.
+- Reporte de incidencias en PDF, completo o filtrado por pendientes, en proceso, resueltas o canceladas. En el detalle la prioridad y el estado van abreviados (A/M/B, P/EP/R/C) y el resumen explica cada sigla.
 - Asignar (o reasignar) incidencias a empleados de Sistemas y cancelar las pendientes.
-- Filtros extra en la lista: "Abiertas" (pendientes y en proceso juntas) y "Sin asignar".
+- Filtro extra en la lista: "Sin asignar".
 - BREAD de usuarios, áreas, categorías y artículos.
 
 ## Stack
@@ -113,7 +113,7 @@ database/
 
 **Estados de solo lectura.** Los cuatro estados (Pendiente, En Proceso, Resuelta, Cancelada) se consultan pero no se crean, editan ni eliminan: todo el flujo de una incidencia depende de ellos.
 
-**Protecciones en usuarios.** Nadie puede cambiarse su propio rol ni darse de baja a sí mismo, y un empleado de Sistemas con incidencias abiertas asignadas no puede ser dado de baja ni cambiar de rol hasta que se reasignen. El Director y los empleados de Sistemas pertenecen al área Sistemas: el formulario la fija al elegir esos roles y el servidor rechaza otra. El área indica dónde trabaja cada usuario; lo que puede hacer lo define el rol.
+**Protecciones en usuarios.** Nadie puede cambiarse su propio rol ni darse de baja a sí mismo, y un empleado de Sistemas con incidencias sin resolver asignadas no puede ser dado de baja ni cambiar de rol hasta que se reasignen. El Director y los empleados de Sistemas pertenecen al área Sistemas: el formulario la fija al elegir esos roles y el servidor rechaza otra. El área indica dónde trabaja cada usuario; lo que puede hacer lo define el rol.
 
 **Cambios de estado sin carreras.** Asignar, finalizar y cancelar actualizan la incidencia solo si sigue en un estado que lo permite (la condición va en el mismo `UPDATE`). Si dos personas actúan a la vez sobre la misma incidencia, la segunda recibe 409 en lugar de aplicar un segundo cambio.
 
