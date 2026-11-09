@@ -54,18 +54,19 @@ function prioritarias({ prioridad, estados, limite }) {
     .then((r) => r.rows);
 }
 
-function cargaPorEmpleado({ rolSistemas, enProceso, resuelta }) {
+function cargaPorEmpleado({ rolSistemas, enProceso, resuelta, cancelada }) {
   return pool
     .query(`SELECT usuarios.id_usuario,
                    usuarios.nombres,
                    usuarios.apellidos,
                    COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = $2)::int AS en_proceso,
-                   COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = $3)::int AS resueltas
+                   COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = $3)::int AS resueltas,
+                   COUNT(incidencias.id_incidencia) FILTER (WHERE incidencias.id_estado = $4)::int AS canceladas
             FROM usuarios
             LEFT JOIN incidencias ON incidencias.asignado_a = usuarios.id_usuario
             WHERE usuarios.rol = $1 AND usuarios.activo = 1
             GROUP BY usuarios.id_usuario, usuarios.nombres, usuarios.apellidos
-            ORDER BY en_proceso DESC, usuarios.apellidos`, [rolSistemas, enProceso, resuelta])
+            ORDER BY en_proceso DESC, usuarios.apellidos`, [rolSistemas, enProceso, resuelta, cancelada])
     .then((r) => r.rows);
 }
 

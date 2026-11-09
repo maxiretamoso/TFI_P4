@@ -34,6 +34,7 @@ async function obtenerResumen() {
       rolSistemas: ROLES.EMPLEADO_SISTEMAS,
       enProceso: ESTADOS.EN_PROCESO,
       resuelta: ESTADOS.RESUELTA,
+      cancelada: ESTADOS.CANCELADA,
     }),
   ]);
 

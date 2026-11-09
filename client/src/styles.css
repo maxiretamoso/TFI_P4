@@ -1123,8 +1123,12 @@ h3 {
     background-color: var(--gim-resuelta);
 }
 
+.carga-canceladas {
+    background-color: var(--gim-cancelada);
+}
+
 .carga-numeros {
-    width: 56px;
+    width: 76px;
     text-align: right;
     font-weight: 600;
     white-space: nowrap;

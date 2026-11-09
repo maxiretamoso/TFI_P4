@@ -178,7 +178,7 @@ function cargaDeEmpleados(resumen) {
     return `<p class="texto-grafico">No hay empleados de Sistemas activos.</p>`;
   }
 
-  const maximo = Math.max(...resumen.cargaPorEmpleado.map((e) => e.en_proceso + e.resueltas), 1);
+  const maximo = Math.max(...resumen.cargaPorEmpleado.map((e) => e.en_proceso + e.resueltas + e.canceladas), 1);
   const filas = resumen.cargaPorEmpleado
     .map(
       (e) => `<li>
@@ -187,8 +187,9 @@ function cargaDeEmpleados(resumen) {
           <span class="barra-pista carga-pista">
             <span class="carga-en-proceso" style="width: ${(e.en_proceso / maximo) * 100}%"></span>
             <span class="carga-resueltas" style="width: ${(e.resueltas / maximo) * 100}%"></span>
+            <span class="carga-canceladas" style="width: ${(e.canceladas / maximo) * 100}%"></span>
           </span>
-          <span class="carga-numeros" data-ayuda="En proceso / resueltas">${e.en_proceso} / ${e.resueltas}</span>
+          <span class="carga-numeros" data-ayuda="En proceso / resueltas / canceladas">${e.en_proceso} / ${e.resueltas} / ${e.canceladas}</span>
         </a>
       </li>`
     )
@@ -197,6 +198,7 @@ function cargaDeEmpleados(resumen) {
     <p class="referencias-linea">
       <span><span class="punto" style="background: var(--gim-proceso)"></span>En proceso</span>
       <span><span class="punto" style="background: var(--gim-resuelta)"></span>Resueltas</span>
+      <span><span class="punto" style="background: var(--gim-cancelada)"></span>Canceladas</span>
     </p>`;
 }
 

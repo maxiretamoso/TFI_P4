@@ -89,7 +89,7 @@ const router = express.Router();
  *                       creador_apellidos:  { type: string }
  *                 cargaPorEmpleado:
  *                   type: array
- *                   description: Incidencias en proceso y resueltas de cada empleado de Sistemas
+ *                   description: Incidencias en proceso, resueltas y canceladas de cada empleado de Sistemas
  *                   items:
  *                     type: object
  *                     properties:
@@ -98,6 +98,7 @@ const router = express.Router();
  *                       apellidos:  { type: string }
  *                       en_proceso: { type: integer }
  *                       resueltas:  { type: integer }
+ *                       canceladas: { type: integer }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  */
