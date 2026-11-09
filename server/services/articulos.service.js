@@ -48,11 +48,11 @@ async function desactivarArticulo(id) {
   const articulo = await articulosDatos.buscarPorId(id);
   if (!articulo) throw crearError(404, "Artículo no encontrado");
 
-  const abiertas = await incidenciasDatos.contarDelArticuloEnEstados(id, [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO]);
-  if (abiertas > 0) {
+  const sinResolver = await incidenciasDatos.contarDelArticuloEnEstados(id, [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO]);
+  if (sinResolver > 0) {
     throw crearError(
       409,
-      `No se puede dar de baja: el artículo tiene ${abiertas} incidencia${abiertas === 1 ? "" : "s"} sin resolver.`
+      `No se puede dar de baja: el artículo tiene ${sinResolver} incidencia${sinResolver === 1 ? "" : "s"} sin resolver.`
     );
   }
 

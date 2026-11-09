@@ -1,11 +1,16 @@
 import { api } from "../api.js";
-import { esc, cargando, mensajeError } from "../ui.js";
+import { esc, cargando, mensajeError, paginar, paginacion } from "../ui.js";
 
 let contenedor = null;
 let articulos = [];
+let busqueda = "";
+let pagina = 1;
 
 export async function pintar(zona) {
   contenedor = zona;
+  articulos = [];
+  busqueda = "";
+  pagina = 1;
   contenedor.innerHTML = `
     <div class="tarjeta-lista">
       <div class="encabezado-lista">
@@ -24,19 +29,32 @@ export async function pintar(zona) {
     return;
   }
 
-  contenedor.querySelector("#buscar-articulo").addEventListener("input", (e) => pintarTabla(e.target.value));
-  pintarTabla("");
+  contenedor.querySelector("#buscar-articulo").addEventListener("input", (e) => {
+    busqueda = e.target.value;
+    pagina = 1;
+    pintarTabla();
+  });
+  contenedor.querySelector(".zona-lista").addEventListener("click", (e) => {
+    const boton = e.target.closest("button[data-pagina]");
+    if (!boton) return;
+    pagina = Number(boton.dataset.pagina);
+    pintarTabla();
+  });
+  pintarTabla();
 }
 
-function pintarTabla(texto) {
-  const buscado = texto.trim().toLowerCase();
+function pintarTabla() {
+  const buscado = busqueda.trim().toLowerCase();
   const filtrados = articulos.filter((a) =>
     [a.descripcion, a.area, a.categoria].some((campo) => campo.toLowerCase().includes(buscado))
   );
 
+  const vista = paginar(filtrados, pagina, articulos.length);
+  pagina = vista.pagina;
+
   const filas =
     filtrados.length > 0
-      ? filtrados
+      ? vista.items
           .map(
             (a) => `<tr>
               <td>${esc(a.descripcion)}</td>
@@ -56,5 +74,5 @@ function pintarTabla(texto) {
       <thead><tr><th>Artículo</th><th>Área</th><th>Categoría</th></tr></thead>
       <tbody>${filas}</tbody>
     </table>
-    <p class="texto-paginacion">${filtrados.length} de ${articulos.length} artículos</p>`;
+    ${paginacion(vista, ["artículo", "artículos"])}`;
 }

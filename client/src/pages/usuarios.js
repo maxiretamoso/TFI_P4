@@ -2,7 +2,7 @@ import { api } from "../api.js";
 import { puedeGestionarUsuarios } from "../permisos.js";
 import { leerUsuario } from "../session.js";
 import { confirmar } from "../confirmar.js";
-import { NOMBRES_ROL, ROLES, AREA_SISTEMAS, esc, cargando, mensajeError } from "../ui.js";
+import { NOMBRES_ROL, ROLES, AREA_SISTEMAS, esc, cargando, mensajeError, paginar, paginacion } from "../ui.js";
 
 let contenedor = null;
 let esDirector = false;
@@ -17,6 +17,7 @@ let contrasenia = "";
 let idArea = "";
 let rol = "3";
 let busqueda = "";
+let pagina = 1;
 
 export async function pintar(zona) {
   contenedor = zona;
@@ -32,6 +33,7 @@ export async function pintar(zona) {
   idArea = "";
   rol = "3";
   busqueda = "";
+  pagina = 1;
 
   const opcionesRol = Object.entries(NOMBRES_ROL)
     .map(([valor, etiqueta]) => `<option value="${valor}">${etiqueta}</option>`)
@@ -105,6 +107,7 @@ export async function pintar(zona) {
 
   contenedor.querySelector(".buscador input").addEventListener("input", (evento) => {
     busqueda = evento.target.value;
+    pagina = 1;
     pintarTabla();
   });
 
@@ -147,10 +150,13 @@ function pintarTabla() {
     return texto.includes(busqueda.toLowerCase());
   });
 
+  const vista = paginar(visibles, pagina, usuarios.length);
+  pagina = vista.pagina;
+
   let cuerpo = `<tr><td colspan="${esDirector ? 6 : 5}">No hay usuarios.</td></tr>`;
 
   if (visibles.length > 0) {
-    cuerpo = visibles
+    cuerpo = vista.items
       .map(
         (item) => `<tr>
           <td>${item.id_usuario}</td>
@@ -184,10 +190,17 @@ function pintarTabla() {
         </tr>
       </thead>
       <tbody>${cuerpo}</tbody>
-    </table>`;
+    </table>
+    ${paginacion(vista, ["usuario", "usuarios"])}`;
 }
 
 function manejarAccion(evento) {
+  const botonPagina = evento.target.closest("button[data-pagina]");
+  if (botonPagina) {
+    pagina = Number(botonPagina.dataset.pagina);
+    pintarTabla();
+    return;
+  }
   const boton = evento.target.closest("button[data-accion]");
   if (!boton) return;
 

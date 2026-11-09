@@ -12,6 +12,7 @@ import {
   badgeEstado,
   paginacion,
   nombreDelAsignado,
+  POR_PAGINA,
 } from "../ui.js";
 import {
   puedeCrearIncidencias,
@@ -22,7 +23,6 @@ import {
   esDeSistemas,
 } from "../permisos.js";
 
-const POR_PAGINA = 10;
 const FILTROS_ADMITIDOS = ["buscar", "estado", "prioridad", "desde", "fecha", "sin_asignar", "area", "categoria", "asignado"];
 // Estos vienen solo desde el dashboard; la barra de filtros los conserva al cambiar los demás.
 const FILTROS_DEL_DASHBOARD = ["area", "categoria", "asignado", "fecha"];
@@ -77,9 +77,7 @@ function nombreDeEstados(valor) {
 // Si el filtro trae una combinación que no está entre las opciones (por ejemplo desde
 // un enlace), se muestra mientras esté aplicada y se quita al elegir otra.
 function opcionesDeEstado(estado) {
-  const abiertas = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
-  const fijas = esDirector(usuario) ? [[abiertas, "Abiertas"]] : [];
-  fijas.push(...Object.entries(NOMBRES_ESTADO_PLURAL));
+  const fijas = Object.entries(NOMBRES_ESTADO_PLURAL);
 
   const temporal =
     estado && !fijas.some(([valor]) => valor === estado)

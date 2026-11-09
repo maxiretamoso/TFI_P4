@@ -1,7 +1,7 @@
 import { api } from "../api.js";
 import { esDirector } from "../permisos.js";
 import { leerUsuario } from "../session.js";
-import { esc, cargando, mensajeError } from "../ui.js";
+import { esc, cargando, mensajeError, paginar, paginacion } from "../ui.js";
 import { confirmar } from "../confirmar.js";
 
 const CATALOGOS = {
@@ -41,6 +41,7 @@ let items = [];
 let areas = [];
 let categorias = [];
 let busqueda = "";
+let pagina = 1;
 let editandoId = null;
 
 function pestanias(usuario, actual) {
@@ -102,6 +103,7 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
   cfg = CATALOGOS[clave];
   items = [];
   busqueda = "";
+  pagina = 1;
   editandoId = null;
 
   contenedor.innerHTML = `
@@ -121,6 +123,7 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
 
   contenedor.querySelector(".buscador-catalogo").addEventListener("input", (e) => {
     busqueda = e.target.value;
+    pagina = 1;
     pintarTabla();
   });
   contenedor.querySelector("#boton-agregar").addEventListener("click", () => abrirFormulario(null));
@@ -148,8 +151,11 @@ function pintarTabla() {
     cfg.columnas.some(([campo]) => String(item[campo] ?? "").toLowerCase().includes(buscado))
   );
 
+  const vista = paginar(visibles, pagina, items.length);
+  pagina = vista.pagina;
+
   const filas = visibles.length
-    ? visibles
+    ? vista.items
         .map(
           (item) => `<tr>
             ${cfg.columnas.map(([campo]) => `<td>${esc(item[campo])}</td>`).join("")}
@@ -171,7 +177,7 @@ function pintarTabla() {
       </thead>
       <tbody>${filas}</tbody>
     </table>
-    <p class="texto-paginacion">${visibles.length} de ${items.length} ${cfg.titulo.toLowerCase()}</p>`;
+    ${paginacion(vista, [cfg.singular, cfg.titulo.toLowerCase()])}`;
 }
 
 function opciones(lista, campoId, elegido) {
@@ -201,6 +207,12 @@ function abrirFormulario(item) {
 }
 
 function manejarAccion(evento) {
+  const botonPagina = evento.target.closest("button[data-pagina]");
+  if (botonPagina) {
+    pagina = Number(botonPagina.dataset.pagina);
+    pintarTabla();
+    return;
+  }
   const boton = evento.target.closest("button[data-accion]");
   if (!boton) return;
   const item = items.find((i) => i[cfg.campoId] === Number(boton.dataset.id));

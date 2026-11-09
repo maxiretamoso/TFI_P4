@@ -83,14 +83,33 @@ function botonDePagina(numero, texto, { activa = false, deshabilitada = false, e
   </li>`;
 }
 
-export function paginacion({ pagina, paginas, total, total_sin_filtros: totalSinFiltros = total, limite }) {
+export const POR_PAGINA = 15;
+
+// Recorta una lista ya cargada a la página pedida, con los mismos datos que devuelve la API.
+export function paginar(lista, pagina, totalSinFiltros = lista.length) {
+  const paginas = Math.max(Math.ceil(lista.length / POR_PAGINA), 1);
+  const actual = Math.min(Math.max(pagina, 1), paginas);
+  return {
+    items: lista.slice((actual - 1) * POR_PAGINA, actual * POR_PAGINA),
+    pagina: actual,
+    paginas,
+    total: lista.length,
+    total_sin_filtros: totalSinFiltros,
+    limite: POR_PAGINA,
+  };
+}
+
+export function paginacion(
+  { pagina, paginas, total, total_sin_filtros: totalSinFiltros = total, limite },
+  [singular, plural] = ["incidencia", "incidencias"]
+) {
   if (totalSinFiltros === 0) return "";
   const filtrado = total !== totalSinFiltros;
 
   if (paginas <= 1) {
     const texto = filtrado
-      ? `${total} de ${totalSinFiltros} incidencias`
-      : `${total} ${total === 1 ? "incidencia" : "incidencias"}`;
+      ? `${total} de ${totalSinFiltros} ${plural}`
+      : `${total} ${total === 1 ? singular : plural}`;
     return `<p class="texto-paginacion">Mostrando ${texto}</p>`;
   }
 

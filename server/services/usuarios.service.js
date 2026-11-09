@@ -17,17 +17,17 @@ function esElMismo(id, solicitante) {
   return solicitante && Number(id) === solicitante.id_usuario;
 }
 
-// Un empleado de Sistemas con incidencias abiertas no puede dejar de serlo: quedarían sin responsable.
-async function exigirSinIncidenciasAbiertas(usuario, accion) {
+// Un empleado de Sistemas con incidencias sin resolver no puede dejar de serlo: quedarían sin responsable.
+async function exigirSinIncidenciasSinResolver(usuario, accion) {
   if (usuario.rol !== ROLES.EMPLEADO_SISTEMAS) return;
-  const abiertas = await incidenciasDatos.contarAsignadasEnEstados(usuario.id_usuario, [
+  const sinResolver = await incidenciasDatos.contarAsignadasEnEstados(usuario.id_usuario, [
     ESTADOS.PENDIENTE,
     ESTADOS.EN_PROCESO,
   ]);
-  if (abiertas > 0) {
+  if (sinResolver > 0) {
     throw crearError(
       409,
-      `No se puede ${accion}: tiene ${abiertas} incidencia${abiertas === 1 ? "" : "s"} abierta${abiertas === 1 ? "" : "s"} asignada${abiertas === 1 ? "" : "s"}. Reasignalas primero.`
+      `No se puede ${accion}: tiene ${sinResolver} incidencia${sinResolver === 1 ? "" : "s"} sin resolver asignada${sinResolver === 1 ? "" : "s"}. Reasignalas primero.`
     );
   }
 }
@@ -94,7 +94,7 @@ async function actualizarUsuario(id, datos, solicitante) {
   if (cambiaRol && esElMismo(id, solicitante)) {
     throw crearError(400, "No podés cambiar tu propio rol");
   }
-  if (cambiaRol) await exigirSinIncidenciasAbiertas(actual, "cambiarle el rol");
+  if (cambiaRol) await exigirSinIncidenciasSinResolver(actual, "cambiarle el rol");
 
   const id_area = datos.id_area ?? actual.id_area;
   await validarArea(id_area, datos.rol ?? actual.rol);
@@ -121,7 +121,7 @@ async function desactivarUsuario(id, solicitante) {
   }
   const actual = await usuariosDatos.buscarCredencialesPorId(id);
   if (!actual) throw crearError(404, "Usuario no encontrado");
-  await exigirSinIncidenciasAbiertas(actual, "darlo de baja");
+  await exigirSinIncidenciasSinResolver(actual, "darlo de baja");
 
   return usuariosDatos.desactivar(id);
 }

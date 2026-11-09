@@ -25,15 +25,15 @@ export function puedeCancelar(usuario, incidencia) {
 }
 
 export function puedeFinalizar(usuario, incidencia) {
-  const abierta =
+  const sinResolver =
     incidencia.id_estado !== ESTADOS.RESUELTA && incidencia.id_estado !== ESTADOS.CANCELADA;
-  return abierta && esDeSistemas(usuario) && incidencia.asignado_a === usuario.id_usuario;
+  return sinResolver && esDeSistemas(usuario) && incidencia.asignado_a === usuario.id_usuario;
 }
 
 export function puedeAsignar(usuario, incidencia) {
-  const abierta =
+  const sinResolver =
     incidencia.id_estado !== ESTADOS.RESUELTA && incidencia.id_estado !== ESTADOS.CANCELADA;
-  return abierta && esDirector(usuario);
+  return sinResolver && esDirector(usuario);
 }
 
 export function puedeGestionarUsuarios(usuario) {

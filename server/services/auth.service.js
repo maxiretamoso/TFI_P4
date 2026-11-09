@@ -78,7 +78,7 @@ async function cambiarContrasenia(idUsuario, actual, nueva) {
   return { mensaje: "Contraseña actualizada" };
 }
 
-// El token puede seguir vigente después de una baja o un cambio de rol: se usa el estado actual.
+// El token puede seguir vigente después de una baja o de un cambio de rol o de área: se usa el estado actual.
 async function validarSesion(datosDelToken) {
   const usuario = await usuariosDatos.buscarPorId(datosDelToken.id_usuario);
   if (!usuario || usuario.activo !== 1) {

@@ -6,10 +6,10 @@ import { enviarNotificacionDeIncidencia } from "./notificaciones.service.js";
 import { ROLES } from "../config/roles.js";
 import { ESTADOS } from "../config/estados.js";
 
-const LIMITE_POR_DEFECTO = 20;
+const LIMITE_POR_DEFECTO = 15;
 const LIMITE_MAXIMO = 100;
 
-const ABIERTOS = [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO];
+const SIN_RESOLVER = [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO];
 const CAMBIO_SIMULTANEO = "La incidencia cambió de estado mientras tanto. Recargá la lista y probá de nuevo.";
 
 function filtroSegunRol({ rol, id_usuario }) {
@@ -105,7 +105,7 @@ async function asignar(id, asignadoA) {
     throw crearError(409, "No se puede asignar una incidencia resuelta o cancelada");
   }
 
-  const actualizada = await incidenciasDatos.asignar(id, asignadoA, ESTADOS.EN_PROCESO, ABIERTOS);
+  const actualizada = await incidenciasDatos.asignar(id, asignadoA, ESTADOS.EN_PROCESO, SIN_RESOLVER);
   if (!actualizada) throw crearError(409, CAMBIO_SIMULTANEO);
   return actualizada;
 }
@@ -123,7 +123,7 @@ async function finalizar(id, descripcionResolucion, solicitante) {
 
   const actualizada = await incidenciasDatos.cambiarEstado(id, ESTADOS.RESUELTA, {
     descripcion_resolucion: descripcionResolucion,
-    desde: ABIERTOS,
+    desde: SIN_RESOLVER,
   });
   if (!actualizada) throw crearError(409, CAMBIO_SIMULTANEO);
 

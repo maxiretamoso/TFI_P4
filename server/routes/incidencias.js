@@ -28,7 +28,7 @@ router.use(verificarToken);
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - { in: query, name: pagina,    schema: { type: integer, minimum: 1, default: 1 } }
- *       - { in: query, name: limite,    schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+ *       - { in: query, name: limite,    schema: { type: integer, minimum: 1, maximum: 100, default: 15 } }
  *       - { in: query, name: estado,    schema: { type: string, example: "1,2" }, description: Uno o varios id_estado separados por coma }
  *       - { in: query, name: prioridad, schema: { type: integer, minimum: 1, maximum: 3 } }
  *       - { in: query, name: buscar,    schema: { type: string }, description: Texto en el pedido o el artículo }
