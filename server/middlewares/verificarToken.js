@@ -15,12 +15,8 @@ async function verificarToken(req, res, next) {
     return res.status(401).json({ error: "Token inválido o expirado" });
   }
 
-  try {
-    req.usuario = await authService.validarSesion(datosDelToken);
-    next();
-  } catch (error) {
-    next(error);
-  }
+  req.usuario = await authService.validarSesion(datosDelToken);
+  next();
 }
 
 export default verificarToken;

@@ -1,4 +1,4 @@
-import { ROLES, ESTADOS } from "../../shared/constantes.js";
+import { ROLES, ESTADOS, SIN_RESOLVER } from "../../shared/constantes.js";
 
 
 // Reflejan lo que permite la API; el control real está siempre en el servidor.
@@ -26,14 +26,12 @@ export function puedeCancelar(usuario, incidencia) {
 }
 
 export function puedeFinalizar(usuario, incidencia) {
-  const sinResolver =
-    incidencia.id_estado !== ESTADOS.RESUELTA && incidencia.id_estado !== ESTADOS.CANCELADA;
+  const sinResolver = SIN_RESOLVER.includes(incidencia.id_estado);
   return sinResolver && esDeSistemas(usuario) && incidencia.asignado_a === usuario.id_usuario;
 }
 
 export function puedeAsignar(usuario, incidencia) {
-  const sinResolver =
-    incidencia.id_estado !== ESTADOS.RESUELTA && incidencia.id_estado !== ESTADOS.CANCELADA;
+  const sinResolver = SIN_RESOLVER.includes(incidencia.id_estado);
   return sinResolver && esDirector(usuario);
 }
 

@@ -1,5 +1,3 @@
-import { esc } from "./ui.js";
-
 let resolver = null;
 
 function asegurarVentana() {
@@ -44,7 +42,7 @@ function asegurarVentana() {
 export function confirmar({ titulo, mensaje, textoBoton = "Eliminar", textoVolver = "Cancelar" }) {
   const ventana = asegurarVentana();
   ventana.querySelector("#titulo-confirmar").textContent = titulo;
-  ventana.querySelector(".texto-confirmar").innerHTML = esc(mensaje);
+  ventana.querySelector(".texto-confirmar").textContent = mensaje;
   ventana.querySelector(".boton-confirmar").textContent = textoBoton;
   ventana.querySelector(".boton-volver").textContent = textoVolver;
   document.getElementById("abrir-confirmar").click();
