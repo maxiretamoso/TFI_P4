@@ -2,7 +2,7 @@ import * as usuariosDatos from "../datos/usuarios.datos.js";
 import * as areasDatos from "../datos/areas.datos.js";
 import * as incidenciasDatos from "../datos/incidencias.datos.js";
 import { crearError } from "../utils/httpError.js";
-import { ROLES, ESTADOS, AREA_SISTEMAS } from "../config/constantes.js";
+import { ROLES, SIN_RESOLVER, AREA_SISTEMAS } from "../config/constantes.js";
 import { hashearContrasenia } from "./auth.service.js";
 
 const CODIGO_CLAVE_DUPLICADA = "23505";
@@ -15,13 +15,10 @@ function esElMismo(id, solicitante) {
   return solicitante && Number(id) === solicitante.id_usuario;
 }
 
-// Un empleado de Sistemas con incidencias sin resolver no puede dejar de serlo: quedarían sin responsable.
+// Las incidencias abiertas deben reasignarse antes de dar de baja o cambiar el rol del responsable.
 async function exigirSinIncidenciasSinResolver(usuario, accion) {
   if (usuario.rol !== ROLES.EMPLEADO_SISTEMAS) return;
-  const sinResolver = await incidenciasDatos.contarAsignadasEnEstados(usuario.id_usuario, [
-    ESTADOS.PENDIENTE,
-    ESTADOS.EN_PROCESO,
-  ]);
+  const sinResolver = await incidenciasDatos.contarAsignadasEnEstados(usuario.id_usuario, SIN_RESOLVER);
   if (sinResolver > 0) {
     throw crearError(
       409,
