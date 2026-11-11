@@ -568,6 +568,17 @@ h3 {
     white-space: nowrap;
 }
 
+.tooltip-pedido {
+    --bs-tooltip-bg: #192719;
+    --bs-tooltip-color: #c5ebaa;
+    --bs-tooltip-opacity: 1;
+    --bs-tooltip-max-width: min(20rem, calc(100vw - 2rem));
+}
+
+.tooltip-pedido .tooltip-inner {
+    text-align: left;
+}
+
 .celda-acciones {
     white-space: nowrap;
 }
@@ -1466,58 +1477,6 @@ h3 {
 
     .tarjeta-contrasenia {
         max-width: none;
-    }
-}
-
-/* Globo de ayuda */
-
-.globo-ayuda {
-    --globo-fondo: #2f3a2a;
-    position: absolute;
-    z-index: 2000;
-    max-width: 260px;
-    padding: 6px 11px;
-    border-radius: 8px;
-    background-color: var(--globo-fondo);
-    color: #f3f5ef;
-    font-size: 0.78rem;
-    line-height: 1.35;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(4px);
-    transition: opacity 0.15s ease, transform 0.15s ease;
-}
-
-.globo-ayuda.visible {
-    opacity: 1;
-    transform: none;
-}
-
-.globo-ayuda::after {
-    content: "";
-    position: absolute;
-    left: var(--flecha, 50%);
-    bottom: -4px;
-    width: 9px;
-    height: 9px;
-    background-color: var(--globo-fondo);
-    transform: translateX(-50%) rotate(45deg);
-}
-
-.globo-ayuda.debajo::after {
-    bottom: auto;
-    top: -4px;
-}
-
-[data-bs-theme="dark"] .globo-ayuda {
-    --globo-fondo: #e7ece2;
-    color: #1c211c;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .globo-ayuda {
-        transition: none;
     }
 }
 

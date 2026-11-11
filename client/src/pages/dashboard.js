@@ -141,12 +141,6 @@ function graficoPorCategoria(resumen) {
   );
 }
 
-function antiguedad(fecha) {
-  const dias = Math.floor((Date.now() - new Date(fecha)) / 86400000);
-  if (dias <= 0) return "hoy";
-  return dias === 1 ? "hace 1 día" : `hace ${dias} días`;
-}
-
 function tablaDePrioritarias(resumen) {
   if (resumen.prioritarias.length === 0) {
     return `<p class="texto-grafico">No hay incidencias de prioridad Alta sin resolver.</p>`;
@@ -156,17 +150,17 @@ function tablaDePrioritarias(resumen) {
       (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: SIN_RESOLVER, prioridad: PRIORIDAD_ALTA })}">
         <td>${inc.id_incidencia}</td>
         <td>${esc(inc.articulo)}</td>
-        <td class="celda-pedido" data-ayuda-si-cortado>${esc(inc.descripcion_pedido)}</td>
+        <td class="celda-pedido">${esc(inc.descripcion_pedido)}</td>
         <td>${badgeEstado(inc)}</td>
         <td>${nombreDelAsignado(inc.asignado_nombres, inc.asignado_apellidos)}</td>
         <td>${esc(inc.creador_nombres)} ${esc(inc.creador_apellidos)}</td>
-        <td data-ayuda="${fechaHora(inc.creado)}">${antiguedad(inc.creado)}</td>
+        <td>${fechaHora(inc.creado)}</td>
       </tr>`
     )
     .join("");
   return `<div class="tabla-scroll tabla-dashboard">
     <table>
-      <thead><tr><th>#</th><th>Artículo</th><th>Pedido</th><th>Estado</th><th>Asignada a</th><th>Creada por</th><th>Antigüedad</th></tr></thead>
+      <thead><tr><th>#</th><th>Artículo</th><th>Pedido</th><th>Estado</th><th>Asignada a</th><th>Creada por</th><th>Fecha de creación</th></tr></thead>
       <tbody>${filas}</tbody>
     </table>
   </div>
@@ -189,7 +183,7 @@ function cargaDeEmpleados(resumen) {
             <span class="carga-resueltas" style="width: ${(e.resueltas / maximo) * 100}%"></span>
             <span class="carga-canceladas" style="width: ${(e.canceladas / maximo) * 100}%"></span>
           </span>
-          <span class="carga-numeros" data-ayuda="En proceso / resueltas / canceladas">${e.en_proceso} / ${e.resueltas} / ${e.canceladas}</span>
+          <span class="carga-numeros">${e.en_proceso} / ${e.resueltas} / ${e.canceladas}</span>
         </a>
       </li>`
     )

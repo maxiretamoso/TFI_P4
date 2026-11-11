@@ -1,12 +1,36 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles.css";
 import { enrutar } from "./router.js";
 import { activarCierreDeAvisos } from "./avisos.js";
-import { activarAyudas } from "./ayudas.js";
 
 activarCierreDeAvisos();
-activarAyudas();
+
+let tooltipPedido;
+
+function cerrarTooltipPedido() {
+  tooltipPedido?.dispose();
+  tooltipPedido = undefined;
+}
+
+document.addEventListener("pointerover", (evento) => {
+  const celda = evento.target.closest(".celda-pedido");
+  if (!celda || celda.scrollWidth <= celda.clientWidth) return;
+
+  cerrarTooltipPedido();
+  tooltipPedido = new bootstrap.Tooltip(celda, {
+    title: celda.textContent,
+    customClass: "tooltip-pedido",
+    trigger: "manual",
+    container: document.body,
+  });
+  tooltipPedido.show();
+});
+
+document.addEventListener("pointerout", cerrarTooltipPedido);
+window.addEventListener("scroll", cerrarTooltipPedido, true);
+window.addEventListener("resize", cerrarTooltipPedido);
+window.addEventListener("hashchange", cerrarTooltipPedido);
 window.addEventListener("hashchange", enrutar);
 
 // Las rutas van después del #: localhost:5173/catalogos pasa a localhost:5173/#/catalogos.

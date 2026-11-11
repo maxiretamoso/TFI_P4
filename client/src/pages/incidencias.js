@@ -287,7 +287,7 @@ function filaIncidencia(inc) {
   return `<tr>
     <td>${inc.id_incidencia}</td>
     <td>${esc(inc.articulo_descripcion)}</td>
-    <td class="celda-pedido" data-ayuda-si-cortado>${esc(inc.descripcion_pedido)}</td>
+    <td class="celda-pedido">${esc(inc.descripcion_pedido)}</td>
     <td>${esc(PRIORIDADES[inc.prioridad] ?? inc.prioridad)}</td>
     <td>${badgeEstado(inc)}${
       CERRADAS.includes(inc.id_estado) && inc.fecha_estado
