@@ -1,7 +1,7 @@
 import path from "path";
 import { PRIORIDADES, ZONA_HORARIA } from "../../shared/constantes.js";
 
-// Los clientes de correo ignoran <style> y CSS moderno: todo va en línea y con tablas.
+// Las tablas y los estilos en línea mejoran la compatibilidad entre clientes de correo.
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 const CID_LOGO = "logo-municipalidad";
 

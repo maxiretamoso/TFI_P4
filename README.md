@@ -99,14 +99,14 @@ client/
     styles.css        estilos propios sobre Bootstrap
     pages/            una pantalla por archivo
 shared/
-  constantes.js       valores de área, roles, estados y prioridades compartidos
+  constantes.js       área, roles, estados, prioridades, prefijo API y filtros de reportes compartidos
 database/
   incidencias_db.sql  estructura y datos de prueba de la cátedra
 ```
 
 ## Decisiones de diseño
 
-**División en capas.** El servidor separa rutas, controladores, servicios y datos. Las rutas solo declaran el endpoint y validan la entrada; los controladores traducen entre HTTP y el dominio; los servicios concentran las reglas de negocio; y la capa de datos es el único lugar del proyecto donde se escribe SQL. Cambiar una consulta no obliga a tocar las reglas, y al revés.
+**División en capas.** El servidor separa rutas, controladores, servicios y datos. Las rutas solo declaran el endpoint y validan la entrada; los controladores traducen entre HTTP y el dominio; los servicios concentran las reglas de negocio; y la capa de datos concentra las consultas de la aplicación; `db/index.js` administra las transacciones con `BEGIN`, `COMMIT` y `ROLLBACK`. Cambiar una consulta no obliga a tocar las reglas, y al revés.
 
 **Versionado del API.** Los recursos de la aplicación cuelgan de `/api/v1`. Swagger se sirve en `/api-docs`.
 
@@ -174,3 +174,5 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | BREAD | `/usuarios` | Director (cada uno puede ver y editar su propio perfil) |
 | PATCH | `/usuarios/{id}/avatar` | el propio usuario o el Director |
 | GET | `/avatares` | autenticado |
+
+**Formularios y fotos.** Guardar usuarios bloquea el botón durante el pedido. Los catálogos admiten descripciones de hasta 250 caracteres, igual que la API. Las direcciones temporales de las vistas previas se liberan al reemplazar la imagen, cerrar su ventana o navegar a otra pantalla.
