@@ -73,13 +73,14 @@ Son los que trae `database/incidencias_db.sql`. La contraseña es la parte del c
 ```
 server/
   index.js            arranque, middlewares globales y montaje de rutas
-  config/             roles, estados, avatares predefinidos y definición de Swagger
+  config/             constantes de área, roles y estados, avatares y definición de Swagger
   routes/             definición de endpoints y validaciones de entrada
   controllers/        traducen HTTP a llamadas al servicio
   services/           reglas de negocio (permisos, transiciones de estado, correo)
-  datos/              acceso a la base: único lugar donde hay SQL
+  datos/              consultas de la aplicación
+  db/                 pool de PostgreSQL y gestión de transacciones
   middlewares/        verificación de token y de rol
-  utils/              errores, transacciones, carga de archivos, reporte PDF y correo
+  utils/              errores, validación, carga de archivos, reporte PDF y correo
   assets/             logo usado en el reporte PDF y en el correo
   publico/avatares/   fotos subidas por los usuarios y avatares predefinidos
 client/
@@ -92,7 +93,7 @@ client/
     session.js        token y datos del usuario en localStorage
     tema.js           interruptor de modo claro y oscuro
     avisos.js         avisos flotantes que se cierran solos
-    ayudas.js         globos de ayuda al pasar el mouse
+    main.js           arranque, navegación y tooltip para pedidos truncados
     confirmar.js      ventana de confirmación reutilizable
     ui.js             constantes y helpers de presentación
     styles.css        estilos propios sobre Bootstrap
@@ -105,7 +106,7 @@ database/
 
 **División en capas.** El servidor separa rutas, controladores, servicios y datos. Las rutas solo declaran el endpoint y validan la entrada; los controladores traducen entre HTTP y el dominio; los servicios concentran las reglas de negocio; y la capa de datos es el único lugar del proyecto donde se escribe SQL. Cambiar una consulta no obliga a tocar las reglas, y al revés.
 
-**Versionado del API.** Todos los endpoints cuelgan de `/api/v1`. No hay rutas sin versionar.
+**Versionado del API.** Los recursos de la aplicación cuelgan de `/api/v1`. Swagger se sirve en `/api-docs`.
 
 **Acciones como recursos.** Asignar, finalizar y cancelar una incidencia son `PATCH` sobre `/incidencias/{id}/asignacion`, `/resolucion` y `/cancelacion`, en lugar de verbos en la ruta.
 
@@ -115,7 +116,7 @@ database/
 
 **Protecciones en usuarios.** Nadie puede cambiarse su propio rol ni darse de baja a sí mismo, y un empleado de Sistemas con incidencias sin resolver asignadas no puede ser dado de baja ni cambiar de rol hasta que se reasignen. El Director y los empleados de Sistemas pertenecen al área Sistemas: el formulario la fija al elegir esos roles y el servidor rechaza otra. El área indica dónde trabaja cada usuario; lo que puede hacer lo define el rol.
 
-**Cambios de estado sin carreras.** Asignar, finalizar y cancelar actualizan la incidencia solo si sigue en un estado que lo permite (la condición va en el mismo `UPDATE`). Si dos personas actúan a la vez sobre la misma incidencia, la segunda recibe 409 en lugar de aplicar un segundo cambio.
+**Cambios concurrentes de estado.** Asignar, finalizar y cancelar verifican el estado en el mismo `UPDATE`. Si un cambio anterior dejó la incidencia en un estado incompatible con la acción, el servidor responde 409.
 
 **Sesión verificada en cada pedido.** Además de validar el token, el servidor comprueba que el usuario siga activo y toma su rol actual de la base: una baja o un cambio de rol se aplican de inmediato, sin esperar a que venza el token. El token dura 8 horas: vencido, el próximo pedido recibe 401 y el cliente vuelve al login con el aviso "La sesión venció".
 
