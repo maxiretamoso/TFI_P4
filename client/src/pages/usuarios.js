@@ -285,6 +285,8 @@ function errorDelFormulario() {
 
 async function guardar(evento) {
   evento.preventDefault();
+  const boton = evento.currentTarget.querySelector(".boton-guardar");
+  if (boton.disabled) return;
 
   nombres = contenedor.querySelector("#campo-nombres").value;
   apellidos = contenedor.querySelector("#campo-apellidos").value;
@@ -306,6 +308,7 @@ async function guardar(evento) {
     rol: Number(rol),
   };
 
+  boton.disabled = true;
   try {
     if (editandoId) {
       await api.put(`/usuarios/${editandoId}`, datos);
@@ -319,6 +322,8 @@ async function guardar(evento) {
   } catch (e) {
     error = e.message;
     pintarError();
+  } finally {
+    boton.disabled = false;
   }
 }
 

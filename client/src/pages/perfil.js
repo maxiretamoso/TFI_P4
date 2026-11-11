@@ -10,6 +10,14 @@ let perfil = null;
 let predefinidos = [];
 // Lo que el usuario eligió en la ventana y todavía no guardó.
 let pendiente = null;
+let urlVistaPrevia = null;
+
+function liberarVistaPrevia() {
+  if (urlVistaPrevia) URL.revokeObjectURL(urlVistaPrevia);
+  urlVistaPrevia = null;
+}
+
+window.addEventListener("hashchange", liberarVistaPrevia);
 
 const ICONO_SUBIR = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 const ICONO_CANDADO = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2"/></svg>`;
@@ -142,6 +150,11 @@ export async function pintar(zona) {
 
   const ventana = contenedor.querySelector("#modal-cambiar-foto");
   ventana.addEventListener("show.bs.modal", reiniciarVentana);
+  ventana.addEventListener("hidden.bs.modal", () => {
+    liberarVistaPrevia();
+    pendiente = null;
+    ventana.querySelector(".vista-previa-imagen").replaceChildren();
+  });
   ventana.querySelector(".grilla-avatares").addEventListener("click", marcarPredefinido);
   ventana.querySelector("#campo-avatar").addEventListener("change", (e) => marcarArchivo(e.target.files[0]));
   ventana.querySelector("#boton-guardar-foto").addEventListener("click", guardarFoto);
@@ -175,6 +188,7 @@ function mostrarVistaPrevia(url) {
 }
 
 function reiniciarVentana() {
+  liberarVistaPrevia();
   pendiente = null;
   mostrarVistaPrevia(urlDelAvatar(perfil.avatar));
   contenedor.querySelectorAll(".opcion-avatar").forEach((b) => {
@@ -195,6 +209,7 @@ function marcarPredefinido(evento) {
     b.classList.toggle("elegido", b === boton);
     b.setAttribute("aria-checked", String(b === boton));
   });
+  liberarVistaPrevia();
   pendiente = { predefinido: boton.dataset.predefinido };
   mostrarVistaPrevia(boton.querySelector("img").src);
   contenedor.querySelector("#boton-guardar-foto").disabled = false;
@@ -233,7 +248,9 @@ function marcarArchivo(archivo) {
   });
   pendiente = { archivo };
   contenedor.querySelector(".nombre-archivo").textContent = archivo.name;
-  mostrarVistaPrevia(URL.createObjectURL(archivo));
+  liberarVistaPrevia();
+  urlVistaPrevia = URL.createObjectURL(archivo);
+  mostrarVistaPrevia(urlVistaPrevia);
   contenedor.querySelector("#boton-guardar-foto").disabled = false;
 }
 

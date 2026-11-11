@@ -58,7 +58,7 @@ function pestanias(usuario, actual) {
 function camposDelFormulario() {
   const descripcion = `<div class="mb-3">
     <label class="form-label" for="campo-descripcion">${cfg === CATALOGOS.articulos ? "Nombre del artículo" : "Descripción"}</label>
-    <input class="form-control" type="text" id="campo-descripcion" maxlength="150" required>
+    <input class="form-control" type="text" id="campo-descripcion" maxlength="250" required>
   </div>`;
   if (cfg !== CATALOGOS.articulos) return descripcion;
 
