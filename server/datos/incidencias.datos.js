@@ -136,6 +136,14 @@ function buscarPorId(id) {
     .then((r) => r.rows[0] || null);
 }
 
+function registrarCambioDeEstado(cliente, idIncidencia, idEstado) {
+  return cliente.query(
+    `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado)
+     VALUES ($1, $2, now())`,
+    [idIncidencia, idEstado]
+  );
+}
+
 function insertar({ id_articulo, id_estado, creado_por, asignado_a, prioridad, descripcion_pedido }) {
   return conTransaccion(async (cliente) => {
     const alta = await cliente.query(
@@ -148,11 +156,7 @@ function insertar({ id_articulo, id_estado, creado_por, asignado_a, prioridad, d
 
     const incidencia = alta.rows[0];
 
-    await cliente.query(
-      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado)
-       VALUES ($1, $2, now())`,
-      [incidencia.id_incidencia, id_estado]
-    );
+    await registrarCambioDeEstado(cliente, incidencia.id_incidencia, id_estado);
 
     return incidencia;
   });
@@ -172,11 +176,7 @@ function cambiarEstado(id, idEstado, { descripcion_resolucion, desde, asignadoA 
 
     if (cambio.rowCount === 0) return null;
 
-    await cliente.query(
-      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado)
-       VALUES ($1, $2, now())`,
-      [id, idEstado]
-    );
+    await registrarCambioDeEstado(cliente, id, idEstado);
 
     return cambio.rows[0];
   });
@@ -194,11 +194,7 @@ function asignar(id, asignadoA, idEstado, desde) {
 
     if (cambio.rowCount === 0) return null;
 
-    await cliente.query(
-      `INSERT INTO incidencias_estados (id_incidencia, id_estado, fecha_hora_estado)
-       VALUES ($1, $2, now())`,
-      [id, idEstado]
-    );
+    await registrarCambioDeEstado(cliente, id, idEstado);
 
     return cambio.rows[0];
   });
