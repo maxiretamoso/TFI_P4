@@ -104,7 +104,7 @@ router.post(
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   put:
  *     summary: Modifica un usuario
- *     description: El Director puede modificar a cualquiera; el resto, solo su propio perfil y sin cambiar rol ni área.
+ *     description: El Director puede editar datos de cualquier cuenta. El resto solo puede editar sus propios datos y no puede cambiar el área. Nadie puede cambiar su propio rol. La pantalla Usuarios no ofrece editar la cuenta con la sesión abierta.
  *     tags: [Usuarios]
  *     security: [{ bearerAuth: [] }]
  *     parameters:

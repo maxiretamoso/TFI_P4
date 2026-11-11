@@ -29,7 +29,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 - Reporte de incidencias en PDF, completo o filtrado por pendientes, en proceso, resueltas o canceladas. En el detalle la prioridad y el estado van abreviados (A/M/B, P/EP/R/C) y el resumen explica cada sigla.
 - Asignar (o reasignar) incidencias a empleados de Sistemas y cancelar las pendientes.
 - Filtro extra en la lista: "Sin asignar".
-- BREAD de usuarios, áreas, categorías y artículos.
+- Administración de usuarios, áreas, categorías y artículos mediante bajas lógicas. En Usuarios, «+ Nuevo usuario» abre el alta y «Editar» despliega el formulario debajo de la fila. La cuenta del Director conectado figura como «Tu cuenta» y no ofrece edición ni baja desde esa pantalla.
 
 ## Stack
 
@@ -174,7 +174,9 @@ Todos cuelgan de `/api/v1`. La documentación completa, con cuerpos y códigos d
 | GET | `/categorias`, `/articulos`, `/areas`, `/estados` | autenticado (el Municipal recibe solo los artículos de su área) |
 | POST, PUT, DELETE | `/categorias`, `/articulos` | Sistemas y Director |
 | POST, PUT, DELETE | `/areas` | Director |
-| BREAD | `/usuarios` | Director (cada uno puede ver y editar su propio perfil) |
+| GET, POST | `/usuarios` | Director |
+| GET, PUT | `/usuarios/{id}` | Director o titular de la cuenta. El titular no puede cambiar su propio rol y solo el Director puede cambiar el área |
+| DELETE | `/usuarios/{id}` | Director, para dar de baja otra cuenta |
 | PATCH | `/usuarios/{id}/avatar` | el propio usuario o el Director |
 | GET | `/avatares` | autenticado |
 

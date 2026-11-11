@@ -161,7 +161,7 @@ function pintarTabla() {
             ${cfg.columnas.map(([campo]) => `<td>${esc(item[campo])}</td>`).join("")}
             <td class="celda-acciones">
               <button type="button" class="btn btn-editar btn-sm" data-accion="editar" data-id="${item[cfg.campoId]}">Editar</button>
-              <button type="button" class="btn btn-eliminar btn-sm" data-accion="eliminar" data-id="${item[cfg.campoId]}">Eliminar</button>
+              <button type="button" class="btn btn-eliminar btn-sm" data-accion="eliminar" data-id="${item[cfg.campoId]}">Dar de baja</button>
             </td>
           </tr>`
         )
@@ -259,14 +259,15 @@ async function guardar(evento) {
 
 async function eliminar(item) {
   const seguro = await confirmar({
-    titulo: `Eliminar ${cfg.singular}`,
-    mensaje: `¿Seguro que querés eliminar "${item.descripcion}"? Deja de aparecer en los listados, pero se conserva en las incidencias que ya lo usan.`,
+    titulo: `Dar de baja: ${cfg.singular}`,
+    textoBoton: "Dar de baja",
+    mensaje: `¿Seguro que querés dar de baja "${item.descripcion}"? Deja de aparecer en los listados, pero se conserva en las incidencias que ya lo usan.`,
   });
   if (!seguro) return;
 
   try {
     await api.del(`${cfg.ruta}/${item[cfg.campoId]}`);
-    contenedor.querySelector(".zona-error").innerHTML = `<p class="mensaje-ok" role="status">"${esc(item.descripcion)}" se eliminó.</p>`;
+    contenedor.querySelector(".zona-error").innerHTML = `<p class="mensaje-ok" role="status">"${esc(item.descripcion)}" se dio de baja.</p>`;
     await recargar();
   } catch (e) {
     contenedor.querySelector(".zona-error").innerHTML = mensajeError(e.message);
