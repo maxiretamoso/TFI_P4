@@ -10,7 +10,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 
 **Todos los roles**
 - Inicio de sesión con token JWT.
-- Mi perfil: datos del usuario, elección de un avatar predefinido o subida de una foto propia (que se puede ampliar), y cambio de contraseña.
+- Mi perfil: datos del usuario, elección de un avatar predefinido o subida de una foto propia (que se puede ampliar), y un formulario de cambio de contraseña que se abre desde el encabezado «Cambiar contraseña».
 - Lista de incidencias ordenada de la más reciente a la más vieja, con búsqueda en vivo, filtros por estado, prioridad y fecha (el calendario de "Desde" empieza en el año de la incidencia más vieja), y paginación de a 15 que indica cuántas cumplen el filtro sobre el total ("Mostrando 1 de 4 incidencias").
 - Modo claro y oscuro, con la preferencia guardada en el navegador.
 - Diseño responsivo: en el celular el menú lateral se pliega.

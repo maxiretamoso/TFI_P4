@@ -1364,6 +1364,41 @@ h3 {
     max-width: 560px;
 }
 
+.encabezado-contrasenia {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+}
+
+.encabezado-contrasenia:hover:not(:disabled),
+.encabezado-contrasenia:focus-visible {
+    background: var(--gim-verde-suave);
+}
+
+.encabezado-contrasenia::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    margin-inline-start: auto;
+    margin-inline-end: 4px;
+    border-right: 2px solid var(--gim-verde-texto);
+    border-bottom: 2px solid var(--gim-verde-texto);
+    transform: rotate(45deg);
+}
+
+.encabezado-contrasenia[aria-expanded="true"]::after {
+    transform: rotate(225deg);
+}
+
 .icono-titulo {
     width: 22px;
     height: 22px;

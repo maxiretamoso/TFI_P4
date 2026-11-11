@@ -122,15 +122,18 @@ export async function pintar(zona) {
     </section>
 
     <section class="tarjeta-perfil tarjeta-contrasenia">
-      <h3><span class="icono-titulo">${ICONO_CANDADO}</span>Cambiar la contraseña</h3>
-      <form id="form-contrasenia" novalidate>
+      <button class="encabezado-contrasenia" type="button" id="abrir-contrasenia"
+        aria-controls="form-contrasenia" aria-expanded="false">
+        <span class="icono-titulo">${ICONO_CANDADO}</span><span>Cambiar contraseña</span>
+      </button>
+      <form id="form-contrasenia" class="mt-3" hidden novalidate>
         ${campoContrasenia("campo-actual", "Contraseña actual", "current-password")}
         ${campoContrasenia("campo-nueva", "Contraseña nueva", "new-password")}
         ${campoContrasenia("campo-repetir", "Repetí la contraseña nueva", "new-password")}
         <p class="texto-ayuda">Tiene que tener al menos 6 caracteres.</p>
-        <div class="zona-contrasenia"></div>
         <button class="btn btn-gim w-100" type="submit" id="boton-contrasenia">Guardar contraseña</button>
       </form>
+      <div class="zona-contrasenia"></div>
     </section>
 
     ${ventanaCambiarFoto()}
@@ -160,7 +163,13 @@ export async function pintar(zona) {
   ventana.querySelector("#boton-guardar-foto").addEventListener("click", guardarFoto);
   activarArrastre(ventana.querySelector(".zona-carga"));
 
-  contenedor.querySelector("#form-contrasenia").addEventListener("submit", cambiarContrasenia);
+  const formulario = contenedor.querySelector("#form-contrasenia");
+  const abrir = contenedor.querySelector("#abrir-contrasenia");
+  abrir.addEventListener("click", () => {
+    contenedor.querySelector(".zona-contrasenia").replaceChildren();
+    mostrarFormularioContrasenia(formulario, abrir, formulario.hidden);
+  });
+  formulario.addEventListener("submit", cambiarContrasenia);
   contenedor.querySelector("#form-contrasenia").addEventListener("click", alternarVisibilidad);
 }
 
@@ -294,6 +303,21 @@ function alternarVisibilidad(evento) {
   boton.setAttribute("aria-pressed", String(mostrar));
 }
 
+function mostrarFormularioContrasenia(formulario, boton, abierto) {
+  formulario.hidden = !abierto;
+  boton.setAttribute("aria-expanded", String(abierto));
+  if (abierto) {
+    formulario.querySelector("#campo-actual").focus();
+    return;
+  }
+
+  formulario.reset();
+  for (const control of formulario.querySelectorAll("[data-ver]")) {
+    formulario.querySelector(`#${control.dataset.ver}`).type = "password";
+    control.setAttribute("aria-pressed", "false");
+  }
+}
+
 async function cambiarContrasenia(evento) {
   evento.preventDefault();
 
@@ -314,18 +338,24 @@ async function cambiarContrasenia(evento) {
     return;
   }
 
-  const boton = contenedor.querySelector("#boton-contrasenia");
+  const formulario = evento.currentTarget;
+  const boton = formulario.querySelector("#boton-contrasenia");
+  const abrir = contenedor.querySelector("#abrir-contrasenia");
+  if (boton.disabled) return;
   boton.disabled = true;
+  abrir.disabled = true;
   try {
     await api.patch("/auth/contrasenia", {
       contrasenia_actual: actual.value,
       contrasenia_nueva: nueva.value,
     });
-    [actual, nueva, repetir].forEach((campo) => (campo.value = ""));
-    avisar(".zona-contrasenia", "Contraseña actualizada.", false);
+    mostrarFormularioContrasenia(formulario, abrir, false);
+    if (formulario.isConnected) avisar(".zona-contrasenia", "Contraseña actualizada.", false);
   } catch (e) {
-    avisar(".zona-contrasenia", e.message, true);
+    if (formulario.isConnected) avisar(".zona-contrasenia", e.message, true);
   } finally {
     boton.disabled = false;
+    abrir.disabled = false;
+    if (formulario.hidden && formulario.isConnected) abrir.focus();
   }
 }
