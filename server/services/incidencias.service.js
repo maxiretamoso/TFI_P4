@@ -3,13 +3,11 @@ import * as usuariosDatos from "../datos/usuarios.datos.js";
 import * as articulosDatos from "../datos/articulos.datos.js";
 import { crearError } from "../utils/httpError.js";
 import { enviarNotificacionDeIncidencia } from "./notificaciones.service.js";
-import { ROLES } from "../config/roles.js";
-import { ESTADOS } from "../config/estados.js";
+import { ROLES, ESTADOS, SIN_RESOLVER } from "../config/constantes.js";
 
 const LIMITE_POR_DEFECTO = 15;
 const LIMITE_MAXIMO = 100;
 
-const SIN_RESOLVER = [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO];
 const CAMBIO_SIMULTANEO = "La incidencia cambió de estado mientras tanto. Recargá la lista y probá de nuevo.";
 
 function filtroSegunRol({ rol, id_usuario }) {

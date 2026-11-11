@@ -2,7 +2,7 @@ import express from "express";
 import verificarToken from "../middlewares/verificarToken.js";
 import verificarRol from "../middlewares/verificarRol.js";
 import * as dashboardController from "../controllers/dashboard.controller.js";
-import { ROLES } from "../config/roles.js";
+import { ROLES } from "../config/constantes.js";
 
 const router = express.Router();
 

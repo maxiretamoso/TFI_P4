@@ -1,5 +1,5 @@
 import * as reportesDatos from "../datos/reportes.datos.js";
-import { ESTADOS } from "../config/estados.js";
+import { ESTADOS } from "../config/constantes.js";
 
 const FILTROS = {
   pendientes: { titulo: "Incidencias pendientes", estados: [ESTADOS.PENDIENTE] },

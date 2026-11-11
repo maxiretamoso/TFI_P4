@@ -3,8 +3,7 @@ import * as areasDatos from "../datos/areas.datos.js";
 import * as categoriasDatos from "../datos/categorias.datos.js";
 import * as incidenciasDatos from "../datos/incidencias.datos.js";
 import { crearError } from "../utils/httpError.js";
-import { ESTADOS } from "../config/estados.js";
-import { ROLES } from "../config/roles.js";
+import { ROLES, SIN_RESOLVER } from "../config/constantes.js";
 
 async function validarReferencias(id_area, id_categoria) {
   const [area, categoria] = await Promise.all([
@@ -48,7 +47,7 @@ async function desactivarArticulo(id) {
   const articulo = await articulosDatos.buscarPorId(id);
   if (!articulo) throw crearError(404, "Artículo no encontrado");
 
-  const sinResolver = await incidenciasDatos.contarDelArticuloEnEstados(id, [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO]);
+  const sinResolver = await incidenciasDatos.contarDelArticuloEnEstados(id, SIN_RESOLVER);
   if (sinResolver > 0) {
     throw crearError(
       409,

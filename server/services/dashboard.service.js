@@ -1,12 +1,10 @@
 import * as dashboardDatos from "../datos/dashboard.datos.js";
 import * as reportesDatos from "../datos/reportes.datos.js";
-import { ESTADOS } from "../config/estados.js";
-import { ROLES } from "../config/roles.js";
+import { ESTADOS, ROLES, SIN_RESOLVER } from "../config/constantes.js";
 
 const FECHAS_DEL_LISTADO = 7;
 const PRIORIDAD_ALTA = 3;
 const MAXIMO_PRIORITARIAS = 10;
-const SIN_RESOLVER = [ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO];
 
 async function obtenerResumen() {
   const [

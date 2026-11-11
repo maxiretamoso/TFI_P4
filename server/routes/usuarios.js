@@ -4,7 +4,7 @@ import verificarToken from "../middlewares/verificarToken.js";
 import verificarRol from "../middlewares/verificarRol.js";
 import * as usuariosController from "../controllers/usuarios.controller.js";
 import { uploadAvatar } from "../utils/avatarUpload.js";
-import { ROLES } from "../config/roles.js";
+import { ROLES } from "../config/constantes.js";
 import { AVATARES_PREDEFINIDOS } from "../config/avatares.js";
 
 const router = express.Router();
