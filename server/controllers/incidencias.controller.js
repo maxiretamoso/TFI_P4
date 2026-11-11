@@ -1,3 +1,4 @@
+import { PREFIJO_API } from "../../shared/constantes.js";
 import * as incidenciasService from "../services/incidencias.service.js";
 import * as historialService from "../services/incidencias_estados.service.js";
 import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
@@ -21,7 +22,7 @@ async function obtenerHistorial(req, res) {
 async function crear(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   const incidencia = await incidenciasService.crear(req.body, req.usuario);
-  res.status(201).location(`/api/v1/incidencias/${incidencia.id_incidencia}`).json(incidencia);
+  res.status(201).location(`${PREFIJO_API}/incidencias/${incidencia.id_incidencia}`).json(incidencia);
 }
 
 async function asignar(req, res) {

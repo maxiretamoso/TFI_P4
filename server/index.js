@@ -8,7 +8,8 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import swaggerUi from "swagger-ui-express";
 
-import { especificacion, PREFIJO_API } from "./config/swagger.js";
+import { especificacion } from "./config/swagger.js";
+import { PREFIJO_API } from "../shared/constantes.js";
 import validarEntorno from "./utils/validarEntorno.js";
 import rutasAuth from "./routes/auth.js";
 import rutasHealth from "./routes/health.js";

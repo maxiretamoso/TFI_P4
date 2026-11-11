@@ -23,9 +23,22 @@ const PRIORIDADES = Object.freeze({
   [PRIORIDAD_ALTA]: "Alta",
 });
 
+const PREFIJO_API = "/api/v1";
+
+const REPORTES = Object.freeze({
+  pendientes: { etiqueta: "Pendientes", titulo: "Incidencias pendientes", estados: [ESTADOS.PENDIENTE] },
+  en_proceso: { etiqueta: "En proceso", titulo: "Incidencias en proceso", estados: [ESTADOS.EN_PROCESO] },
+  resueltas: { etiqueta: "Resueltas", titulo: "Incidencias resueltas", estados: [ESTADOS.RESUELTA] },
+  canceladas: { etiqueta: "Canceladas", titulo: "Incidencias canceladas", estados: [ESTADOS.CANCELADA] },
+});
+const FILTROS_DE_REPORTE = Object.freeze(Object.keys(REPORTES));
+
 const ZONA_HORARIA = "America/Argentina/Buenos_Aires";
 
 export {
+  PREFIJO_API,
+  REPORTES,
+  FILTROS_DE_REPORTE,
   AREA_SISTEMAS,
   ROLES,
   ESTADOS,

@@ -1,6 +1,6 @@
 import swaggerJsdoc from "swagger-jsdoc";
 
-const PREFIJO_API = "/api/v1";
+import { PREFIJO_API, FILTROS_DE_REPORTE } from "../../shared/constantes.js";
 
 const definicion = {
   openapi: "3.0.0",
@@ -79,12 +79,14 @@ const definicion = {
     },
     responses: {
       DatosInvalidos: {
-        description: "Los datos enviados no pasaron la validación",
+        description: "Datos inválidos: errores de validación o de reglas de negocio",
         content: {
           "application/json": {
             schema: {
-              type: "object",
-              properties: { errors: { type: "array", items: { type: "object" } } },
+              oneOf: [
+                { type: "object", required: ["errors"], properties: { errors: { type: "array", items: { type: "object" } } } },
+                { type: "object", required: ["error"], properties: { error: { type: "string" } } },
+              ],
             },
           },
         },
@@ -112,4 +114,6 @@ const especificacion = swaggerJsdoc({
   apis: [`${import.meta.dirname.replaceAll("\\", "/")}/../routes/*.js`],
 });
 
-export { especificacion, PREFIJO_API };
+especificacion.paths["/reportes/incidencias"].get.parameters.find((p) => p.name === "filtro").schema.enum = [...FILTROS_DE_REPORTE];
+
+export { especificacion };

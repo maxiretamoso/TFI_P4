@@ -1,13 +1,8 @@
+import { REPORTES } from "../../../shared/constantes.js";
 import { api } from "../api.js";
 import { mensajeError } from "../ui.js";
 
-const OPCIONES = [
-  ["", "Todas"],
-  ["pendientes", "Pendientes"],
-  ["en_proceso", "En proceso"],
-  ["resueltas", "Resueltas"],
-  ["canceladas", "Canceladas"],
-];
+const OPCIONES = [["", "Todas"], ...Object.entries(REPORTES).map(([valor, config]) => [valor, config.etiqueta])];
 
 let contenedor = null;
 

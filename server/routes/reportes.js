@@ -4,7 +4,7 @@ import verificarToken from "../middlewares/verificarToken.js";
 import verificarRol from "../middlewares/verificarRol.js";
 import * as reportesController from "../controllers/reportes.controller.js";
 import { ROLES } from "../../shared/constantes.js";
-import { FILTROS_DE_REPORTE } from "../services/reportes.service.js";
+import { FILTROS_DE_REPORTE } from "../../shared/constantes.js";
 
 const router = express.Router();
 
@@ -26,7 +26,7 @@ const router = express.Router();
  *     parameters:
  *       - in: query
  *         name: filtro
- *         schema: { type: string, enum: [pendientes, en_proceso, resueltas, canceladas] }
+ *         schema: { type: string }
  *         description: Sin filtro incluye todas las incidencias
  *     responses:
  *       200:

@@ -1,7 +1,8 @@
+import { PREFIJO_API } from "../../shared/constantes.js";
 import { cerrarSesion } from "./session.js";
 
 export const URL_SERVIDOR = "http://localhost:3000";
-const URL_BASE = `${URL_SERVIDOR}/api/v1`;
+const URL_BASE = `${URL_SERVIDOR}${PREFIJO_API}`;
 
 async function leerError(respuesta) {
   const datos = await respuesta.json().catch(() => ({}));

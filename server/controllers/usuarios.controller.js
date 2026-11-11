@@ -1,3 +1,4 @@
+import { PREFIJO_API } from "../../shared/constantes.js";
 import fs from "fs";
 import path from "path";
 import * as usuariosService from "../services/usuarios.service.js";
@@ -37,7 +38,7 @@ async function obtenerPorId(req, res) {
 async function crear(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
   const usuario = await usuariosService.crearUsuario(req.body);
-  res.status(201).location(`/api/v1/usuarios/${usuario.id_usuario}`).json(usuario);
+  res.status(201).location(`${PREFIJO_API}/usuarios/${usuario.id_usuario}`).json(usuario);
 }
 
 async function actualizar(req, res) {

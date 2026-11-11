@@ -57,7 +57,7 @@ router.use(verificarToken);
  *               nombres:     { type: string, maxLength: 250 }
  *               apellidos:   { type: string, maxLength: 250 }
  *               usuario:     { type: string, format: email }
- *               contrasenia: { type: string, minLength: 6 }
+ *               contrasenia: { type: string, minLength: 6, maxLength: 100 }
  *               rol:         { type: integer, enum: [1, 2, 3], description: '1 Director, 2 Sistemas, 3 Municipal' }
  *     responses:
  *       201: { description: Usuario creado }
@@ -98,6 +98,7 @@ router.post(
  *       - { in: path, name: id, required: true, schema: { type: integer } }
  *     responses:
  *       200: { description: El usuario pedido }
+ *       403: { description: Solo el Director puede consultar a otro usuario }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
@@ -116,8 +117,8 @@ router.post(
  *             type: object
  *             properties:
  *               id_area:     { type: integer, description: 'Director y Sistemas deben ser del área Sistemas (3); el Municipal elige' }
- *               nombres:     { type: string }
- *               apellidos:   { type: string }
+ *               nombres:     { type: string, minLength: 1, maxLength: 250 }
+ *               apellidos:   { type: string, minLength: 1, maxLength: 250 }
  *               usuario:     { type: string, format: email }
  *               rol:         { type: integer, enum: [1, 2, 3] }
  *     responses:
