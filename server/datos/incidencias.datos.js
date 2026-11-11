@@ -158,17 +158,16 @@ function insertar({ id_articulo, id_estado, creado_por, asignado_a, prioridad, d
   });
 }
 
-// "desde" son los estados en los que tiene que estar la incidencia para cambiar: si otro
-// pedido la cambió antes, el UPDATE no afecta filas y se devuelve null.
-function cambiarEstado(id, idEstado, { descripcion_resolucion, desde }) {
+function cambiarEstado(id, idEstado, { descripcion_resolucion, desde, asignadoA = null }) {
   return conTransaccion(async (cliente) => {
     const cambio = await cliente.query(
       `UPDATE incidencias
        SET id_estado = $1,
            descripcion_resolucion = COALESCE($2, descripcion_resolucion)
        WHERE id_incidencia = $3 AND id_estado = ANY($4)
+         AND ($5::integer IS NULL OR asignado_a = $5)
        RETURNING *`,
-      [idEstado, descripcion_resolucion ?? null, id, desde]
+      [idEstado, descripcion_resolucion ?? null, id, desde, asignadoA]
     );
 
     if (cambio.rowCount === 0) return null;

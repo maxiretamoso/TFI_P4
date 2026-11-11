@@ -8,7 +8,7 @@ import { ROLES, ESTADOS, SIN_RESOLVER } from "../config/constantes.js";
 const LIMITE_POR_DEFECTO = 15;
 const LIMITE_MAXIMO = 100;
 
-const CAMBIO_SIMULTANEO = "La incidencia cambió de estado mientras tanto. Recargá la lista y probá de nuevo.";
+const CAMBIO_SIMULTANEO = "La incidencia cambió mientras tanto. Recargá la lista y probá de nuevo.";
 
 function filtroSegunRol({ rol, id_usuario }) {
   if (rol === ROLES.EMPLEADO_MUNICIPAL) return { creadoPor: id_usuario };
@@ -115,6 +115,7 @@ async function finalizar(id, descripcionResolucion, solicitante) {
   const actualizada = await incidenciasDatos.cambiarEstado(id, ESTADOS.RESUELTA, {
     descripcion_resolucion: descripcionResolucion,
     desde: SIN_RESOLVER,
+    asignadoA: solicitante.id_usuario,
   });
   if (!actualizada) throw crearError(409, CAMBIO_SIMULTANEO);
 
