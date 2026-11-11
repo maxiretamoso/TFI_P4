@@ -1,28 +1,8 @@
-export const ROLES = {
-  DIRECTOR: 1,
-  EMPLEADO_SISTEMAS: 2,
-  EMPLEADO_MUNICIPAL: 3,
-};
-
+import { ROLES, ESTADOS } from "../../shared/constantes.js";
 export const NOMBRES_ROL = {
   [ROLES.DIRECTOR]: "Director",
   [ROLES.EMPLEADO_SISTEMAS]: "Sistemas",
   [ROLES.EMPLEADO_MUNICIPAL]: "Municipal",
-};
-
-export const AREA_SISTEMAS = 3;
-
-export const ESTADOS = {
-  PENDIENTE: 1,
-  EN_PROCESO: 2,
-  RESUELTA: 3,
-  CANCELADA: 4,
-};
-
-export const PRIORIDADES = {
-  1: "Baja",
-  2: "Media",
-  3: "Alta",
 };
 
 export function esc(texto) {

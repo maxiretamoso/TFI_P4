@@ -3,7 +3,7 @@ import { body, param } from "express-validator";
 import verificarToken from "../middlewares/verificarToken.js";
 import verificarRol from "../middlewares/verificarRol.js";
 import * as articulosController from "../controllers/articulos.controller.js";
-import { ROLES } from "../config/constantes.js";
+import { ROLES } from "../../shared/constantes.js";
 
 const router = express.Router();
 

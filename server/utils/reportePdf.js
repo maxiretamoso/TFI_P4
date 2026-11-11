@@ -1,6 +1,6 @@
 import path from "path";
 import PDFDocument from "pdfkit";
-import { ESTADOS } from "../config/constantes.js";
+import { ESTADOS } from "../../shared/constantes.js";
 
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 

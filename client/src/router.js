@@ -1,3 +1,4 @@
+import { ROLES } from "../../shared/constantes.js";
 import * as login from "./pages/login.js";
 import * as incidencias from "./pages/incidencias.js";
 import * as catalogos from "./pages/catalogos.js";
@@ -8,7 +9,7 @@ import * as reportes from "./pages/reportes.js";
 import * as nueva from "./pages/nueva.js";
 import * as articulos from "./pages/articulos.js";
 import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
-import { esc, ROLES, avatarHtml } from "./ui.js";
+import { esc, avatarHtml } from "./ui.js";
 import { botonTema, activarBotonTema } from "./tema.js";
 import { rutaDeInicio } from "./permisos.js";
 

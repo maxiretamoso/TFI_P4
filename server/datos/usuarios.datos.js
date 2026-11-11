@@ -1,5 +1,5 @@
 import pool from "../db/index.js";
-import { ROLES } from "../config/constantes.js";
+import { ROLES } from "../../shared/constantes.js";
 
 const CAMPOS = `
   usuarios.id_usuario,

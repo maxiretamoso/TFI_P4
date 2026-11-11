@@ -3,7 +3,7 @@ import * as areasDatos from "../datos/areas.datos.js";
 import * as categoriasDatos from "../datos/categorias.datos.js";
 import * as incidenciasDatos from "../datos/incidencias.datos.js";
 import { crearError } from "../utils/httpError.js";
-import { ROLES, SIN_RESOLVER } from "../config/constantes.js";
+import { ROLES, SIN_RESOLVER } from "../../shared/constantes.js";
 
 async function validarReferencias(id_area, id_categoria) {
   const [area, categoria] = await Promise.all([

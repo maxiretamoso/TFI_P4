@@ -1,4 +1,5 @@
-import { ROLES, ESTADOS } from "./ui.js";
+import { ROLES, ESTADOS } from "../../shared/constantes.js";
+
 
 // Reflejan lo que permite la API; el control real está siempre en el servidor.
 

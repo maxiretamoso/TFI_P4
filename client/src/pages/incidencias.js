@@ -1,19 +1,8 @@
+import { PRIORIDADES, ESTADOS } from "../../../shared/constantes.js";
 import { api } from "../api.js";
 import { leerUsuario } from "../session.js";
 import { confirmar } from "../confirmar.js";
-import {
-  PRIORIDADES,
-  ESTADOS,
-  esc,
-  fecha,
-  fechaHora,
-  cargando,
-  mensajeError,
-  badgeEstado,
-  paginacion,
-  nombreDelAsignado,
-  POR_PAGINA,
-} from "../ui.js";
+import { esc, fecha, fechaHora, cargando, mensajeError, badgeEstado, paginacion, nombreDelAsignado, POR_PAGINA } from "../ui.js";
 import {
   puedeCrearIncidencias,
   puedeCancelar,

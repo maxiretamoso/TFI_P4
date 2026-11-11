@@ -73,7 +73,7 @@ Son los que trae `database/incidencias_db.sql`. La contraseña es la parte del c
 ```
 server/
   index.js            arranque, middlewares globales y montaje de rutas
-  config/             constantes de área, roles y estados, avatares y definición de Swagger
+  config/             avatares y definición de Swagger
   routes/             definición de endpoints y validaciones de entrada
   controllers/        traducen HTTP a llamadas al servicio
   services/           reglas de negocio (permisos, transiciones de estado, correo)
@@ -95,9 +95,11 @@ client/
     avisos.js         avisos flotantes que se cierran solos
     main.js           arranque, navegación y tooltip para pedidos truncados
     confirmar.js      ventana de confirmación reutilizable
-    ui.js             constantes y helpers de presentación
+    ui.js             helpers de presentación
     styles.css        estilos propios sobre Bootstrap
     pages/            una pantalla por archivo
+shared/
+  constantes.js       valores de área, roles, estados y prioridades compartidos
 database/
   incidencias_db.sql  estructura y datos de prueba de la cátedra
 ```

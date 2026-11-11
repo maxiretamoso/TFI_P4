@@ -1,5 +1,6 @@
+import { PRIORIDADES } from "../../../shared/constantes.js";
 import { api } from "../api.js";
-import { PRIORIDADES, esc, cargando, mensajeError } from "../ui.js";
+import { esc, cargando, mensajeError } from "../ui.js";
 
 let contenedor = null;
 

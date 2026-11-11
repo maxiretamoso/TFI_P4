@@ -2,7 +2,7 @@ import express from "express";
 import verificarToken from "../middlewares/verificarToken.js";
 import verificarRol from "../middlewares/verificarRol.js";
 import * as historialController from "../controllers/incidencias_estados.controller.js";
-import { ROLES } from "../config/constantes.js";
+import { ROLES } from "../../shared/constantes.js";
 
 const router = express.Router();
 

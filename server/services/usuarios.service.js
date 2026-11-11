@@ -2,7 +2,7 @@ import * as usuariosDatos from "../datos/usuarios.datos.js";
 import * as areasDatos from "../datos/areas.datos.js";
 import * as incidenciasDatos from "../datos/incidencias.datos.js";
 import { crearError } from "../utils/httpError.js";
-import { ROLES, SIN_RESOLVER, AREA_SISTEMAS } from "../config/constantes.js";
+import { ROLES, SIN_RESOLVER, AREA_SISTEMAS } from "../../shared/constantes.js";
 import { hashearContrasenia } from "./auth.service.js";
 
 const CODIGO_CLAVE_DUPLICADA = "23505";

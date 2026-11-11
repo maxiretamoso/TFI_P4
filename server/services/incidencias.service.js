@@ -3,7 +3,7 @@ import * as usuariosDatos from "../datos/usuarios.datos.js";
 import * as articulosDatos from "../datos/articulos.datos.js";
 import { crearError } from "../utils/httpError.js";
 import { enviarNotificacionDeIncidencia } from "./notificaciones.service.js";
-import { ROLES, ESTADOS, SIN_RESOLVER } from "../config/constantes.js";
+import { ROLES, ESTADOS, SIN_RESOLVER } from "../../shared/constantes.js";
 
 const LIMITE_POR_DEFECTO = 15;
 const LIMITE_MAXIMO = 100;
