@@ -1,9 +1,8 @@
 import * as dashboardDatos from "../datos/dashboard.datos.js";
 import * as reportesDatos from "../datos/reportes.datos.js";
-import { ESTADOS, ROLES, SIN_RESOLVER } from "../../shared/constantes.js";
+import { ESTADOS, ROLES, SIN_RESOLVER, PRIORIDAD_ALTA } from "../../shared/constantes.js";
 
 const FECHAS_DEL_LISTADO = 7;
-const PRIORIDAD_ALTA = 3;
 const MAXIMO_PRIORITARIAS = 10;
 
 async function obtenerResumen() {

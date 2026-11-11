@@ -16,10 +16,11 @@ const ESTADOS = Object.freeze({
 
 const SIN_RESOLVER = Object.freeze([ESTADOS.PENDIENTE, ESTADOS.EN_PROCESO]);
 
+const PRIORIDAD_ALTA = 3;
 const PRIORIDADES = Object.freeze({
   1: "Baja",
   2: "Media",
-  3: "Alta",
+  [PRIORIDAD_ALTA]: "Alta",
 });
 
-export { AREA_SISTEMAS, ROLES, ESTADOS, SIN_RESOLVER, PRIORIDADES };
+export { AREA_SISTEMAS, ROLES, ESTADOS, SIN_RESOLVER, PRIORIDADES, PRIORIDAD_ALTA };

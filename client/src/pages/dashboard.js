@@ -1,4 +1,4 @@
-import { PRIORIDADES, ESTADOS } from "../../../shared/constantes.js";
+import { PRIORIDADES, PRIORIDAD_ALTA, ESTADOS, SIN_RESOLVER } from "../../../shared/constantes.js";
 import { api } from "../api.js";
 import { esc, cargando, mensajeError, badgeEstado, fecha, fechaHora, nombreDelAsignado } from "../ui.js";
 
@@ -16,8 +16,6 @@ const NOMBRE_EN_PLURAL = {
   [ESTADOS.CANCELADA]: "Canceladas",
 };
 
-const SIN_RESOLVER = `${ESTADOS.PENDIENTE},${ESTADOS.EN_PROCESO}`;
-const PRIORIDAD_ALTA = 3;
 const RADIO_TORTA = 15.915;
 
 function enlaceALista(filtros, etiqueta) {
@@ -138,7 +136,7 @@ function tablaDePrioritarias(resumen) {
   }
   const filas = resumen.prioritarias
     .map(
-      (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: SIN_RESOLVER, prioridad: PRIORIDAD_ALTA })}">
+      (inc) => `<tr class="fila-clicable" data-enlace="${enlaceALista({ estado: SIN_RESOLVER.join(","), prioridad: PRIORIDAD_ALTA })}">
         <td>${inc.id_incidencia}</td>
         <td>${esc(inc.articulo)}</td>
         <td class="celda-pedido">${esc(inc.descripcion_pedido)}</td>

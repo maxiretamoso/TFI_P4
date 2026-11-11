@@ -1,6 +1,6 @@
 import path from "path";
 import PDFDocument from "pdfkit";
-import { ESTADOS } from "../../shared/constantes.js";
+import { ESTADOS, PRIORIDADES } from "../../shared/constantes.js";
 
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 
@@ -15,10 +15,10 @@ const COLOR = {
 };
 
 // En el detalle van las siglas para dejarle lugar al artículo y al pedido; el resumen las explica.
-const PRIORIDADES = {
-  3: { sigla: "A", nombre: "Alta" },
-  2: { sigla: "M", nombre: "Media" },
-  1: { sigla: "B", nombre: "Baja" },
+const SIGLAS_PRIORIDAD = {
+  3: "A",
+  2: "M",
+  1: "B",
 };
 const ESTADOS_ABREVIADOS = {
   [ESTADOS.PENDIENTE]: { sigla: "P", nombre: "Pendiente" },
@@ -217,7 +217,7 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
       fecha: formatoFecha.format(new Date(inc.creado)),
       cierre:
         CERRADAS.includes(inc.id_estado) && inc.fecha_estado ? formatoFecha.format(new Date(inc.fecha_estado)) : "-",
-      prioridad_sigla: PRIORIDADES[inc.prioridad]?.sigla ?? inc.prioridad,
+      prioridad_sigla: SIGLAS_PRIORIDAD[inc.prioridad] ?? inc.prioridad,
       estado_sigla: ESTADOS_ABREVIADOS[inc.id_estado]?.sigla ?? inc.estado,
       asignado: inc.asignado_nombres ? `${inc.asignado_nombres} ${inc.asignado_apellidos}` : "Sin asignar",
     }))
@@ -239,7 +239,7 @@ function crearReporteIncidencias({ titulo: subtitulo, porEstado, porPrioridad, p
       titulo: "Por prioridad",
       columna: "Prioridad",
       filas: porPrioridad.length
-        ? [3, 2, 1].map((p) => ({ nombre: `${PRIORIDADES[p].sigla} - ${PRIORIDADES[p].nombre}`, total: porId.get(p) ?? 0 }))
+        ? [3, 2, 1].map((p) => ({ nombre: `${SIGLAS_PRIORIDAD[p]} - ${PRIORIDADES[p]}`, total: porId.get(p) ?? 0 }))
         : [],
     },
     {

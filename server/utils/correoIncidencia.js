@@ -1,9 +1,9 @@
 import path from "path";
+import { PRIORIDADES } from "../../shared/constantes.js";
 
 // Los clientes de correo ignoran <style> y CSS moderno: todo va en línea y con tablas.
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 const CID_LOGO = "logo-municipalidad";
-const PRIORIDADES = { 1: "Baja", 2: "Media", 3: "Alta" };
 
 const CIERRES = {
   finalizada: { verbo: "fue resuelta", etiqueta: "Resuelta", fondo: "#e6f0dc", texto: "#3d6326" },
