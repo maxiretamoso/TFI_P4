@@ -41,7 +41,7 @@ const router = express.Router();
  *                       total:     { type: integer, example: 4 }
  *                 porFecha:
  *                   type: array
- *                   description: Las últimas 7 fechas en que se crearon incidencias, la más reciente primero
+ *                   description: Las últimas 7 fechas con incidencias según la hora de Buenos Aires, la más reciente primero
  *                   items:
  *                     type: object
  *                     properties:

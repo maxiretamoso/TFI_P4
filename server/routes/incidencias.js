@@ -32,8 +32,8 @@ router.use(verificarToken);
  *       - { in: query, name: estado,    schema: { type: string, example: "1,2" }, description: Uno o varios id_estado separados por coma }
  *       - { in: query, name: prioridad, schema: { type: integer, minimum: 1, maximum: 3 } }
  *       - { in: query, name: buscar,    schema: { type: string }, description: Texto en el pedido o el artículo }
- *       - { in: query, name: desde,     schema: { type: string, format: date }, description: Creadas desde esa fecha (AAAA-MM-DD) }
- *       - { in: query, name: fecha,     schema: { type: string, format: date }, description: Creadas ese día (AAAA-MM-DD) }
+ *       - { in: query, name: desde,     schema: { type: string, format: date }, description: Creadas desde esa fecha según la hora de Buenos Aires (AAAA-MM-DD) }
+ *       - { in: query, name: fecha,     schema: { type: string, format: date }, description: Creadas ese día según la hora de Buenos Aires (AAAA-MM-DD) }
  *       - { in: query, name: sin_asignar, schema: { type: boolean }, description: Solo las que todavía no tienen a nadie asignado (asignado_a en null) }
  *       - { in: query, name: area,      schema: { type: integer }, description: id_area del artículo }
  *       - { in: query, name: categoria, schema: { type: integer }, description: id_categoria del artículo }

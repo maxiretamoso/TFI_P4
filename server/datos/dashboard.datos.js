@@ -1,4 +1,5 @@
 import pool from "../db/index.js";
+import { ZONA_HORARIA } from "../../shared/constantes.js";
 
 function totalesPorEstado() {
   return pool
@@ -15,12 +16,12 @@ function totalesPorEstado() {
 
 function totalesPorFecha(limite) {
   return pool
-    .query(`SELECT to_char(creado::date, 'YYYY-MM-DD') AS fecha,
+    .query(`SELECT to_char((creado AT TIME ZONE $2)::date, 'YYYY-MM-DD') AS fecha,
                    COUNT(*)::int AS total
             FROM incidencias
-            GROUP BY creado::date
-            ORDER BY creado::date DESC
-            LIMIT $1`, [limite])
+            GROUP BY fecha
+            ORDER BY fecha DESC
+            LIMIT $1`, [limite, ZONA_HORARIA])
     .then((r) => r.rows);
 }
 

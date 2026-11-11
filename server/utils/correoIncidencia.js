@@ -1,5 +1,5 @@
 import path from "path";
-import { PRIORIDADES } from "../../shared/constantes.js";
+import { PRIORIDADES, ZONA_HORARIA } from "../../shared/constantes.js";
 
 // Los clientes de correo ignoran <style> y CSS moderno: todo va en línea y con tablas.
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
@@ -11,7 +11,7 @@ const CIERRES = {
 };
 
 const formatoFecha = new Intl.DateTimeFormat("es-AR", {
-  timeZone: "America/Argentina/Buenos_Aires",
+  timeZone: ZONA_HORARIA,
   day: "2-digit",
   month: "2-digit",
   year: "numeric",

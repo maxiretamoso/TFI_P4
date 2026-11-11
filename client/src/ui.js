@@ -1,4 +1,4 @@
-import { ROLES, ESTADOS } from "../../shared/constantes.js";
+import { ROLES, ESTADOS, ZONA_HORARIA } from "../../shared/constantes.js";
 export const NOMBRES_ROL = {
   [ROLES.DIRECTOR]: "Director",
   [ROLES.EMPLEADO_SISTEMAS]: "Sistemas",
@@ -21,7 +21,7 @@ export function fecha(iso) {
 
 export function fechaHora(iso) {
   return new Date(iso).toLocaleString("es-AR", {
-    timeZone: "America/Argentina/Buenos_Aires",
+    timeZone: ZONA_HORARIA,
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

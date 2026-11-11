@@ -1,4 +1,5 @@
 import pool, { conTransaccion } from "../db/index.js";
+import { ZONA_HORARIA } from "../../shared/constantes.js";
 
 const DESDE = `
   FROM incidencias
@@ -71,12 +72,12 @@ function armarFiltros({
   }
 
   if (desde) {
-    valores.push(desde);
-    condiciones.push(`incidencias.creado >= $${valores.length}::date`);
+    valores.push(desde, ZONA_HORARIA);
+    condiciones.push(`incidencias.creado >= ($${valores.length - 1}::date::timestamp AT TIME ZONE $${valores.length})`);
   }
   if (fecha) {
-    valores.push(fecha);
-    condiciones.push(`incidencias.creado::date = $${valores.length}::date`);
+    valores.push(fecha, ZONA_HORARIA);
+    condiciones.push(`(incidencias.creado AT TIME ZONE $${valores.length})::date = $${valores.length - 1}::date`);
   }
   if (area) {
     valores.push(area);
@@ -116,9 +117,9 @@ async function listar(filtros) {
     pool.query(`SELECT COUNT(*)::int AS total ${DESDE} ${where}`, valores),
     pool.query(
       `SELECT COUNT(*)::int AS total,
-              EXTRACT(YEAR FROM MIN(incidencias.creado) AT TIME ZONE 'America/Argentina/Buenos_Aires')::int AS primer_anio
+              EXTRACT(YEAR FROM MIN(incidencias.creado) AT TIME ZONE $${delRol.valores.length + 1})::int AS primer_anio
        ${DESDE} ${delRol.where}`,
-      delRol.valores
+      [...delRol.valores, ZONA_HORARIA]
     ),
   ]);
 

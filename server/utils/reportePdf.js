@@ -1,6 +1,6 @@
 import path from "path";
 import PDFDocument from "pdfkit";
-import { ESTADOS, PRIORIDADES } from "../../shared/constantes.js";
+import { ESTADOS, PRIORIDADES, ZONA_HORARIA } from "../../shared/constantes.js";
 
 const LOGO = path.join(import.meta.dirname, "..", "assets", "logo-muni.png");
 
@@ -29,7 +29,7 @@ const ESTADOS_ABREVIADOS = {
 const CERRADAS = [ESTADOS.RESUELTA, ESTADOS.CANCELADA];
 
 // Hora de Argentina en 24 h, sin segundos, sin depender de la zona del servidor.
-const FORMATO_FECHA = { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit", month: "2-digit", year: "numeric" };
+const FORMATO_FECHA = { timeZone: ZONA_HORARIA, day: "2-digit", month: "2-digit", year: "numeric" };
 const formatoFecha = new Intl.DateTimeFormat("es-AR", FORMATO_FECHA);
 const formatoFechaHora = new Intl.DateTimeFormat("es-AR", {
   ...FORMATO_FECHA,
