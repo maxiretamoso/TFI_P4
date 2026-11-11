@@ -95,7 +95,7 @@ router.get(
  *             properties:
  *               id_articulo:        { type: integer, example: 1 }
  *               prioridad:          { type: integer, minimum: 1, maximum: 3, example: 2 }
- *               descripcion_pedido: { type: string, maxLength: 250, example: El monitor no enciende }
+ *               descripcion_pedido: { type: string, minLength: 1, maxLength: 250, example: El monitor no enciende }
  *     responses:
  *       201:
  *         description: Incidencia creada
@@ -104,6 +104,7 @@ router.get(
  *             schema: { $ref: '#/components/schemas/Incidencia' }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.post(
   "/",
@@ -137,6 +138,8 @@ router.post(
  *         description: La incidencia pedida
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  */
 router.get("/:id", [param("id").isInt({ min: 1 })], incidenciasController.obtenerPorId);
 
@@ -165,6 +168,8 @@ router.get("/:id", [param("id").isInt({ min: 1 })], incidenciasController.obtene
  *                   fecha_hora_estado:  { type: string, format: date-time, example: "2026-11-05T18:30:00-03:00" }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  */
 router.get("/:id/estados", [param("id").isInt({ min: 1 })], incidenciasController.obtenerHistorial);
 
@@ -188,11 +193,16 @@ router.get("/:id/estados", [param("id").isInt({ min: 1 })], incidenciasControlle
  *             properties:
  *               asignado_a: { type: integer, description: id_usuario de un empleado de Sistemas }
  *     responses:
- *       200: { description: Incidencia asignada }
- *       400: { description: El usuario indicado no es un empleado de Sistemas }
+ *       200:
+ *         description: Incidencia asignada
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Incidencia' }
+ *       400: { description: Datos inválidos o responsable inactivo o ajeno al rol de Sistemas }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       409: { description: La incidencia ya está resuelta o cancelada }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.patch(
   "/:id/asignacion",
@@ -222,13 +232,18 @@ router.patch(
  *             type: object
  *             required: [descripcion_resolucion]
  *             properties:
- *               descripcion_resolucion: { type: string, maxLength: 250 }
+ *               descripcion_resolucion: { type: string, minLength: 1, maxLength: 250 }
  *     responses:
- *       200: { description: Incidencia resuelta }
+ *       200:
+ *         description: Incidencia resuelta
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Incidencia' }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
- *       409: { description: La incidencia ya estaba resuelta o cancelada }
+ *       409: { description: La incidencia se cerró o cambió de responsable durante la operación }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.patch(
   "/:id/resolucion",
@@ -255,10 +270,16 @@ router.patch(
  *     parameters:
  *       - { in: path, name: id, required: true, schema: { type: integer } }
  *     responses:
- *       200: { description: Incidencia cancelada }
+ *       200:
+ *         description: Incidencia cancelada
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Incidencia' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       409: { description: La incidencia no está pendiente }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  */
 router.patch(
   "/:id/cancelacion",

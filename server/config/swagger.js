@@ -53,7 +53,10 @@ const definicion = {
           id_articulo: { type: "integer" },
           id_estado: { type: "integer" },
           estado: { type: "string" },
+          articulo_descripcion: { type: "string" },
           creado_por: { type: "integer" },
+          creado_por_nombre: { type: "string" },
+          creado_por_apellido: { type: "string" },
           asignado_a: {
             type: "integer",
             nullable: true,
@@ -105,7 +108,8 @@ const definicion = {
 
 const especificacion = swaggerJsdoc({
   definition: definicion,
-  apis: [`${import.meta.dirname}/../routes/*.js`],
+  failOnErrors: true,
+  apis: [`${import.meta.dirname.replaceAll("\\", "/")}/../routes/*.js`],
 });
 
 export { especificacion, PREFIJO_API };

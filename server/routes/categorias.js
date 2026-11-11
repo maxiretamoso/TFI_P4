@@ -43,6 +43,7 @@ const PUEDEN_GESTIONAR = [ROLES.EMPLEADO_SISTEMAS, ROLES.DIRECTOR];
  *       201: { description: Creada }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.get("/", verificarToken, categoriasController.listar);
 
@@ -66,6 +67,8 @@ router.post(
  *     responses:
  *       200: { description: El recurso pedido }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   put:
  *     summary: Modifica una categoría
  *     tags: [Categorias]
@@ -85,6 +88,8 @@ router.post(
  *       200: { description: Modificada }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   delete:
  *     summary: Da de baja una categoría (soft delete, activo = 0)
  *     tags: [Categorias]
@@ -96,6 +101,8 @@ router.post(
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       409: { description: La categoría tiene artículos activos }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  */
 router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], categoriasController.obtenerPorId);
 

@@ -40,6 +40,7 @@ router.use(verificarToken);
  *               items: { $ref: '#/components/schemas/Usuario' }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   post:
  *     summary: Crea un usuario
  *     tags: [Usuarios]
@@ -63,6 +64,7 @@ router.use(verificarToken);
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       409: { description: Ya existe un usuario con ese correo }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.get(
   "/",
@@ -97,6 +99,8 @@ router.post(
  *     responses:
  *       200: { description: El usuario pedido }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   put:
  *     summary: Modifica un usuario
  *     description: El Director puede modificar a cualquiera; el resto, solo su propio perfil y sin cambiar rol ni área.
@@ -122,6 +126,7 @@ router.post(
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       400: { description: Datos inválidos o intento de cambiar el propio rol }
  *       409: { description: Ya existe un usuario con ese correo, o es empleado de Sistemas con incidencias sin resolver y se le cambia el rol }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  *   delete:
  *     summary: Da de baja un usuario (soft delete, activo = 0)
  *     tags: [Usuarios]
@@ -134,6 +139,7 @@ router.post(
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       409: { description: Es empleado de Sistemas y tiene incidencias sin resolver asignadas }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.get("/:id", [param("id").isInt({ min: 1 })], usuariosController.obtenerPorId);
 
@@ -190,6 +196,7 @@ router.delete(
  *       400: { description: Falta la imagen o el predefinido, el archivo no es válido o supera los 2 MB }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.patch(
   "/:id/avatar",

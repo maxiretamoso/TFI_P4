@@ -43,6 +43,7 @@ const PUEDEN_GESTIONAR = [ROLES.DIRECTOR];
  *       201: { description: Creada }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.get("/", verificarToken, areasController.listar);
 
@@ -66,6 +67,8 @@ router.post(
  *     responses:
  *       200: { description: El recurso pedido }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   put:
  *     summary: Modifica un área
  *     tags: [Areas]
@@ -85,6 +88,8 @@ router.post(
  *       200: { description: Modificada }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   delete:
  *     summary: Da de baja un área (soft delete, activo = 0)
  *     tags: [Areas]
@@ -96,6 +101,8 @@ router.post(
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       409: { description: El área tiene usuarios o artículos activos }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  */
 router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], areasController.obtenerPorId);
 

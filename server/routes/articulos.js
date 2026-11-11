@@ -52,6 +52,7 @@ const PUEDEN_GESTIONAR = [ROLES.EMPLEADO_SISTEMAS, ROLES.DIRECTOR];
  *       201: { description: Artículo creado }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.get("/", verificarToken, articulosController.listar);
 
@@ -79,6 +80,8 @@ router.post(
  *     responses:
  *       200: { description: El artículo pedido }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *   put:
  *     summary: Modifica un artículo
  *     tags: [Articulos]
@@ -100,6 +103,7 @@ router.post(
  *       400: { $ref: '#/components/responses/DatosInvalidos' }
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
  *   delete:
  *     summary: Da de baja un artículo (soft delete, activo = 0)
  *     tags: [Articulos]
@@ -111,6 +115,8 @@ router.post(
  *       403: { $ref: '#/components/responses/SinPermiso' }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       409: { description: El artículo tiene incidencias pendientes o en proceso }
+ *       401: { $ref: '#/components/responses/NoAutenticado' }
+ *       400: { $ref: '#/components/responses/DatosInvalidos' }
  */
 router.get("/:id", verificarToken, [param("id").isInt({ min: 1 })], articulosController.obtenerPorId);
 

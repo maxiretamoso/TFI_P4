@@ -15,6 +15,7 @@ const router = express.Router();
  * /health:
  *   get:
  *     summary: Comprueba que el servidor responde y la base está conectada
+ *     security: []
  *     tags: [Health]
  *     responses:
  *       200: { description: Todo en orden }

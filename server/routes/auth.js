@@ -17,6 +17,7 @@ const router = express.Router();
  * /auth/login:
  *   post:
  *     summary: Inicia sesión y devuelve un token JWT
+ *     security: []
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -72,10 +73,10 @@ router.post(
  *             required: [contrasenia_actual, contrasenia_nueva]
  *             properties:
  *               contrasenia_actual: { type: string }
- *               contrasenia_nueva: { type: string, minLength: 6 }
+ *               contrasenia_nueva: { type: string, minLength: 6, maxLength: 100 }
  *     responses:
  *       200: { description: Contraseña actualizada }
- *       400: { description: La contraseña actual no es correcta }
+ *       400: { description: Datos inválidos o contraseña actual incorrecta }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  */
 router.patch(
