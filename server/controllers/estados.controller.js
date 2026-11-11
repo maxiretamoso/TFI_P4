@@ -1,5 +1,5 @@
 import * as estadosService from "../services/estados.service.js";
-import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 
 async function listar(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;

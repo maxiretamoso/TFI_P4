@@ -1,5 +1,5 @@
 import * as authService from "../services/auth.service.js";
-import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 
 async function login(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;

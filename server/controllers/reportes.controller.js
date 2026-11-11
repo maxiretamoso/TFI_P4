@@ -1,6 +1,6 @@
 import * as reportesService from "../services/reportes.service.js";
 import { crearReporteIncidencias } from "../utils/reportePdf.js";
-import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 
 async function generarReporteIncidencias(req, res, next) {
   if (responderSiHayErroresDeValidacion(req, res)) return;

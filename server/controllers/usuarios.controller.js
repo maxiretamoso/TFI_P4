@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import * as usuariosService from "../services/usuarios.service.js";
 import { uploadDir } from "../utils/avatarUpload.js";
-import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 import { archivoDelPredefinido, esPredefinido } from "../config/avatares.js";
 
 function borrarArchivo(ruta) {

@@ -1,4 +1,4 @@
-import { responderSiHayErroresDeValidacion } from "../utils/validar.js";
+import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 import * as articulosService from "../services/articulos.service.js";
 
 async function listar(req, res, next) {
