@@ -73,12 +73,14 @@ router.post(
  * /articulos/{id}:
  *   get:
  *     summary: Obtiene un artículo por id
+ *     description: El Municipal solo puede consultar artículos de su área; Sistemas y el Director pueden consultar cualquier área.
  *     tags: [Articulos]
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - { in: path, name: id, required: true, schema: { type: integer } }
  *     responses:
  *       200: { description: El artículo pedido }
+ *       403: { description: El artículo pertenece a otra área y el solicitante es Municipal }
  *       404: { $ref: '#/components/responses/NoEncontrado' }
  *       401: { $ref: '#/components/responses/NoAutenticado' }
  *       400: { $ref: '#/components/responses/DatosInvalidos' }

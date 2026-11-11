@@ -16,7 +16,7 @@ Aplicación web para que el área de Sistemas de un municipio registre, asigne, 
 - Diseño responsivo: en el celular el menú lateral se pliega.
 
 **Empleado Municipal**
-- Listar los artículos de su área, con buscador.
+- Listar los artículos de su área, con buscador. La consulta por ID también comprueba el área y devuelve 403 si pertenece a otra.
 - Crear una incidencia sobre un artículo de su área.
 - Listar sus incidencias y cancelar las que siguen pendientes.
 

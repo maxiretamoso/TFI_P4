@@ -20,9 +20,12 @@ function listarArticulos(solicitante) {
   return articulosDatos.listar(soloSuArea);
 }
 
-async function obtenerArticuloPorId(id) {
+async function obtenerArticuloPorId(id, solicitante) {
   const articulo = await articulosDatos.buscarPorId(id);
   if (!articulo) throw crearError(404, "Artículo no encontrado");
+  if (solicitante.rol === ROLES.EMPLEADO_MUNICIPAL && articulo.id_area !== solicitante.id_area) {
+    throw crearError(403, "Solo podés consultar artículos de tu área");
+  }
   return articulo;
 }
 

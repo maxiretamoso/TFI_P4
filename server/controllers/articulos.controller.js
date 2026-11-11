@@ -8,7 +8,7 @@ async function listar(req, res) {
 
 async function obtenerPorId(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  res.json(await articulosService.obtenerArticuloPorId(req.params.id));
+  res.json(await articulosService.obtenerArticuloPorId(req.params.id, req.usuario));
 }
 
 async function crear(req, res) {
