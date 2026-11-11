@@ -675,6 +675,69 @@ h3 {
     box-shadow: 0 0 0 0.2rem rgba(94, 140, 58, 0.3);
 }
 
+/* Desplegables de filtros y formularios */
+@supports (appearance: base-select) and selector(::picker(select)) {
+    .form-select,
+    .form-select::picker(select) {
+        appearance: base-select;
+    }
+
+    .form-select {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background-image: none;
+        padding-inline-end: 0.75rem;
+        white-space: nowrap;
+    }
+
+    .form-select::picker-icon {
+        flex: 0 0 1rem;
+        margin-inline-start: auto;
+        color: var(--gim-verde-texto);
+        text-align: center;
+    }
+
+    .form-select:open::picker-icon {
+        rotate: 180deg;
+    }
+
+    .form-select::picker(select) {
+        margin-block: 4px;
+        padding: 4px;
+        max-block-size: min(20rem, 50dvh);
+        overflow-y: auto;
+        border: 1px solid var(--gim-borde);
+        border-radius: 10px;
+        background: var(--gim-tarjeta);
+        color: var(--bs-body-color);
+        box-shadow: var(--bs-box-shadow);
+    }
+
+    .form-select option {
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 6px;
+    }
+
+    .form-select option:checked {
+        color: var(--gim-verde-texto);
+        font-weight: 600;
+    }
+
+    .form-select option:hover:not(:disabled),
+    .form-select option:focus,
+    .form-select option:checked {
+        background: var(--gim-verde-suave);
+    }
+
+    .form-select option::checkmark {
+        order: 1;
+        margin-inline-start: auto;
+        color: var(--gim-verde-texto);
+    }
+}
+
 /* Estados */
 
 .estado {
