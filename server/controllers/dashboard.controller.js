@@ -1,11 +1,7 @@
 import * as dashboardService from "../services/dashboard.service.js";
 
-async function obtenerResumen(req, res, next) {
-  try {
-    res.json(await dashboardService.obtenerResumen());
-  } catch (error) {
-    next(error);
-  }
+async function obtenerResumen(req, res) {
+  res.json(await dashboardService.obtenerResumen());
 }
 
 export { obtenerResumen };

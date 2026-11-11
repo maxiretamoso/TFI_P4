@@ -1,23 +1,15 @@
 import * as estadosService from "../services/estados.service.js";
 import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 
-async function listar(req, res, next) {
+async function listar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.json(await estadosService.listarEstados());
-  } catch (error) {
-    next(error);
-  }
+  res.json(await estadosService.listarEstados());
 }
 
-async function obtenerPorId(req, res, next) {
+async function obtenerPorId(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    const estado = await estadosService.obtenerEstadoPorId(req.params.id);
-    res.json(estado);
-  } catch (error) {
-    next(error);
-  }
+  const estado = await estadosService.obtenerEstadoPorId(req.params.id);
+  res.json(estado);
 }
 
 export { listar, obtenerPorId };

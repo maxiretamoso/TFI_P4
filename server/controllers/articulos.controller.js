@@ -1,57 +1,37 @@
 import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 import * as articulosService from "../services/articulos.service.js";
 
-async function listar(req, res, next) {
+async function listar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.json(await articulosService.listarArticulos(req.usuario));
-  } catch (error) {
-    next(error);
-  }
+  res.json(await articulosService.listarArticulos(req.usuario));
 }
 
-async function obtenerPorId(req, res, next) {
+async function obtenerPorId(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.json(await articulosService.obtenerArticuloPorId(req.params.id));
-  } catch (error) {
-    next(error);
-  }
+  res.json(await articulosService.obtenerArticuloPorId(req.params.id));
 }
 
-async function crear(req, res, next) {
+async function crear(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    const { id_area, id_categoria, descripcion } = req.body;
-    res.status(201).json(await articulosService.crearArticulo({ id_area, id_categoria, descripcion }));
-  } catch (error) {
-    next(error);
-  }
+  const { id_area, id_categoria, descripcion } = req.body;
+  res.status(201).json(await articulosService.crearArticulo({ id_area, id_categoria, descripcion }));
 }
 
-async function actualizar(req, res, next) {
+async function actualizar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.json(
-      await articulosService.actualizarArticulo(req.params.id, {
-        id_area: req.body.id_area,
-        id_categoria: req.body.id_categoria,
-        descripcion: req.body.descripcion,
-      }),
-    );
-  } catch (error) {
-    next(error);
-  }
+  res.json(
+    await articulosService.actualizarArticulo(req.params.id, {
+      id_area: req.body.id_area,
+      id_categoria: req.body.id_categoria,
+      descripcion: req.body.descripcion,
+    }),
+  );
 }
 
-async function eliminar(req, res, next) {
+async function eliminar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    await articulosService.desactivarArticulo(req.params.id);
-    res.status(204).end();
-  } catch (error) {
-    next(error);
-  }
+  await articulosService.desactivarArticulo(req.params.id);
+  res.status(204).end();
 }
 
 export { listar, obtenerPorId, crear, actualizar, eliminar };

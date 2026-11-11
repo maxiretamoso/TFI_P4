@@ -19,56 +19,36 @@ function borrarAvatarAnterior(nombreArchivo) {
   borrarArchivo(path.join(uploadDir, path.basename(nombreArchivo)));
 }
 
-async function listar(req, res, next) {
+async function listar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    const soloSistemas = req.query.rol === "sistemas";
-    res.json(
-      soloSistemas
-        ? await usuariosService.listarEmpleadosDeSistemas()
-        : await usuariosService.listarUsuarios()
-    );
-  } catch (error) {
-    next(error);
-  }
+  const soloSistemas = req.query.rol === "sistemas";
+  res.json(
+    soloSistemas
+      ? await usuariosService.listarEmpleadosDeSistemas()
+      : await usuariosService.listarUsuarios()
+  );
 }
 
-async function obtenerPorId(req, res, next) {
+async function obtenerPorId(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.json(await usuariosService.obtenerUsuarioPorId(req.params.id, req.usuario));
-  } catch (error) {
-    next(error);
-  }
+  res.json(await usuariosService.obtenerUsuarioPorId(req.params.id, req.usuario));
 }
 
-async function crear(req, res, next) {
+async function crear(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    const usuario = await usuariosService.crearUsuario(req.body);
-    res.status(201).location(`/api/v1/usuarios/${usuario.id_usuario}`).json(usuario);
-  } catch (error) {
-    next(error);
-  }
+  const usuario = await usuariosService.crearUsuario(req.body);
+  res.status(201).location(`/api/v1/usuarios/${usuario.id_usuario}`).json(usuario);
 }
 
-async function actualizar(req, res, next) {
+async function actualizar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.json(await usuariosService.actualizarUsuario(req.params.id, req.body, req.usuario));
-  } catch (error) {
-    next(error);
-  }
+  res.json(await usuariosService.actualizarUsuario(req.params.id, req.body, req.usuario));
 }
 
-async function eliminar(req, res, next) {
+async function eliminar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    await usuariosService.desactivarUsuario(req.params.id, req.usuario);
-    res.status(204).end();
-  } catch (error) {
-    next(error);
-  }
+  await usuariosService.desactivarUsuario(req.params.id, req.usuario);
+  res.status(204).end();
 }
 
 async function subirAvatar(req, res, next) {

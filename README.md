@@ -110,6 +110,8 @@ database/
 
 **Versionado del API.** Los recursos de la aplicación cuelgan de `/api/v1`. Swagger se sirve en `/api-docs`.
 
+**Errores de los controladores.** Express 5 envía los errores de los controladores asíncronos al middleware central. La carga de avatares captura el error para limpiar el archivo y el chequeo de salud responde con 503 si falla la conexión a PostgreSQL.
+
 **Acciones como recursos.** Asignar, finalizar y cancelar una incidencia son `PATCH` sobre `/incidencias/{id}/asignacion`, `/resolucion` y `/cancelacion`, en lugar de verbos en la ruta.
 
 **Autorización en el servidor, no en la interfaz.** El cliente esconde los botones que el usuario no puede usar, pero quien decide es el middleware `verificarRol` de cada ruta y las reglas de cada servicio. Pedir un endpoint prohibido con el token de otro rol devuelve 403 aunque el botón no estuviera en pantalla.

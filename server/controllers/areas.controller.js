@@ -1,52 +1,32 @@
 import * as areasService from "../services/areas.service.js";
 import { responderSiHayErroresDeValidacion } from "../utils/validarSolicitud.js";
 
-async function listar(req, res, next) {
+async function listar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.json(await areasService.listarAreas());
-  } catch (error) {
-    next(error);
-  }
+  res.json(await areasService.listarAreas());
 }
 
-async function obtenerPorId(req, res, next) {
+async function obtenerPorId(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    const area = await areasService.obtenerAreaPorId(req.params.id);
-    res.json(area);
-  } catch (error) {
-    next(error);
-  }
+  const area = await areasService.obtenerAreaPorId(req.params.id);
+  res.json(area);
 }
 
-async function crear(req, res, next) {
+async function crear(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    res.status(201).json(await areasService.crearArea(req.body.descripcion));
-  } catch (error) {
-    next(error);
-  }
+  res.status(201).json(await areasService.crearArea(req.body.descripcion));
 }
 
-async function actualizar(req, res, next) {
+async function actualizar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    const area = await areasService.actualizarArea(req.params.id, req.body.descripcion);
-    res.json(area);
-  } catch (error) {
-    next(error);
-  }
+  const area = await areasService.actualizarArea(req.params.id, req.body.descripcion);
+  res.json(area);
 }
 
-async function eliminar(req, res, next) {
+async function eliminar(req, res) {
   if (responderSiHayErroresDeValidacion(req, res)) return;
-  try {
-    await areasService.desactivarArea(req.params.id);
-    res.status(204).end();
-  } catch (error) {
-    next(error);
-  }
+  await areasService.desactivarArea(req.params.id);
+  res.status(204).end();
 }
 
 export { listar, obtenerPorId, crear, actualizar, eliminar };
