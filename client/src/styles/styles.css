@@ -1098,8 +1098,111 @@ h3 {
     color: var(--gim-texto-suave);
 }
 
-.filtro-fecha .form-control {
-    width: auto;
+.abrir-calendario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 10.5rem;
+    min-height: 40px;
+    padding-inline: 0.75rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.abrir-calendario svg {
+    flex-shrink: 0;
+    color: var(--gim-verde-texto);
+}
+
+.abrir-calendario:hover {
+    border-color: var(--gim-verde);
+    background-color: var(--gim-verde-suave);
+}
+
+.calendario-fecha {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    width: min(320px, calc(100vw - 24px));
+    max-height: calc(100dvh - 24px);
+    overflow: auto;
+    padding: 12px;
+    border: 1px solid var(--gim-borde);
+    border-radius: 14px;
+    background: var(--gim-tarjeta);
+    color: var(--bs-body-color);
+    box-shadow: var(--bs-box-shadow);
+}
+
+.calendario-cabecera,
+.calendario-pie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.calendario-cabecera strong {
+    text-transform: capitalize;
+    text-align: center;
+}
+
+.calendario-dias {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 3px;
+    margin-block: 8px;
+    text-align: center;
+}
+
+.calendario-dias span {
+    color: var(--gim-texto-suave);
+    font-size: 0.78rem;
+    padding-block: 4px;
+}
+
+.calendario-fecha button {
+    min-height: 34px;
+    padding: 2px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+}
+
+.calendario-cabecera button,
+.calendario-pie button {
+    min-width: 34px;
+    padding-inline: 8px;
+    color: var(--gim-verde-texto);
+    font-weight: 600;
+}
+
+.calendario-cabecera button {
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.calendario-fecha button:hover:not(:disabled),
+.calendario-fecha button:focus-visible {
+    background-color: var(--gim-verde-suave);
+}
+
+.calendario-fecha button[aria-current="date"] {
+    border-color: var(--gim-verde);
+}
+
+.calendario-fecha button[aria-pressed="true"] {
+    background: var(--gim-verde-suave);
+    color: var(--gim-verde-texto);
+    border-color: var(--gim-verde);
+    font-weight: 700;
+}
+
+.calendario-fecha button:disabled {
+    opacity: 0.4;
 }
 
 .filtro-check {

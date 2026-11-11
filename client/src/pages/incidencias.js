@@ -2,6 +2,7 @@ import { PRIORIDADES, ESTADOS } from "../../../shared/constantes.js";
 import { api } from "../api.js";
 import { leerUsuario } from "../auth/session.js";
 import { confirmar } from "../ui/confirmar.js";
+import { activarCalendario } from "../ui/calendario.js";
 import { esc, fecha, fechaHora, cargando, mensajeError, badgeEstado, paginacion, nombreDelAsignado, POR_PAGINA } from "../ui/ui.js";
 import {
   puedeCrearIncidencias,
@@ -91,10 +92,17 @@ function barraDeFiltros() {
       ${opcion("", "Todas las prioridades", prioridad)}
       ${[3, 2, 1].map((p) => opcion(p, PRIORIDADES[p], prioridad)).join("")}
     </select>
-    <label class="filtro-fecha">
+    <div class="filtro-fecha">
       <span>Desde</span>
-      <input class="form-control" type="date" name="desde" value="${esc(filtros.get("desde") ?? "")}">
-    </label>
+      <input type="date" name="desde" hidden value="${esc(filtros.get("desde") ?? "")}">
+      <button type="button" class="form-control abrir-calendario" popovertarget="calendario-desde">
+        <span class="visually-hidden">Desde: </span><span data-fecha-elegida></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v5M16 3v5"/>
+        </svg>
+      </button>
+      <div id="calendario-desde" class="calendario-fecha" popover aria-label="Filtrar incidencias desde una fecha"></div>
+    </div>
     ${
       esDirector(usuario)
         ? `<label class="form-check filtro-check">
@@ -112,6 +120,7 @@ function aplicarFiltros(evento) {
   formulario.querySelector("option[data-temporal]:not(:checked)")?.remove();
   const desde = formulario.querySelector('[name="desde"]');
   if (desde.value && desde.min && desde.value < desde.min) desde.value = desde.min;
+  formulario.querySelector("[data-fecha-elegida]").textContent = desde.value ? desde.value.split("-").reverse().join("/") : "Elegir fecha";
   const nuevos = new URLSearchParams();
   for (const [clave, valor] of new FormData(formulario)) {
     if (valor.trim()) nuevos.set(clave, valor.trim());
@@ -166,6 +175,7 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
     </div>`;
 
   const formulario = contenedor.querySelector("#form-filtros");
+  activarCalendario(formulario.querySelector(".filtro-fecha"));
   formulario.addEventListener("submit", aplicarFiltros);
   formulario.querySelectorAll("select, input[type=date], input[type=checkbox]").forEach((campo) =>
     campo.addEventListener("change", () => aplicarFiltros())
