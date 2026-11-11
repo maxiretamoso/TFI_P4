@@ -1,5 +1,4 @@
-import pool from "../db/index.js";
-import { conTransaccion } from "../utils/transaccion.js";
+import pool, { conTransaccion } from "../db/index.js";
 
 const DESDE = `
   FROM incidencias
