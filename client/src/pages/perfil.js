@@ -1,6 +1,6 @@
 import { api } from "../api.js";
-import { actualizarUsuarioGuardado } from "../session.js";
-import { NOMBRES_ROL, esc, cargando, mensajeError, urlDelAvatar, avatarHtml } from "../ui.js";
+import { actualizarUsuarioGuardado } from "../auth/session.js";
+import { NOMBRES_ROL, esc, cargando, mensajeError, urlDelAvatar, avatarHtml } from "../ui/ui.js";
 
 const TAMANIO_MAXIMO = 2 * 1024 * 1024;
 const TIPOS_PERMITIDOS = ["image/jpeg", "image/png", "image/webp"];

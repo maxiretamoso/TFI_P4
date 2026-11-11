@@ -87,16 +87,19 @@ client/
   index.html
   public/             logo de la Municipalidad
   src/
-    api.js            cliente HTTP contra la API
-    router.js         navegación, menú lateral y barra superior según el rol
-    permisos.js       qué puede hacer cada rol en la interfaz
-    session.js        token y datos del usuario en localStorage
-    tema.js           interruptor de modo claro y oscuro
-    avisos.js         avisos flotantes que se cierran solos
     main.js           arranque, navegación y tooltip para pedidos truncados
-    confirmar.js      ventana de confirmación reutilizable
-    ui.js             helpers de presentación
-    styles.css        estilos propios sobre Bootstrap
+    api.js            cliente HTTP contra la API
+    router.js         navegación y menú según el rol
+    auth/
+      session.js      token y datos del usuario en localStorage
+      permisos.js     permisos de la interfaz
+    ui/
+      ui.js           helpers de presentación
+      avisos.js       avisos flotantes
+      confirmar.js    ventana de confirmación reutilizable
+      tema.js         interruptor de modo claro y oscuro
+    styles/
+      styles.css      estilos propios sobre Bootstrap
     pages/            una pantalla por archivo
 shared/
   constantes.js       área, roles, estados, prioridades, prefijo API y filtros de reportes compartidos

@@ -8,10 +8,10 @@ import * as dashboard from "./pages/dashboard.js";
 import * as reportes from "./pages/reportes.js";
 import * as nueva from "./pages/nueva.js";
 import * as articulos from "./pages/articulos.js";
-import { haySesion, leerUsuario, cerrarSesion } from "./session.js";
-import { esc, avatarHtml } from "./ui.js";
-import { botonTema, activarBotonTema } from "./tema.js";
-import { rutaDeInicio } from "./permisos.js";
+import { haySesion, leerUsuario, cerrarSesion } from "./auth/session.js";
+import { esc, avatarHtml } from "./ui/ui.js";
+import { botonTema, activarBotonTema } from "./ui/tema.js";
+import { rutaDeInicio } from "./auth/permisos.js";
 
 const TODOS = [ROLES.DIRECTOR, ROLES.EMPLEADO_SISTEMAS, ROLES.EMPLEADO_MUNICIPAL];
 

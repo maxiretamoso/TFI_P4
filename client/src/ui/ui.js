@@ -1,5 +1,5 @@
-import { ROLES, ESTADOS, ZONA_HORARIA } from "../../shared/constantes.js";
-import { URL_SERVIDOR } from "./api.js";
+import { ROLES, ESTADOS, ZONA_HORARIA } from "../../../shared/constantes.js";
+import { URL_SERVIDOR } from "../api.js";
 export const NOMBRES_ROL = {
   [ROLES.DIRECTOR]: "Director",
   [ROLES.EMPLEADO_SISTEMAS]: "Sistemas",

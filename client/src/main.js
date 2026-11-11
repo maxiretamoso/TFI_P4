@@ -1,8 +1,8 @@
 import "bootstrap/dist/css/bootstrap.min.css";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "./styles.css";
+import "./styles/styles.css";
 import { enrutar } from "./router.js";
-import { activarCierreDeAvisos } from "./avisos.js";
+import { activarCierreDeAvisos } from "./ui/avisos.js";
 
 activarCierreDeAvisos();
 

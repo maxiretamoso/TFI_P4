@@ -1,8 +1,8 @@
 import { api } from "../api.js";
-import { esDirector } from "../permisos.js";
-import { leerUsuario } from "../session.js";
-import { esc, cargando, mensajeError, paginar, paginacion } from "../ui.js";
-import { confirmar } from "../confirmar.js";
+import { esDirector } from "../auth/permisos.js";
+import { leerUsuario } from "../auth/session.js";
+import { esc, cargando, mensajeError, paginar, paginacion } from "../ui/ui.js";
+import { confirmar } from "../ui/confirmar.js";
 
 const CATALOGOS = {
   articulos: {

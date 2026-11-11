@@ -1,4 +1,4 @@
-import { ROLES, ESTADOS, SIN_RESOLVER } from "../../shared/constantes.js";
+import { ROLES, ESTADOS, SIN_RESOLVER } from "../../../shared/constantes.js";
 
 
 // Reflejan lo que permite la API; el control real está siempre en el servidor.

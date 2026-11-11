@@ -1,5 +1,5 @@
 import { api } from "../api.js";
-import { esc, cargando, mensajeError, paginar, paginacion } from "../ui.js";
+import { esc, cargando, mensajeError, paginar, paginacion } from "../ui/ui.js";
 
 let contenedor = null;
 let articulos = [];

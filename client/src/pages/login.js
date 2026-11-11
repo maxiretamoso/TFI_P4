@@ -1,8 +1,8 @@
 import { api } from "../api.js";
-import { guardarSesion } from "../session.js";
-import { rutaDeInicio } from "../permisos.js";
-import { mensajeError } from "../ui.js";
-import { botonTema, activarBotonTema } from "../tema.js";
+import { guardarSesion } from "../auth/session.js";
+import { rutaDeInicio } from "../auth/permisos.js";
+import { mensajeError } from "../ui/ui.js";
+import { botonTema, activarBotonTema } from "../ui/tema.js";
 
 let contenedor = null;
 

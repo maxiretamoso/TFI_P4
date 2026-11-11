@@ -1,6 +1,6 @@
 import { PRIORIDADES, PRIORIDAD_ALTA, ESTADOS, SIN_RESOLVER } from "../../../shared/constantes.js";
 import { api } from "../api.js";
-import { esc, cargando, mensajeError, badgeEstado, fecha, fechaHora, nombreDelAsignado } from "../ui.js";
+import { esc, cargando, mensajeError, badgeEstado, fecha, fechaHora, nombreDelAsignado } from "../ui/ui.js";
 
 const COLOR_ESTADO = {
   [ESTADOS.PENDIENTE]: "var(--gim-pendiente)",

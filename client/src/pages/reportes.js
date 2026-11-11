@@ -1,6 +1,6 @@
 import { REPORTES } from "../../../shared/constantes.js";
 import { api } from "../api.js";
-import { mensajeError } from "../ui.js";
+import { mensajeError } from "../ui/ui.js";
 
 const OPCIONES = [["", "Todas"], ...Object.entries(REPORTES).map(([valor, config]) => [valor, config.etiqueta])];
 

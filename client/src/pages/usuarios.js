@@ -1,9 +1,9 @@
 import { ROLES, AREA_SISTEMAS } from "../../../shared/constantes.js";
 import { api } from "../api.js";
-import { puedeGestionarUsuarios } from "../permisos.js";
-import { leerUsuario } from "../session.js";
-import { confirmar } from "../confirmar.js";
-import { NOMBRES_ROL, esc, cargando, mensajeError, paginar, paginacion } from "../ui.js";
+import { puedeGestionarUsuarios } from "../auth/permisos.js";
+import { leerUsuario } from "../auth/session.js";
+import { confirmar } from "../ui/confirmar.js";
+import { NOMBRES_ROL, esc, cargando, mensajeError, paginar, paginacion } from "../ui/ui.js";
 
 let contenedor = null;
 let esDirector = false;

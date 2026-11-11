@@ -1,8 +1,8 @@
 import { PRIORIDADES, ESTADOS } from "../../../shared/constantes.js";
 import { api } from "../api.js";
-import { leerUsuario } from "../session.js";
-import { confirmar } from "../confirmar.js";
-import { esc, fecha, fechaHora, cargando, mensajeError, badgeEstado, paginacion, nombreDelAsignado, POR_PAGINA } from "../ui.js";
+import { leerUsuario } from "../auth/session.js";
+import { confirmar } from "../ui/confirmar.js";
+import { esc, fecha, fechaHora, cargando, mensajeError, badgeEstado, paginacion, nombreDelAsignado, POR_PAGINA } from "../ui/ui.js";
 import {
   puedeCrearIncidencias,
   puedeCancelar,
@@ -10,7 +10,7 @@ import {
   puedeAsignar,
   esDirector,
   esDeSistemas,
-} from "../permisos.js";
+} from "../auth/permisos.js";
 
 const FILTROS_ADMITIDOS = ["buscar", "estado", "prioridad", "desde", "fecha", "sin_asignar", "area", "categoria", "asignado"];
 // Estos vienen solo desde el dashboard; la barra de filtros los conserva al cambiar los demás.

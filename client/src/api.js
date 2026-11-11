@@ -1,5 +1,5 @@
 import { PREFIJO_API } from "../../shared/constantes.js";
-import { cerrarSesion } from "./session.js";
+import { cerrarSesion } from "./auth/session.js";
 
 export const URL_SERVIDOR = "http://localhost:3000";
 const URL_BASE = `${URL_SERVIDOR}${PREFIJO_API}`;
