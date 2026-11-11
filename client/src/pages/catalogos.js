@@ -49,7 +49,7 @@ function pestanias(usuario, actual) {
     .filter(([, c]) => !c.soloDirector || esDirector(usuario))
     .map(
       ([clave, c]) => `<li class="nav-item">
-        <a class="nav-link${clave === actual ? " active" : ""}" href="#/catalogos?ver=${clave}"${clave === actual ? ' aria-current="page"' : ""}>${c.titulo}</a>
+        <button type="button" class="nav-link${clave === actual ? " active" : ""}" data-ruta="#/catalogos?ver=${clave}"${clave === actual ? ' aria-current="page"' : ""}>${c.titulo}</button>
       </li>`
     )
     .join("");

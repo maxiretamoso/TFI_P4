@@ -31,7 +31,7 @@ export async function pintar(zona) {
         </div>
         <div class="zona-error"></div>
         <div class="d-flex gap-2 justify-content-end">
-          <a class="btn btn-outline-secondary" href="#/">Volver</a>
+          <button type="button" class="btn btn-outline-secondary" data-ruta="#/">Volver</button>
           <button class="btn btn-gim" type="submit" id="boton-crear">Crear incidencia</button>
         </div>
       </form>

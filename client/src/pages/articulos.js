@@ -15,7 +15,7 @@ export async function pintar(zona) {
     <div class="tarjeta-lista">
       <div class="encabezado-lista">
         <h2>Artículos</h2>
-        <a class="btn btn-gim" href="#/nueva">+ Nueva incidencia</a>
+        <button type="button" class="btn btn-gim" data-ruta="#/nueva">+ Nueva incidencia</button>
       </div>
       <p class="texto-ayuda">Equipos de tu área sobre los que podés reportar una incidencia.</p>
       <input class="form-control buscador" type="search" id="buscar-articulo" placeholder="Buscar por artículo, área o categoría" aria-label="Buscar artículos">

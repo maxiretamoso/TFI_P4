@@ -50,7 +50,7 @@ function enlacesDelMenu(rutaActual, usuario) {
     .map(([ruta, config]) => {
       const activa = ruta === rutaActual;
       return `<li>
-        <a class="enlace-menu${activa ? " activo" : ""}" href="#${ruta}"${activa ? ' aria-current="page"' : ""}>${textoDelEnlace(config, usuario)}</a>
+        <button type="button" class="enlace-menu${activa ? " activo" : ""}" data-ruta="#${ruta}"${activa ? ' aria-current="page"' : ""}>${textoDelEnlace(config, usuario)}</button>
       </li>`;
     })
     .join("");
@@ -78,10 +78,10 @@ function estructuraHtml(rutaActual, usuario) {
         <h1 class="titulo-app">${TITULO}</h1>
         <div class="barra-derecha">
           ${botonTema()}
-          <a class="enlace-usuario" href="#/perfil">
+          <button type="button" class="enlace-usuario" data-ruta="#/perfil">
             ${avatarHtml(usuario, "avatar-barra")}
             <span class="usuario-nombre">${esc(usuario.nombres)} ${esc(usuario.apellidos)}</span>
-          </a>
+          </button>
         </div>
       </header>
       <main id="contenido-principal"></main>
@@ -114,7 +114,7 @@ function limpiarFondos() {
 
 function marcarEnlaceActivo(ruta) {
   document.querySelectorAll(".lista-menu .enlace-menu").forEach((enlace) => {
-    const activo = enlace.getAttribute("href") === `#${ruta}`;
+    const activo = enlace.dataset.ruta === `#${ruta}`;
     enlace.classList.toggle("activo", activo);
     if (activo) enlace.setAttribute("aria-current", "page");
     else enlace.removeAttribute("aria-current");

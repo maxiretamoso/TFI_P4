@@ -45,11 +45,11 @@ function graficoPorEstado(resumen) {
   const referencias = resumen.porEstado
     .map(
       (f) => `<li>
-        <a class="referencia-enlace" href="#/?estado=${f.id_estado}">
+        <button type="button" class="referencia-enlace" data-enlace="#/?estado=${f.id_estado}">
           <span class="punto" style="background: ${COLOR_ESTADO[f.id_estado]}"></span>
           ${NOMBRE_EN_PLURAL[f.id_estado] ?? esc(f.estado)} <strong>${f.total}</strong>
           <span class="porcentaje">${porcentaje(f.total, resumen.total)}%</span>
-        </a>
+        </button>
       </li>`
     )
     .join("");
@@ -59,13 +59,13 @@ function graficoPorEstado(resumen) {
     .join(", ");
 
   return `<div class="grafico-torta">
-    <svg viewBox="0 0 42 42" role="img" aria-label="Incidencias por estado. ${esc(descripcion)}">
+    <svg viewBox="0 0 42 42" role="group" aria-label="Incidencias por estado. ${esc(descripcion)}">
       <circle cx="21" cy="21" r="${RADIO_TORTA}" fill="none" stroke="var(--gim-borde)" stroke-width="6"></circle>
       ${tramos}
-      <a href="#/" class="torta-enlace" aria-label="Ver todas las incidencias">
+      <g role="button" tabindex="0" data-enlace="#/" class="torta-enlace" aria-label="Ver todas las incidencias">
         <circle cx="21" cy="21" r="11" class="torta-fondo-centro"></circle>
         <text x="21" y="23.5" text-anchor="middle" class="torta-centro">${resumen.total}</text>
-      </a>
+      </g>
     </svg>
     <ul class="referencias">${referencias}</ul>
   </div>`;
@@ -78,11 +78,11 @@ function barrasHorizontales(filas) {
   return `<ul class="barras">${filas
     .map(
       (f) => `<li>
-        <a class="fila-enlace" href="${f.enlace}">
+        <button type="button" class="fila-enlace" data-enlace="${f.enlace}">
           <span class="barra-nombre">${esc(f.nombre)}</span>
           <span class="barra-pista"><span class="barra-relleno" style="width: ${(f.total / maximo) * 100}%"></span></span>
           <span class="barra-total">${f.total}</span>
-        </a>
+        </button>
       </li>`
     )
     .join("")}</ul>`;
@@ -153,7 +153,7 @@ function tablaDePrioritarias(resumen) {
       <tbody>${filas}</tbody>
     </table>
   </div>
-  <a class="enlace-ver-todas" href="#/">Ver todas las incidencias</a>`;
+  <button type="button" class="enlace-ver-todas" data-enlace="#/">Ver todas las incidencias</button>`;
 }
 
 function cargaDeEmpleados(resumen) {
@@ -165,7 +165,7 @@ function cargaDeEmpleados(resumen) {
   const filas = resumen.cargaPorEmpleado
     .map(
       (e) => `<li>
-        <a class="fila-enlace" href="${enlaceALista({ asignado: e.id_usuario }, `asignadas a ${e.nombres} ${e.apellidos}`)}">
+        <button type="button" class="fila-enlace" data-enlace="${enlaceALista({ asignado: e.id_usuario }, `asignadas a ${e.nombres} ${e.apellidos}`)}">
           <span class="barra-nombre carga-nombre">${esc(e.nombres)} ${esc(e.apellidos)}</span>
           <span class="barra-pista carga-pista">
             <span class="carga-en-proceso" style="width: ${(e.en_proceso / maximo) * 100}%"></span>
@@ -173,7 +173,7 @@ function cargaDeEmpleados(resumen) {
             <span class="carga-canceladas" style="width: ${(e.canceladas / maximo) * 100}%"></span>
           </span>
           <span class="carga-numeros">${e.en_proceso} / ${e.resueltas} / ${e.canceladas}</span>
-        </a>
+        </button>
       </li>`
     )
     .join("");
@@ -197,49 +197,58 @@ export async function pintar(zona) {
   }
 
   zona.innerHTML = `
-    <h2>Dashboard</h2>
+    <div class="contenido-dashboard">
+      <h2>Dashboard</h2>
 
-    <div class="grilla-resumen">
-      <section class="tarjeta-grafico">
-        <h3>Por estado</h3>
-        ${graficoPorEstado(resumen)}
-      </section>
-      <section class="tarjeta-grafico">
-        <h3>Carga de trabajo del equipo de Sistemas</h3>
-        ${cargaDeEmpleados(resumen)}
-      </section>
-    </div>
+      <div class="grilla-resumen">
+        <section class="tarjeta-grafico">
+          <h3>Por estado</h3>
+          ${graficoPorEstado(resumen)}
+        </section>
+        <section class="tarjeta-grafico">
+          <h3>Carga de trabajo del equipo de Sistemas</h3>
+          ${cargaDeEmpleados(resumen)}
+        </section>
+      </div>
 
-    <section class="tarjeta-grafico tarjeta-completa">
-      <h3>Incidencias prioritarias</h3>
-      ${tablaDePrioritarias(resumen)}
-    </section>
+      <section class="tarjeta-grafico tarjeta-completa">
+        <h3>Incidencias prioritarias</h3>
+        ${tablaDePrioritarias(resumen)}
+      </section>
 
-    <div class="grilla-dos">
-      <section class="tarjeta-grafico">
-        <h3>Por fecha</h3>
-        ${graficoPorFecha(resumen)}
-      </section>
-      <section class="tarjeta-grafico">
-        <h3>Por prioridad</h3>
-        ${graficoPorPrioridad(resumen)}
-      </section>
-    </div>
+      <div class="grilla-dos">
+        <section class="tarjeta-grafico">
+          <h3>Por fecha</h3>
+          ${graficoPorFecha(resumen)}
+        </section>
+        <section class="tarjeta-grafico">
+          <h3>Por prioridad</h3>
+          ${graficoPorPrioridad(resumen)}
+        </section>
+      </div>
 
-    <div class="grilla-dos">
-      <section class="tarjeta-grafico">
-        <h3>Por área</h3>
-        ${graficoPorArea(resumen)}
-      </section>
-      <section class="tarjeta-grafico">
-        <h3>Por categoría</h3>
-        ${graficoPorCategoria(resumen)}
-      </section>
+      <div class="grilla-dos">
+        <section class="tarjeta-grafico">
+          <h3>Por área</h3>
+          ${graficoPorArea(resumen)}
+        </section>
+        <section class="tarjeta-grafico">
+          <h3>Por categoría</h3>
+          ${graficoPorCategoria(resumen)}
+        </section>
+      </div>
     </div>
 `;
 
-  zona.querySelector(".tabla-dashboard")?.addEventListener("click", (evento) => {
-    const fila = evento.target.closest("tr[data-enlace]");
-    if (fila) window.location.hash = fila.dataset.enlace;
+  const contenido = zona.querySelector(".contenido-dashboard");
+  contenido.addEventListener("click", (evento) => {
+    const control = evento.target.closest("[data-enlace]");
+    if (control) window.location.hash = control.dataset.enlace;
+  });
+
+  contenido.querySelector(".torta-enlace")?.addEventListener("keydown", (evento) => {
+    if (evento.key !== "Enter" && evento.key !== " ") return;
+    evento.preventDefault();
+    window.location.hash = evento.currentTarget.dataset.enlace;
   });
 }

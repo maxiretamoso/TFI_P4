@@ -286,6 +286,9 @@ h3 {
 }
 
 .enlace-usuario {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -857,7 +860,7 @@ h3 {
 }
 
 .torta-enlace {
-    text-decoration: none;
+    cursor: pointer;
 }
 
 .torta-enlace:focus-visible {
@@ -925,6 +928,16 @@ h3 {
     width: 28px;
     text-align: right;
     font-weight: 600;
+}
+
+.referencia-enlace,
+.fila-enlace,
+.enlace-ver-todas {
+    background: transparent;
+    border: 0;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
 }
 
 .referencia-enlace {
@@ -1082,7 +1095,12 @@ h3 {
     color: var(--gim-verde-texto);
 }
 
-.filtro-activo a {
+.filtro-activo button {
+    padding: 0;
+    background: transparent;
+    border: 0;
+    text-decoration: underline;
+    cursor: pointer;
     color: var(--gim-verde-texto);
     font-weight: 600;
 }
@@ -1112,6 +1130,8 @@ h3 {
 
 .enlace-ver-todas {
     display: inline-block;
+    padding: 0;
+    text-decoration: underline;
     margin-top: 10px;
     color: var(--gim-verde-texto);
 }

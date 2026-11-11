@@ -134,7 +134,7 @@ function avisoDeFiltro() {
   if ([...filtros.keys()].length === 0) return "";
   return `<div class="filtro-activo">
     <span>Filtrando: <strong>${esc(descripcionDelFiltro())}</strong></span>
-    <a href="#/">Quitar filtro</a>
+    <button type="button" data-ruta="#/">Quitar filtro</button>
   </div>`;
 }
 
@@ -156,7 +156,7 @@ export async function pintar(zona, parametros = new URLSearchParams()) {
     <div class="tarjeta-lista">
       <div class="encabezado-lista">
         <h2>${tituloDeLista()}</h2>
-        ${puedeCrearIncidencias(usuario) ? '<a class="btn btn-gim" href="#/nueva">+ Nueva incidencia</a>' : ""}
+        ${puedeCrearIncidencias(usuario) ? '<button type="button" class="btn btn-gim" data-ruta="#/nueva">+ Nueva incidencia</button>' : ""}
       </div>
       ${barraDeFiltros()}
       <div class="zona-aviso-filtro">${avisoDeFiltro()}</div>

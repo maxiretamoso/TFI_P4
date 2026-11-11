@@ -6,6 +6,11 @@ import { activarCierreDeAvisos } from "./ui/avisos.js";
 
 activarCierreDeAvisos();
 
+document.addEventListener("click", (evento) => {
+  const boton = evento.target.closest("button[data-ruta]");
+  if (boton) window.location.hash = boton.dataset.ruta;
+});
+
 let tooltipPedido;
 
 function cerrarTooltipPedido() {
