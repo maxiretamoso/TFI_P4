@@ -1,10 +1,7 @@
-const URL_BASE = "http://localhost:3000/api/v1";
+import { cerrarSesion } from "./session.js";
 
-function cerrarSesionPorTokenVencido() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("usuario");
-  window.location.hash = "#/login";
-}
+export const URL_SERVIDOR = "http://localhost:3000";
+const URL_BASE = `${URL_SERVIDOR}/api/v1`;
 
 async function leerError(respuesta) {
   const datos = await respuesta.json().catch(() => ({}));
@@ -15,7 +12,7 @@ async function leerError(respuesta) {
   );
 }
 
-async function pedir(metodo, ruta, cuerpo) {
+async function enviarSolicitud(metodo, ruta, cuerpo) {
   const token = localStorage.getItem("token");
   const opciones = { method: metodo, headers: {} };
 
@@ -36,12 +33,17 @@ async function pedir(metodo, ruta, cuerpo) {
   }
 
   if (respuesta.status === 401 && token && ruta !== "/auth/login") {
-    cerrarSesionPorTokenVencido();
+    cerrarSesion();
+    window.location.hash = "#/login";
     throw new Error("La sesión venció. Iniciá sesión otra vez.");
   }
 
   if (!respuesta.ok) throw new Error(await leerError(respuesta));
+  return respuesta;
+}
 
+async function pedir(metodo, ruta, cuerpo) {
+  const respuesta = await enviarSolicitud(metodo, ruta, cuerpo);
   // 204 No Content: las bajas no devuelven cuerpo.
   if (respuesta.status === 204) return null;
 
@@ -49,24 +51,7 @@ async function pedir(metodo, ruta, cuerpo) {
 }
 
 async function descargar(ruta) {
-  const token = localStorage.getItem("token");
-  const opciones = { method: "GET", headers: {} };
-  if (token) opciones.headers.Authorization = `Bearer ${token}`;
-
-  let respuesta;
-  try {
-    respuesta = await fetch(`${URL_BASE}${ruta}`, opciones);
-  } catch {
-    throw new Error("No se pudo conectar con el servidor. Probá de nuevo en unos minutos.");
-  }
-
-  if (respuesta.status === 401 && token) {
-    cerrarSesionPorTokenVencido();
-    throw new Error("La sesión venció. Iniciá sesión otra vez.");
-  }
-
-  if (!respuesta.ok) throw new Error(await leerError(respuesta));
-
+  const respuesta = await enviarSolicitud("GET", ruta);
   return respuesta.blob();
 }
 

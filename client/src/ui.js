@@ -1,4 +1,5 @@
 import { ROLES, ESTADOS, ZONA_HORARIA } from "../../shared/constantes.js";
+import { URL_SERVIDOR } from "./api.js";
 export const NOMBRES_ROL = {
   [ROLES.DIRECTOR]: "Director",
   [ROLES.EMPLEADO_SISTEMAS]: "Sistemas",
@@ -114,8 +115,6 @@ export function paginacion(
     </nav>
   </div>`;
 }
-
-const URL_SERVIDOR = "http://localhost:3000";
 
 export function urlDelAvatar(archivo) {
   return archivo ? `${URL_SERVIDOR}/publico/avatares/${archivo}` : "";
