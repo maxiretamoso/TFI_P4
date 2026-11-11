@@ -7,10 +7,12 @@ import { NOMBRES_ROL, esc, cargando, mensajeError, paginar, paginacion } from ".
 
 let contenedor = null;
 let esDirector = false;
+let idUsuarioActual = null;
 let usuarios = [];
 let areas = [];
 let error = "";
 let editandoId = null;
+let formularioAbierto = false;
 let nombres = "";
 let apellidos = "";
 let nombreUsuario = "";
@@ -22,11 +24,14 @@ let pagina = 1;
 
 export async function pintar(zona) {
   contenedor = zona;
-  esDirector = puedeGestionarUsuarios(leerUsuario());
+  const usuarioActual = leerUsuario();
+  esDirector = puedeGestionarUsuarios(usuarioActual);
+  idUsuarioActual = usuarioActual.id_usuario;
   usuarios = [];
   areas = [];
   error = "";
   editandoId = null;
+  formularioAbierto = false;
   nombres = "";
   apellidos = "";
   nombreUsuario = "";
@@ -41,7 +46,7 @@ export async function pintar(zona) {
     .join("");
 
   const formulario = esDirector
-    ? `<form class="row g-2 align-items-end mb-4" novalidate>
+    ? `<form class="row g-2 align-items-end m-0 p-2" hidden novalidate>
         <div class="col-12 col-md-3">
           <label class="form-label" for="campo-nombres">Nombre/s:</label>
           <input class="form-control" type="text" id="campo-nombres" maxlength="100" required>
@@ -80,7 +85,7 @@ export async function pintar(zona) {
           <button class="btn btn-gim boton-guardar w-100" type="submit">Agregar</button>
         </div>
 
-        <div class="col-6 col-md-2 zona-cancelar" hidden>
+        <div class="col-6 col-md-2 zona-cancelar">
           <button class="btn btn-outline-secondary w-100" type="button">Cancelar</button>
         </div>
       </form>`
@@ -88,10 +93,13 @@ export async function pintar(zona) {
 
   contenedor.innerHTML = `
     <div class="categorias-container">
-      <h2>Usuarios</h2>
+      <div class="encabezado-lista">
+        <h2>Usuarios</h2>
+        ${esDirector ? '<button type="button" class="btn btn-gim boton-nuevo-usuario" disabled>+ Nuevo usuario</button>' : ""}
+      </div>
 
       <div class="zona-error"></div>
-      ${formulario}
+      <div class="zona-alta-usuario">${formulario}</div>
 
       <div class="buscador">
         <input class="form-control" type="search" placeholder="Buscar usuario..." aria-label="Buscar usuario...">
@@ -101,6 +109,7 @@ export async function pintar(zona) {
     </div>`;
 
   if (esDirector) {
+    contenedor.querySelector(".boton-nuevo-usuario").addEventListener("click", empezarAlta);
     contenedor.querySelector("form").addEventListener("submit", guardar);
     contenedor.querySelector(".zona-cancelar button").addEventListener("click", cancelarEdicion);
     contenedor.querySelector("#campo-rol").addEventListener("change", ajustarAreaSegunRol);
@@ -124,6 +133,7 @@ export async function pintar(zona) {
     if (esDirector) {
       llenarSelectArea();
       ajustarAreaSegunRol();
+      contenedor.querySelector(".boton-nuevo-usuario").disabled = false;
     }
   } catch (e) {
     error = e.message;
@@ -168,15 +178,23 @@ function pintarTabla() {
           ${
             esDirector
               ? `<td class="celda-acciones">
-                  <button type="button" class="btn btn-editar btn-sm" data-accion="editar" data-id="${item.id_usuario}">Editar</button>
-                  <button type="button" class="btn btn-eliminar btn-sm" data-accion="eliminar" data-id="${item.id_usuario}">Eliminar</button>
+                  ${item.id_usuario === idUsuarioActual
+                    ? '<span class="text-body-secondary">Tu cuenta</span>'
+                    : `<button type="button" class="btn btn-editar btn-sm" data-accion="editar" data-id="${item.id_usuario}" aria-expanded="${editandoId === item.id_usuario}">Editar</button>
+                       <button type="button" class="btn btn-eliminar btn-sm" data-accion="eliminar" data-id="${item.id_usuario}">Eliminar</button>`}
                 </td>`
               : ""
           }
-        </tr>`
+        </tr>${editandoId === item.id_usuario
+          ? '<tr class="fila-accion"><td colspan="6" class="zona-edicion-usuario"></td></tr>'
+          : ""}`
       )
       .join("");
   }
+
+  const formulario = contenedor.querySelector("form");
+  const zonaAlta = contenedor.querySelector(".zona-alta-usuario");
+  if (formulario) zonaAlta.append(formulario);
 
   contenedor.querySelector(".zona-tabla").innerHTML = `
     <table>
@@ -193,6 +211,12 @@ function pintarTabla() {
       <tbody>${cuerpo}</tbody>
     </table>
     ${paginacion(vista, ["usuario", "usuarios"])}`;
+
+  if (formulario) {
+    const zonaEdicion = contenedor.querySelector(".zona-edicion-usuario");
+    zonaEdicion?.append(formulario);
+    formulario.hidden = !formularioAbierto || (editandoId !== null && !zonaEdicion);
+  }
 }
 
 function manejarAccion(evento) {
@@ -203,9 +227,11 @@ function manejarAccion(evento) {
     return;
   }
   const boton = evento.target.closest("button[data-accion]");
-  if (!boton) return;
+  if (!boton || contenedor.querySelector(".boton-guardar")?.disabled) return;
 
   const item = usuarios.find((u) => u.id_usuario === Number(boton.dataset.id));
+
+  if (!item || item.id_usuario === idUsuarioActual) return;
 
   if (boton.dataset.accion === "editar") empezarEdicion(item);
   if (boton.dataset.accion === "eliminar") eliminar(item);
@@ -219,12 +245,12 @@ function refrescarForm() {
   contenedor.querySelector("#campo-usuario").value = nombreUsuario;
   contenedor.querySelector("#campo-contrasenia").value = contrasenia;
   contenedor.querySelector("#campo-area").value = idArea;
-  contenedor.querySelector("#campo-rol").value = rol;
+  const campoRol = contenedor.querySelector("#campo-rol");
+  campoRol.value = rol;
   contenedor.querySelector(".zona-contrasenia").hidden = Boolean(editandoId);
   contenedor.querySelector(".boton-guardar").textContent = editandoId
     ? "Guardar"
     : "Agregar";
-  contenedor.querySelector(".zona-cancelar").hidden = !editandoId;
   ajustarAreaSegunRol();
 }
 
@@ -237,30 +263,33 @@ function ajustarAreaSegunRol() {
   campoArea.disabled = areaFija;
 }
 
-async function empezarEdicion(item) {
+function empezarAlta() {
+  if (contenedor.querySelector(".boton-guardar").disabled) return;
+  cancelarEdicion();
+  formularioAbierto = true;
+  pintarTabla();
+  contenedor.querySelector("#campo-nombres").focus();
+}
+
+function empezarEdicion(item) {
   error = "";
   pintarError();
-
-  try {
-    const detalle = await api.get(`/usuarios/${item.id_usuario}`);
-    editandoId = detalle.id_usuario;
-    nombres = detalle.nombres;
-    apellidos = detalle.apellidos;
-    nombreUsuario = detalle.usuario;
-    contrasenia = "";
-    idArea = String(detalle.id_area);
-    rol = String(detalle.rol);
-    refrescarForm();
-    contenedor.querySelector("form").scrollIntoView({ behavior: "smooth", block: "start" });
-    contenedor.querySelector("#campo-nombres").focus();
-  } catch (e) {
-    error = e.message;
-    pintarError();
-  }
+  formularioAbierto = true;
+  editandoId = item.id_usuario;
+  nombres = item.nombres;
+  apellidos = item.apellidos;
+  nombreUsuario = item.usuario;
+  contrasenia = "";
+  idArea = String(item.id_area);
+  rol = String(item.rol);
+  pintarTabla();
+  refrescarForm();
+  contenedor.querySelector("#campo-nombres").focus();
 }
 
 function cancelarEdicion() {
   editandoId = null;
+  formularioAbierto = false;
   nombres = "";
   apellidos = "";
   nombreUsuario = "";
@@ -270,6 +299,7 @@ function cancelarEdicion() {
   error = "";
   pintarError();
   refrescarForm();
+  pintarTabla();
 }
 
 // La contraseña solo se pide al crear: al editar, su campo está oculto.
@@ -286,7 +316,7 @@ function errorDelFormulario() {
 async function guardar(evento) {
   evento.preventDefault();
   const boton = evento.currentTarget.querySelector(".boton-guardar");
-  if (boton.disabled) return;
+  if (boton.disabled || editandoId === idUsuarioActual) return;
 
   nombres = contenedor.querySelector("#campo-nombres").value;
   apellidos = contenedor.querySelector("#campo-apellidos").value;
