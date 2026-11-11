@@ -181,7 +181,7 @@ function pintarTabla() {
                   ${item.id_usuario === idUsuarioActual
                     ? '<span class="text-body-secondary">Tu cuenta</span>'
                     : `<button type="button" class="btn btn-editar btn-sm" data-accion="editar" data-id="${item.id_usuario}" aria-expanded="${editandoId === item.id_usuario}">Editar</button>
-                       <button type="button" class="btn btn-eliminar btn-sm" data-accion="eliminar" data-id="${item.id_usuario}">Eliminar</button>`}
+                       <button type="button" class="btn btn-eliminar btn-sm" data-accion="eliminar" data-id="${item.id_usuario}">Dar de baja</button>`}
                 </td>`
               : ""
           }
