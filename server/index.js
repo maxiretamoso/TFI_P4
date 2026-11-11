@@ -40,16 +40,26 @@ const origenesPermitidos = (process.env.CLIENT_URL || "")
   .filter(Boolean);
 
 // Swagger se sirve desde la propia API, así que su origen siempre se acepta.
-const origenesPropios = [`http://localhost:${PUERTO}`, `http://127.0.0.1:${PUERTO}`];
+const origenesPropios = [
+  `http://localhost:${PUERTO}`,
+  `http://127.0.0.1:${PUERTO}`,
+];
 
 app.use(
   cors({
     origin(origen, devolver) {
-      if (!origen || origenesPermitidos.length === 0) return devolver(null, true);
-      if (origenesPermitidos.includes(origen) || origenesPropios.includes(origen)) return devolver(null, true);
-      devolver(Object.assign(new Error("Origen no permitido"), { status: 403 }));
+      if (!origen || origenesPermitidos.length === 0)
+        return devolver(null, true);
+      if (
+        origenesPermitidos.includes(origen) ||
+        origenesPropios.includes(origen)
+      )
+        return devolver(null, true);
+      devolver(
+        Object.assign(new Error("Origen no permitido"), { status: 403 }),
+      );
     },
-  })
+  }),
 );
 app.use(express.json());
 app.use(morgan("dev"));
@@ -62,7 +72,9 @@ const limitadorDeLogin = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   skipSuccessfulRequests: true,
-  message: { error: "Demasiados intentos fallidos. Probá de nuevo en 15 minutos." },
+  message: {
+    error: "Demasiados intentos fallidos. Probá de nuevo en 15 minutos.",
+  },
 });
 app.use(`${PREFIJO_API}/auth/login`, limitadorDeLogin);
 
@@ -84,7 +96,11 @@ app.use(`${PREFIJO_API}/dashboard`, rutasDashboard);
 app.use(`${PREFIJO_API}/reportes`, rutasReportes);
 
 app.get("/", (req, res) => {
-  res.json({ api: "Gestión de Incidencias", version: "v1", documentacion: "/api-docs" });
+  res.json({
+    api: "Gestión de Incidencias",
+    version: "v1",
+    documentacion: "/api-docs",
+  });
 });
 
 app.use((req, res) => {
@@ -93,11 +109,15 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   if (err.code === "LIMIT_FILE_SIZE") {
-    return res.status(400).json({ error: "El archivo supera el tamaño máximo de 2 MB" });
+    return res
+      .status(400)
+      .json({ error: "El archivo supera el tamaño máximo de 2 MB" });
   }
   // 23503: violación de clave foránea en PostgreSQL
   if (err.code === "23503") {
-    return res.status(400).json({ error: "Alguno de los ids enviados no existe en la base" });
+    return res
+      .status(400)
+      .json({ error: "Alguno de los ids enviados no existe en la base" });
   }
 
   const status = err.status || 500;
