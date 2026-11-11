@@ -1,4 +1,4 @@
-// Valores de referencia de incidencias_db.sql
+// Valores de referencia
 const AREA_SISTEMAS = 3;
 
 const ROLES = Object.freeze({
@@ -25,4 +25,12 @@ const PRIORIDADES = Object.freeze({
 
 const ZONA_HORARIA = "America/Argentina/Buenos_Aires";
 
-export { AREA_SISTEMAS, ROLES, ESTADOS, SIN_RESOLVER, PRIORIDADES, PRIORIDAD_ALTA, ZONA_HORARIA };
+export {
+  AREA_SISTEMAS,
+  ROLES,
+  ESTADOS,
+  SIN_RESOLVER,
+  PRIORIDADES,
+  PRIORIDAD_ALTA,
+  ZONA_HORARIA,
+};
